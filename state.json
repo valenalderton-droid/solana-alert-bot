@@ -1,3 +1,17 @@
 {
-  "alerts": {}
+  "alerts": {},
+  "pools": {
+    "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE": {
+      "position": "flat",
+      "last_candle": 0
+    },
+    "3ucNos4NbumPLZNWztqGHNFFgkHeRMBQAVemeeomsUxv": {
+      "position": "flat",
+      "last_candle": 0
+    },
+    "5rCf1DM8LjKTw4YqhnoLcngyZYeNnQqztScTogYHAS6": {
+      "position": "flat",
+      "last_candle": 0
+    }
+  }
 }
