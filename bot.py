@@ -1,394 +1,368 @@
-import os
+
 import json
+import os
+import re
 import time
-import traceback
 from datetime import datetime, timezone
 
 import requests
-import numpy as np
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
 
-TOKENS_FILE = "tokens.json"
+API = "https://api.geckoterminal.com/api/v2"
+NETWORK = "solana"
 STATE_FILE = "state.json"
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
 
-BASE_URL = "https://api.geckoterminal.com/api/v2"
-HEADERS = {"accept": "application/json"}
-ALERT_THRESHOLD = 0.65
+MIN_LIQUIDITY = 100_000
+MIN_VOLUME_24H = 500_000
+MAX_POOLS = 12
+
+# فیلتر اولیه؛ تضمین نمی‌کند همه میم‌کوین‌ها حذف شوند.
+MEME_WORDS = re.compile(
+    r"meme|memecoin|doge|pepe|wojak|inu|shib|bonk|"
+    r"\bwif\b|frog|pump.fun|pumpfun|trump|chad|degen",
+    re.I,
+)
+
+HEADERS = {
+    "accept": "application/json;version=20230203",
+    "user-agent": "SolanaPriceActionBot/1.0",
+}
+
+session = requests.Session()
+session.headers.update(HEADERS)
 
 
-def get_json(url, params=None):
-    response = requests.get(
-        url,
-        headers=HEADERS,
-        params=params,
-        timeout=25
+def api(path, params=None):
+    response = session.get(
+        API + path, params=params, timeout=25
     )
     response.raise_for_status()
     return response.json()
 
 
-def send_telegram(text):
-    if not BOT_TOKEN or not CHAT_ID:
-        raise RuntimeError(
-            "TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing"
-        )
+def num(value):
+    try:
+        return float(value or 0)
+    except (TypeError, ValueError):
+        return 0.0
 
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+def telegram(message):
+    if not BOT_TOKEN or not CHAT_ID:
+        raise RuntimeError("Telegram secrets are missing")
+
     response = requests.post(
-        url,
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
         json={
             "chat_id": CHAT_ID,
-            "text": text,
-            "disable_web_page_preview": True
+            "text": message,
+            "disable_web_page_preview": True,
         },
-        timeout=25
+        timeout=25,
     )
     response.raise_for_status()
-    result = response.json()
 
-    if not result.get("ok"):
-        raise RuntimeError(
-            "Telegram rejected the message: " +
-            str(result.get("description", "unknown error"))
-        )
+    if not response.json().get("ok"):
+        raise RuntimeError("Telegram did not accept the message")
 
 
-def load_tokens():
-    with open(TOKENS_FILE, "r", encoding="utf-8") as file:
-        tokens = json.load(file)
-
-    return [
-        token for token in tokens
-        if token.get("enabled", False)
-        and token.get("category") == "project"
-        and token.get("address")
+def discover_pools():
+    # کشف از چند فهرست عمومی؛ این روش شامل تمام توکن‌های
+    # موجود در اکوسیستم سولانا نمی‌شود.
+    endpoints = [
+        "/networks/solana/trending_pools",
+        "/networks/solana/pools",
+        "/networks/solana/new_pools",
     ]
 
+    pools = {}
 
-def find_pool(token_address):
-    url = f"{BASE_URL}/networks/solana/tokens/{token_address}/pools"
-    data = get_json(url, {"page": 1}).get("data", [])
+    for endpoint in endpoints:
+        params = {"page": 1, "include": "base_token"}
+        if endpoint.endswith("/pools"):
+            params["sort"] = "h24_volume_usd_desc"
 
-    candidates = []
-
-    for item in data:
-        attributes = item.get("attributes", {})
         try:
-            liquidity = float(attributes.get("reserve_in_usd") or 0)
-        except (TypeError, ValueError):
-            liquidity = 0
+            data = api(endpoint, params).get("data", [])
 
-        if liquidity >= 50000:
-            candidates.append((liquidity, item))
+            for item in data:
+                attrs = item.get("attributes") or {}
+                address = attrs.get("address")
 
-    if not candidates:
-        raise RuntimeError("No pool found with at least $50,000 liquidity")
+                if address:
+                    pools[address] = attrs
 
-    candidates.sort(key=lambda pair: pair[0], reverse=True)
-    return candidates[0][1]
+        except Exception as exc:
+            print(f"Discovery error: {endpoint}: {exc}")
+
+        time.sleep(1.5)
+
+    return list(pools.values())
 
 
-def get_ohlcv(pool_address):
-    url = (
-        f"{BASE_URL}/networks/solana/pools/"
-        f"{pool_address}/ohlcv/hour"
-    )
-    result = get_json(
-        url,
+def volume_24h(pool):
+    volumes = pool.get("volume_usd") or {}
+    if isinstance(volumes, dict):
+        return num(volumes.get("h24"))
+    return 0.0
+
+
+def eligible(pool):
+    liquidity = num(pool.get("reserve_in_usd"))
+    volume = volume_24h(pool)
+    name = str(pool.get("name") or "")
+
+    if liquidity < MIN_LIQUIDITY:
+        return False
+
+    if volume < MIN_VOLUME_24H:
+        return False
+
+    if MEME_WORDS.search(name):
+        return False
+
+    return True
+
+
+def get_candles(address):
+    result = api(
+        f"/networks/{NETWORK}/pools/{address}/ohlcv/hour",
         {
             "aggregate": 1,
-            "limit": 200,
+            "limit": 100,
             "currency": "usd",
-            "token": "base"
-        }
+            "token": "base",
+        },
     )
 
-    rows = result.get("data", {}).get("attributes", {}).get(
-        "ohlcv_list", []
+    rows = (
+        result.get("data", {})
+        .get("attributes", {})
+        .get("ohlcv_list", [])
     )
 
-    rows = sorted(rows, key=lambda row: row[0])
-
-    if len(rows) < 40:
-        raise RuntimeError(
-            f"Not enough hourly candles: {len(rows)}"
-        )
-
-    # GeckoTerminal row: [timestamp, open, high, low, close, volume]
     candles = []
-    for row in rows:
-        if len(row) < 6:
-            continue
-        candles.append([
-            int(row[0]),
-            float(row[1]),
-            float(row[2]),
-            float(row[3]),
-            float(row[4]),
-            float(row[5])
-        ])
 
-    if len(candles) < 40:
-        raise RuntimeError("Not enough valid candles")
+    for row in rows:
+        if not isinstance(row, list) or len(row) < 6:
+            continue
+
+        try:
+            candles.append({
+                "time": int(row[0]),
+                "open": float(row[1]),
+                "high": float(row[2]),
+                "low": float(row[3]),
+                "close": float(row[4]),
+                "volume": float(row[5]),
+            })
+        except (ValueError, TypeError):
+            continue
+
+    candles.sort(key=lambda candle: candle["time"])
+
+    if len(candles) < 60:
+        return []
 
     return candles
 
 
-def pct_change(current, previous):
-    if not previous:
+def ema(values, period):
+    if len(values) < period:
         return 0.0
-    return (current / previous - 1.0) * 100.0
+
+    alpha = 2 / (period + 1)
+    result = sum(values[:period]) / period
+
+    for value in values[period:]:
+        result = alpha * value + (1 - alpha) * result
+
+    return result
 
 
-def rsi_value(closes, period=14):
-    values = np.asarray(closes, dtype=float)
-    changes = np.diff(values)
+def analyze(candles):
+    # آخرین کندل را حذف می‌کنیم تا کندل ناقص مبنای سیگنال نباشد.
+    candles = candles[:-1]
 
-    if len(changes) < period:
+    if len(candles) < 55:
         return None
 
-    gains = np.maximum(changes, 0)
-    losses = np.maximum(-changes, 0)
+    closes = [c["close"] for c in candles]
+    volumes = [c["volume"] for c in candles]
 
-    avg_gain = np.mean(gains[-period:])
-    avg_loss = np.mean(losses[-period:])
+    last = candles[-1]
+    previous = candles[-21:-1]
 
-    if avg_loss == 0:
-        return 100.0 if avg_gain > 0 else 50.0
-
-    rs = avg_gain / avg_loss
-    return 100.0 - (100.0 / (1.0 + rs))
-
-
-def make_features(candles, index):
-    closes = np.array(
-        [candle[4] for candle in candles[:index + 1]],
-        dtype=float
-    )
-    volumes = np.array(
-        [candle[5] for candle in candles[:index + 1]],
-        dtype=float
-    )
-
-    if len(closes) < 25:
+    if len(previous) < 20:
         return None
 
-    current = closes[-1]
-    r1 = pct_change(current, closes[-2])
-    r3 = pct_change(current, closes[-4])
-    r6 = pct_change(current, closes[-7])
-    r24 = pct_change(current, closes[-25])
+    resistance = max(c["high"] for c in previous)
+    support = min(c["low"] for c in candles[-11:-1])
 
-    ma6 = np.mean(closes[-6:])
-    ma24 = np.mean(closes[-24:])
+    ema20 = ema(closes[-80:], 20)
+    ema50 = ema(closes[-100:], 50)
 
-    volume_mean = np.mean(volumes[-24:])
-    volume_ratio = volumes[-1] / volume_mean if volume_mean else 0
-
-    candle = candles[index]
-    candle_range = (
-        (candle[2] - candle[3]) / current * 100
-        if current else 0
+    avg_volume = sum(volumes[-21:-1]) / 20
+    volume_ratio = (
+        last["volume"] / avg_volume if avg_volume > 0 else 0
     )
 
-    rsi = rsi_value(closes)
-    if rsi is None:
-        rsi = 50.0
-
-    return [
-        r1,
-        r3,
-        r6,
-        r24,
-        (current / ma6 - 1) * 100 if ma6 else 0,
-        (current / ma24 - 1) * 100 if ma24 else 0,
-        rsi,
-        volume_ratio,
-        candle_range
-    ]
-
-
-def model_probability(candles):
-    # Features use completed historical candles only.
-    # Target: close six hours later is at least 1% higher.
-    features = []
-    labels = []
-
-    last_train_index = len(candles) - 7
-
-    for i in range(25, last_train_index):
-        feature = make_features(candles, i)
-        if feature is None:
-            continue
-
-        future_close = candles[i + 6][4]
-        current_close = candles[i][4]
-        label = int(future_close >= current_close * 1.01)
-
-        features.append(feature)
-        labels.append(label)
-
-    if len(features) < 30 or len(set(labels)) < 2:
-        return None, len(features)
-
-    split = int(len(features) * 0.8)
-    if split < 20 or split >= len(features):
-        return None, len(features)
-
-    x_train = np.asarray(features[:split], dtype=float)
-    y_train = np.asarray(labels[:split], dtype=int)
-
-    model = Pipeline([
-        ("scale", StandardScaler()),
-        ("classifier", LogisticRegression(
-            max_iter=1000,
-            class_weight="balanced"
-        ))
-    ])
-
-    model.fit(x_train, y_train)
-
-    latest_feature = make_features(candles, len(candles) - 1)
-    if latest_feature is None:
-        return None, len(features)
-
-    probability = float(
-        model.predict_proba([latest_feature])[0][
-            list(model.named_steps["classifier"].classes_).index(1)
-        ]
+    change_6h = (
+        (last["close"] / closes[-7] - 1) * 100
+        if closes[-7] > 0 else 0
     )
 
-    # This is an exploratory estimate, not a calibrated forecast.
-    return probability, len(features)
+    change_24h = (
+        (last["close"] / closes[-25] - 1) * 100
+        if closes[-25] > 0 else 0
+    )
 
-
-def analyze_token(token):
-    symbol = token.get("symbol", "UNKNOWN")
-    address = token["address"]
-
-    pool = find_pool(address)
-    pool_attributes = pool.get("attributes", {})
-    pool_address = pool_attributes.get("address")
-
-    if not pool_address:
-        raise RuntimeError("Pool address missing from API response")
-
-    candles = get_ohlcv(pool_address)
-    closes = [candle[4] for candle in candles]
-
-    current_price = closes[-1]
-    change_1h = pct_change(closes[-1], closes[-2])
-    change_6h = pct_change(closes[-1], closes[-7])
-    change_24h = pct_change(closes[-1], closes[-25])
-
-    probability, sample_count = model_probability(candles)
-
-    if probability is None:
-        signal = "اطلاعات کافی برای مدل وجود ندارد"
-    elif (
-        probability >= ALERT_THRESHOLD
-        and change_1h > 0
+    buy = (
+        last["close"] > resistance
+        and last["close"] > ema20 > ema50
+        and volume_ratio >= 1.3
         and change_6h > 0
-    ):
-        signal = "شرایط هشدار اولیه برقرار است"
-    else:
-        signal = "فعلاً هشدار خرید صادر نشده"
+    )
+
+    sell = (
+        last["close"] < support
+        or (last["close"] < ema20 and change_6h < 0)
+    )
 
     return {
-        "symbol": symbol,
-        "price": current_price,
-        "change_1h": change_1h,
+        "time": last["time"],
+        "price": last["close"],
+        "support": support,
+        "resistance": resistance,
+        "volume_ratio": volume_ratio,
         "change_6h": change_6h,
         "change_24h": change_24h,
-        "probability": probability,
-        "sample_count": sample_count,
-        "signal": signal,
-        "liquidity": pool_attributes.get("reserve_in_usd", "نامشخص"),
-        "pool_address": pool_address,
-        "candle_time": candles[-1][0]
+        "buy": buy,
+        "sell": sell,
     }
 
 
-def format_report(result):
-    probability = result["probability"]
+def load_state():
+    try:
+        with open(STATE_FILE, encoding="utf-8") as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"pools": {}}
 
-    if probability is None:
-        probability_text = "قابل محاسبه نیست"
-    else:
-        probability_text = f"{probability * 100:.1f}%"
 
+def save_state(state):
+    with open(STATE_FILE, "w", encoding="utf-8") as file:
+        json.dump(state, file, ensure_ascii=False, indent=2)
+
+
+def format_alert(pool, signal, result):
+    name = pool.get("name") or "Unknown token"
     candle_time = datetime.fromtimestamp(
-        result["candle_time"],
-        tz=timezone.utc
+        result["time"], timezone.utc
     ).strftime("%Y-%m-%d %H:%M UTC")
 
+    if signal == "BUY":
+        title = "🟢 هشدار خرید احتمالی"
+        reason = "شکست مقاومت با روند صعودی و افزایش حجم"
+    else:
+        title = "🔴 هشدار فروش/خروج"
+        reason = "ضعف روند یا شکست حمایت کوتاه‌مدت"
+
+    address = pool.get("address", "")
+    chart = f"https://www.geckoterminal.com/solana/pools/{address}"
+
     return (
-        f"📊 گزارش توکن {result['symbol']}\n\n"
-        f"💵 قیمت آخرین کندل ساعتی: ${result['price']:.8g}\n"
-        f"🕐 تغییر ۱ ساعته: {result['change_1h']:+.2f}%\n"
-        f"🕕 تغییر ۶ ساعته: {result['change_6h']:+.2f}%\n"
-        f"📅 تغییر ۲۴ ساعته: {result['change_24h']:+.2f}%\n"
-        f"🤖 احتمال تخمینی رشد حداقل ۱٪ طی ۶ ساعت: {probability_text}\n"
-        f"🧪 تعداد نمونه‌های مدل: {result['sample_count']}\n"
-        f"💧 نقدینگی استخر: ${float(result['liquidity'] or 0):,.0f}\n"
-        f"📍 وضعیت: {result['signal']}\n"
-        f"🕒 زمان آخرین کندل: {candle_time}\n\n"
-        "⚠️ این گزارش توصیه مالی نیست؛ احتمال مدل تضمین سود نیست."
+        f"{title}\n"
+        f"استخر: {name}\n"
+        f"قیمت: ${result['price']:.8g}\n"
+        f"حمایت مرجع: ${result['support']:.8g}\n"
+        f"مقاومت مرجع: ${result['resistance']:.8g}\n"
+        f"تغییر ۶ ساعت: {result['change_6h']:+.2f}%\n"
+        f"تغییر ۲۴ ساعت: {result['change_24h']:+.2f}%\n"
+        f"حجم نسبت به میانگین: {result['volume_ratio']:.2f}x\n"
+        f"دلیل: {reason}\n"
+        f"زمان کندل: {candle_time}\n"
+        f"نمودار: {chart}\n"
+        "هشدار احتمالی است و تضمین سود نیست."
     )
 
 
 def main():
-    tokens = load_tokens()
+    state = load_state()
+    state.setdefault("pools", {})
 
-    if not tokens:
-        raise RuntimeError(
-            "No enabled project tokens found in tokens.json"
-        )
+    discovered = discover_pools()
+    candidates = [p for p in discovered if eligible(p)]
 
-    # Send a start message so a run never stays silent.
-    send_telegram(
-        "🔎 ربات تحقیق سولانا شروع به کار کرد.\n"
-        f"تعداد توکن‌های فعال: {len(tokens)}"
+    candidates.sort(
+        key=lambda p: (
+            num(p.get("reserve_in_usd"))
+            * max(volume_24h(p), 1)
+        ),
+        reverse=True,
     )
 
-    errors = []
+    candidates = candidates[:MAX_POOLS]
+    print(
+        f"Discovered {len(discovered)} pools; "
+        f"analyzing {len(candidates)}."
+    )
 
-    for token in tokens:
-        symbol = token.get("symbol", "UNKNOWN")
+    for pool in candidates:
+        address = pool.get("address")
+        if not address:
+            continue
 
         try:
-            result = analyze_token(token)
-            send_telegram(format_report(result))
-        except Exception as error:
-            error_text = (
-                f"⚠️ تحلیل {symbol} ناموفق بود.\n"
-                f"نوع خطا: {type(error).__name__}\n"
-                f"جزئیات: {str(error)[:700]}"
+            candles = get_candles(address)
+            result = analyze(candles)
+
+            if not result:
+                continue
+
+            entry = state["pools"].setdefault(
+                address,
+                {"position": "flat", "last_candle": 0},
             )
-            errors.append(symbol)
-            try:
-                send_telegram(error_text)
-            except Exception:
-                print("Could not send Telegram error report for", symbol)
-            print("Analysis error for", symbol, ":", repr(error))
 
-        time.sleep(2)
+            if result["time"] <= int(entry["last_candle"]):
+                continue
 
-    if errors:
-        print("Tokens with errors:", ", ".join(errors))
-    else:
-        print("All enabled tokens processed.")
+            signal = None
+
+            if result["buy"] and entry["position"] != "long":
+                signal = "BUY"
+            elif result["sell"] and entry["position"] == "long":
+                signal = "SELL"
+
+            if signal:
+                telegram(format_alert(pool, signal, result))
+
+                entry["position"] = (
+                    "long" if signal == "BUY" else "flat"
+                )
+                entry["last_candle"] = result["time"]
+
+                # Save after a successful Telegram send.
+                save_state(state)
+                print(f"Sent {signal}: {pool.get('name')}")
+
+            time.sleep(1.5)
+
+        except Exception as exc:
+            # خطاها فقط در لاگ GitHub ثبت می‌شوند.
+            print(
+                f"Skipped {address}: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            time.sleep(1.5)
+
+    save_state(state)
+    print("Finished. No routine Telegram reports sent.")
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as error:
-        print("FATAL ERROR:", repr(error))
-        traceback.print_exc()
-        raise
+    main()
+
