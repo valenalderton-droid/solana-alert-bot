@@ -24,6 +24,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Test Telegram connection
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -c 'import os,requests; r=requests.post("https://api.telegram.org/bot"+os.environ["TELEGRAM_BOT_TOKEN"]+"/sendMessage",json={"chat_id":os.environ["TELEGRAM_CHAT_ID"],"text":"آزمایش اتصال ربات سولانا موفق بود."},timeout=20); print(r.status_code,r.json()); r.raise_for_status(); assert r.json().get("ok"), "Telegram rejected the message"'
+
       - name: Run research bot
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -31,6 +38,7 @@ jobs:
         run: python bot.py
 
       - name: Save state
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
