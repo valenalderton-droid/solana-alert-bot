@@ -1,3 +1,4 @@
+
 name: Solana Project Research Bot
 
 on:
@@ -8,13 +9,20 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: solana-alert-bot
+  cancel-in-progress: false
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
-      - name: Get repository files
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -24,23 +32,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Test Telegram connection
+      - name: Run Solana analysis
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          python -c 'import os,requests; r=requests.post("https://api.telegram.org/bot"+os.environ["TELEGRAM_BOT_TOKEN"]+"/sendMessage",json={"chat_id":os.environ["TELEGRAM_CHAT_ID"],"text":"آزمایش اتصال ربات سولانا موفق بود."},timeout=20); print(r.status_code,r.json()); r.raise_for_status(); assert r.json().get("ok"), "Telegram rejected the message"'
+          PYTHONUNBUFFERED: "1"
+        run: python -u bot.py
 
-      - name: Run research bot
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python bot.py
-
-      - name: Save state
-        if: always()
+      - name: Save alert state
+        if: success()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state.json
-          git diff --cached --quiet || (git commit -m "Update bot state" && git push)
+          if ! git diff --cached --quiet; then
+            git commit -m "Update alert state [skip ci]"
+            git push origin HEAD:main
+          fi
