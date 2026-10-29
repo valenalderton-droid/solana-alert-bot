@@ -4,6 +4,7 @@ import os
 import re
 from datetime import datetime, timezone
 import requests
+import time
 
 STATE_FILE = "data/state.json"
 
@@ -25,17 +26,57 @@ def save_state(state):
 
 
 def telegram_send(token, chat_id, text):
-    """Send a Telegram message and fail loudly if Telegram rejects it."""
-    response = requests.post(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        json={"chat_id": chat_id, "text": text, "disable_web_page_preview": True},
-        timeout=20,
-    )
-    response.raise_for_status()
-    payload = response.json()
-    if not payload.get("ok"):
-        raise RuntimeError(f"Telegram sendMessage failed: {payload}")
-    return True
+    """Send a Telegram message with bounded retries for transient failures."""
+    token = str(token or "").strip()
+    chat_id = str(chat_id or "").strip()
+    if not token or not chat_id:
+        raise RuntimeError(
+            "Telegram credentials are missing: configure TELEGRAM_BOT_TOKEN "
+            "and TELEGRAM_CHAT_ID in GitHub Actions secrets."
+        )
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {"chat_id": chat_id, "text": str(text), "disable_web_page_preview": True}
+    last_error = None
+
+    for attempt in range(3):
+        try:
+            response = requests.post(url, json=payload, timeout=20)
+            # Retry only transient server/rate-limit failures. Invalid credentials,
+            # blocked bots, and invalid chat IDs need configuration fixes instead.
+            if response.status_code == 429 or response.status_code >= 500:
+                last_error = RuntimeError(
+                    f"Telegram temporary HTTP error {response.status_code}: "
+                    f"{getattr(response, 'text', '')[:300]}"
+                )
+                if attempt < 2:
+                    retry_after = 1
+                    try:
+                        retry_after = int(response.json().get("parameters", {}).get("retry_after", 1))
+                    except (ValueError, TypeError, AttributeError):
+                        pass
+                    time.sleep(min(max(retry_after, 1), 5))
+                    continue
+                raise last_error
+
+            response.raise_for_status()
+            result = response.json()
+            if not result.get("ok"):
+                error_code = int(result.get("error_code", 0) or 0)
+                message = result.get("description", "unknown Telegram API error")
+                if (error_code == 429 or error_code >= 500) and attempt < 2:
+                    last_error = RuntimeError(f"Telegram API temporary error {error_code}: {message}")
+                    time.sleep(1 + attempt)
+                    continue
+                raise RuntimeError(f"Telegram sendMessage failed ({error_code}): {message}")
+            return True
+        except requests.RequestException as exc:
+            last_error = exc
+            if attempt >= 2:
+                raise RuntimeError(f"Telegram network request failed after 3 attempts: {exc}") from exc
+            time.sleep(1 + attempt)
+
+    raise RuntimeError(f"Telegram sendMessage failed after retries: {last_error}")
 
 
 def poll_pay(state):
