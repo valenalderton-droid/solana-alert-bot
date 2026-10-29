@@ -83,16 +83,24 @@ def _audit_cores(system, core_specs, civ, timestamp):
             strikes = police.setdefault("strikes", {})
             strikes[core_id] = int(strikes.get(core_id, 0)) + 1
             if strikes[core_id] >= POLICE_SUSPEND_AFTER:
-                until = civ["scan_count"] + SUSPENSION_SCANS
-                police.setdefault("suspended_until", {})[core_id] = max(
-                    int(police["suspended_until"].get(core_id, 0)), until)
-                incident["action"] = "temporary_suspension"
-                incident["suspended_until_scan"] = until
-                civ["court"].setdefault("appeals", []).append({
-                    "core_id": core_id, "filed_scan": civ["scan_count"],
-                    "reason": "automatic appeal against temporary suspension",
-                    "status": "pending", "evidence_finding": finding,
-                })
+                suspended_until = police.setdefault("suspended_until", {})
+                current_until = int(suspended_until.get(core_id, 0) or 0)
+                if civ["scan_count"] >= current_until:
+                    until = civ["scan_count"] + SUSPENSION_SCANS
+                    suspended_until[core_id] = until
+                    incident["action"] = "temporary_suspension"
+                    incident["suspended_until_scan"] = until
+                    pending_exists = any(a.get("core_id") == core_id and a.get("status") == "pending"
+                                         for a in civ["court"].get("appeals", []))
+                    if not pending_exists:
+                        civ["court"].setdefault("appeals", []).append({
+                            "core_id": core_id, "filed_scan": civ["scan_count"],
+                            "reason": "automatic appeal against temporary suspension",
+                            "status": "pending", "evidence_finding": finding,
+                        })
+                else:
+                    incident["action"] = "suspension_continues_under_review"
+
     police["incidents"] = police.get("incidents", [])[-200:]
 
 
@@ -211,7 +219,12 @@ def _update_economy_and_academy(system, civ, timestamp):
             economy["virtual_treasury_usd"] = round(_num(economy.get("virtual_treasury_usd")) + tax, 4)
             economy["tax_revenue_usd"] = round(_num(economy.get("tax_revenue_usd")) + tax, 4)
             stats["trades"] += 1
-            stats["wins" if pnl > 0 else "losses"] += 1
+            if pnl > 0:
+                stats["wins"] += 1
+            elif pnl < 0:
+                stats["losses"] += 1
+            else:
+                stats["breakeven"] = int(stats.get("breakeven", 0)) + 1
             stats["net_pnl_usd"] = round(_num(stats.get("net_pnl_usd")) + pnl, 4)
             academy.setdefault("lessons", []).append({
                 "at": timestamp, "core_id": core_id,
