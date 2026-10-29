@@ -52,7 +52,7 @@ def poll_pay(state):
             if str(chat.get("id", "")) != chat_id:
                 continue
             command = str(message.get("text", "")).strip()
-            if re.fullmatch(r"/{1,2}pay(?:@\w+)?", command, flags=re.IGNORECASE):
+            if command == "//Pay":
                 requested = True
         save_state(state)
         return requested
