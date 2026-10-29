@@ -12,7 +12,10 @@ FEATURES = [
     "volatility_ratio", "volume_ratio", "volume_trend",
     "body_pct", "range_pct", "close_location", "breakout_distance",
     "price_vs_ema21", "rsi_short", "upper_wick_pct", "lower_wick_pct",
-    "high_distance24", "low_distance24", "trend_persistence"
+    "high_distance24", "low_distance24", "trend_persistence",
+    "ret48", "ema_gap50", "price_vs_ema50", "trend_persistence24",
+    "volatility_regime", "volume_zscore", "momentum_consistency",
+    "drawdown24", "close_location_avg3"
 ]
 
 
@@ -25,16 +28,20 @@ def add_features(candles):
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
     close = df["close"]
-    for n in [1, 3, 6, 12, 24]:
+    for n in [1, 3, 6, 12, 24, 48]:
         df[f"ret{n}"] = close.pct_change(n)
 
     ema9 = close.ewm(span=9, adjust=False).mean()
     ema21 = close.ewm(span=21, adjust=False).mean()
     ema34 = close.ewm(span=34, adjust=False).mean()
+    ema50 = close.ewm(span=50, adjust=False).mean()
     df["ema_gap"] = (ema9 / ema21) - 1
     df["ema_gap34"] = (ema9 / ema34) - 1
     df["price_vs_ema21"] = (close / ema21) - 1
+    df["ema_gap50"] = (ema21 / ema50) - 1
+    df["price_vs_ema50"] = (close / ema50) - 1
     df["trend_persistence"] = (close > ema21).rolling(12).mean()
+    df["trend_persistence24"] = (close > ema21).rolling(24).mean()
 
     delta = close.diff()
     gain = delta.clip(lower=0).rolling(14).mean()
@@ -56,16 +63,21 @@ def add_features(candles):
     df["atr_pct"] = tr.rolling(14).mean() / close
     atr_baseline = df["atr_pct"].rolling(48, min_periods=24).median()
     df["volatility_ratio"] = df["atr_pct"] / atr_baseline.replace(0, np.nan)
+    df["volatility_regime"] = df["atr_pct"] / df["atr_pct"].rolling(168, min_periods=48).median().replace(0, np.nan)
 
     vol_avg = df["volume"].rolling(20).mean()
     df["volume_ratio"] = df["volume"] / vol_avg.replace(0, np.nan)
     prior_vol_avg = df["volume"].shift(5).rolling(20).mean()
     df["volume_trend"] = vol_avg / prior_vol_avg.replace(0, np.nan) - 1
+    volume_std = df["volume"].rolling(48, min_periods=24).std().replace(0, np.nan)
+    df["volume_zscore"] = (df["volume"] - df["volume"].rolling(48, min_periods=24).mean()) / volume_std
 
     df["body_pct"] = (df["close"] - df["open"]) / close
     df["range_pct"] = (df["high"] - df["low"]) / close
     candle_range = (df["high"] - df["low"]).replace(0, np.nan)
     df["close_location"] = (df["close"] - df["low"]) / candle_range
+    df["close_location_avg3"] = df["close_location"].rolling(3).mean()
+    df["momentum_consistency"] = (df["ret1"] > 0).rolling(12).mean()
     df["upper_wick_pct"] = (df["high"] - df[["open", "close"]].max(axis=1)) / candle_range
     df["lower_wick_pct"] = (df[["open", "close"]].min(axis=1) - df["low"]) / candle_range
     prior_high = df["high"].shift(1).rolling(20).max()
@@ -74,6 +86,7 @@ def add_features(candles):
     df["breakout_distance"] = close / prior_high - 1
     df["high_distance24"] = close / prior_high24 - 1
     df["low_distance24"] = close / prior_low24 - 1
+    df["drawdown24"] = close / prior_high24 - 1
 
     return df.replace([np.inf, -np.inf], np.nan)
 
@@ -365,7 +378,9 @@ def price_action_ok(candles, row):
     prior_high = float(df.iloc[-21:-1]["high"].max())
     uptrend = float(row["ema_gap"]) > 0 and float(row["ret6"]) > 0
     above_trend = float(row.get("price_vs_ema21", -1)) > 0
+    above_medium_trend = float(row.get("price_vs_ema50", -1)) > 0
     trend_persistence = float(row.get("trend_persistence", 0)) >= 0.55
+    medium_persistence = float(row.get("trend_persistence24", 0)) >= 0.50
     breakout = close > prior_high
     rsi = float(row["rsi"])
     close_location = float(row.get("close_location", 0.5))
@@ -374,8 +389,8 @@ def price_action_ok(candles, row):
 
     if not uptrend:
         return False, "Trend is not bullish"
-    if not above_trend or not trend_persistence:
-        return False, "Price is not holding above a persistent EMA21 trend"
+    if not above_trend or not trend_persistence or not above_medium_trend or not medium_persistence:
+        return False, "Price is not holding above persistent short- and medium-term trends"
     if not (0.35 <= rsi <= 0.78):
         return False, "RSI outside the selected range"
     if not breakout and (close_location < 0.50 or upper_wick > 0.65):
