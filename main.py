@@ -365,6 +365,39 @@ def get_closed_candles(raw_candles):
     ]
 
 
+def recent_cached_position_market_info(address, store, now=None, max_age_hours=3.0):
+    """Return recent cached candles for exit monitoring only, never for fresh entries."""
+    now = now or datetime.now(timezone.utc)
+    current_hour = int(now.timestamp() // 3600) * 3600
+    cached = sorted(
+        (store.get(address) or {}).values(),
+        key=lambda candle: int(candle.get("timestamp", 0))
+    )
+    if len(cached) < 35:
+        return None
+    latest_ts = int(cached[-1].get("timestamp", 0) or 0)
+    if latest_ts <= 0:
+        return None
+    age_hours = (current_hour - latest_ts) / 3600
+    if age_hours < 0 or age_hours > max_age_hours:
+        return None
+    try:
+        price = float(cached[-1]["close"])
+        if not math.isfinite(price) or price <= 0:
+            return None
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return None
+    return {
+        "pair": None,
+        "candles": cached,
+        "price": price,
+        "liquidity": 0.0,
+        "volume24h": 0.0,
+        "data_is_cached": True,
+        "candle_age_hours": round(age_hours, 2),
+    }
+
+
 def select_projects_for_scan(projects, cursor=0, max_projects=5, always_include_addresses=None):
     """Rotate through the project universe while always monitoring open positions."""
     projects = list(projects or [])
@@ -836,6 +869,17 @@ def main():
             if not pair:
                 scan_diagnostics["no_eligible_pair"] += 1
                 print(f"No eligible liquid Solana pair: {project.get('name')}")
+                # Keep monitoring exits from a recent cached candle history if a
+                # position is already open. Cached data is never used for new entries.
+                if address in open_position_addresses:
+                    cached_info = recent_cached_position_market_info(address, store)
+                    if cached_info:
+                        market_info[address] = cached_info
+                        scan_diagnostics["cached_fallbacks"] += 1
+                        print(
+                            f"Exit-only cached fallback for {project.get('name')}; "
+                            f"latest candle age={cached_info['candle_age_hours']:.2f}h."
+                        )
                 continue
 
             pool_address = pair.get("pairAddress")
@@ -895,6 +939,15 @@ def main():
             cached_latest = int(cached[-1].get("timestamp", 0)) if cached else 0
             current_hour = int(datetime.now(timezone.utc).timestamp() // 3600) * 3600
             cached_age_hours = (current_hour - cached_latest) / 3600 if cached_latest else float("inf")
+            if address in open_position_addresses:
+                cached_position_info = recent_cached_position_market_info(address, store)
+                if cached_position_info:
+                    market_info[address] = cached_position_info
+                    scan_diagnostics["cached_fallbacks"] += 1
+                    print(
+                        f"Exit-only cached fallback for {project.get('name')} after market-data "
+                        f"error; latest candle age={cached_position_info['candle_age_hours']:.2f}h."
+                    )
             if (
                 pair is not None and len(cached) >= 65
                 and 0 <= cached_age_hours <= 3
@@ -913,7 +966,7 @@ def main():
                     f"Using recent cached candles for {project.get('name')} "
                     f"after market-data error; candle age={cached_age_hours:.1f}h."
                 )
-            else:
+            elif address not in open_position_addresses or not market_info.get(address):
                 print(f"Market data error for {project.get('name')}: {exc}")
 
     save_candle_store(store)
