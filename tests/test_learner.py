@@ -26,6 +26,37 @@ class LearnerTests(unittest.TestCase):
         numeric = features.select_dtypes(include=[np.number])
         self.assertTrue(np.isfinite(numeric.to_numpy()[~np.isnan(numeric.to_numpy())]).all())
 
+    def test_rsi_handles_zero_losses_in_a_rising_market(self):
+        candles = []
+        for i in range(90):
+            close = 100.0 + i
+            candles.append({
+                "timestamp": 1_800_000_000 + i * 3600,
+                "open": close - 0.2,
+                "high": close + 1.0,
+                "low": close - 1.0,
+                "close": close,
+                "volume": 1000.0 + i * 7.0,
+            })
+        features = add_features(candles)
+        self.assertAlmostEqual(float(features["rsi"].iloc[-1]), 1.0, places=8)
+        self.assertAlmostEqual(float(features["rsi_short"].iloc[-1]), 1.0, places=8)
+
+    def test_rsi_is_neutral_when_price_is_flat(self):
+        candles = []
+        for i in range(90):
+            candles.append({
+                "timestamp": 1_800_000_000 + i * 3600,
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1000.0 + i * 7.0,
+            })
+        features = add_features(candles)
+        self.assertAlmostEqual(float(features["rsi"].iloc[-1]), 0.5, places=8)
+        self.assertAlmostEqual(float(features["rsi_short"].iloc[-1]), 0.5, places=8)
+
     def test_new_price_action_features_are_available(self):
         features = add_features(make_flat_candles(240))
         for name in ("ret24", "ema_gap34", "volatility_ratio",
