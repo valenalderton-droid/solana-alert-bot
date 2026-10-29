@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T17:12:14.410484+00:00",
+  "last_run_utc": "2026-10-29T17:14:01.560945+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -52,7 +52,8 @@
     "bde8d79a7a48a9d1160c0f5d",
     "7b30382e5f6ad2c9b2941c05",
     "df88323fd10d22bda867d4b4",
-    "35370c379c51383ec9b12d7e"
+    "35370c379c51383ec9b12d7e",
+    "194df542048be2e423f23fc8"
   ],
   "news_observations": [
     {
@@ -653,13 +654,25 @@
       "title": "Fed Holds Interest Rates at 3.75% - 4.00%: What it Means for Bitcoin and Crypto Markets - Altcoin Buzz",
       "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNR29xMUxnMUtQSnZVNk5LVjYzYlBWamdidWhFRndqbkhIRjNDLTZfT1l0QVJScUljMW9hREVBMFgtbTVuYXN0WXlSM1JLQnJKWDhaVTA0R2dET1ZMM05KbzhmS0JNVjBqMmdsdzRhb1RLbGdZZjRfdmpjN1RPU0ZMYXVueUpqUnVjbldndA?oc=5",
       "research_topic": "macro"
+    },
+    {
+      "observed_at": "2026-10-29T17:13:18.809956+00:00",
+      "published_at": "2026-10-29T08:02:00+00:00",
+      "sentiment": "BEARISH",
+      "impact_score": -2,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline suggests a risk, delay, selling pressure or a negative catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: BEARISH (rule score -2/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: immediate to days; risk can persist if confirmed\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: inflation. This is a headline-based heuristic, not full-article verification.",
+      "title": "Bitcoin Price Outlook 2027: How Inflation and Interest Rates Could Affect Crypto Markets - KuCoin",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQbGVFb2hHaHlyWVpyQUJuanRVeVMxY19rUTBrZFd4emczWmMwN1ljd3ZvNjByTlhhZG9kUW5pd0UxV2sxUTBWa1A4WS1IU1lRNU9wZHVfVDZaQWhDR19qUGhUV2RPeVNRcE5tby14Y3hENVI2NGQ5dTYzbXhCVDJLOTZrR2VBZmpGY1hxNThfazJrUWRpNThmS1lhTkh6WXNYMUx1bWtEYk44VDE1SWFNOTRoV3c3dw?oc=5"
     }
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T17:10:21.621996+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T17:12:13.985494+00:00",
-  "project_scan_cursor": 43,
+  "last_news_refresh_utc": "2026-10-29T17:13:18.810009+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T17:14:01.092234+00:00",
+  "project_scan_cursor": 73,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
@@ -1068,6 +1081,16 @@
       "entry": 4.491387711180092,
       "stop": 4.406405391016449,
       "target": 4.661352351507379
+    },
+    {
+      "signal_id": "4QsNTBKwHgyYUUHq9tDzk1CCVu7y5hK7z3GE9R36pump:1793289600:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "4QsNTBKwHgyYUUHq9tDzk1CCVu7y5hK7z3GE9R36pump",
+      "name": "nub",
+      "timestamp": 1793289600,
+      "entry": 0.0024802287278724816,
+      "stop": 0.0023979866848202096,
+      "target": 0.0026447128139770256
     }
   ]
 }
