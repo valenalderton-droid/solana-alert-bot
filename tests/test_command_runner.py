@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import command_runner
+import main as scanner
 
 
 class CommandRunnerTests(unittest.TestCase):
@@ -117,6 +118,27 @@ class CommandRunnerTests(unittest.TestCase):
         self.assertIn("Example (EXM)", reply)
         self.assertIn("خرید: $1.25", reply)
         self.assertNotEqual(reply, "NO_SETUP")
+
+    def test_scan_rotation_covers_universe_without_duplicates(self):
+        projects = [{"token_address": f"mint-{i}"} for i in range(10)]
+        first, cursor = scanner.select_projects_for_scan(projects, cursor=0, max_projects=5)
+        second, next_cursor = scanner.select_projects_for_scan(projects, cursor=cursor, max_projects=5)
+        first_addresses = [p["token_address"] for p in first]
+        second_addresses = [p["token_address"] for p in second]
+        self.assertEqual(len(first_addresses), len(set(first_addresses)))
+        self.assertEqual(len(second_addresses), len(set(second_addresses)))
+        self.assertEqual(set(first_addresses + second_addresses), {p["token_address"] for p in projects})
+        self.assertEqual(next_cursor, 0)
+
+    def test_scan_rotation_always_includes_open_positions(self):
+        projects = [{"token_address": f"mint-{i}"} for i in range(8)]
+        selected, _ = scanner.select_projects_for_scan(
+            projects, cursor=0, max_projects=3,
+            always_include_addresses={"mint-7"}
+        )
+        addresses = [p["token_address"] for p in selected]
+        self.assertEqual(len(addresses), 4)
+        self.assertIn("mint-7", addresses)
 
     def test_watchlist_status_is_not_misclassified_as_buy(self):
         message = "SOLANA TOP WATCHLIST — NO VALID BUY SETUP\\nThis is NOT a buy signal."
