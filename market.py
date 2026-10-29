@@ -1,5 +1,8 @@
 
 import requests
+import json
+import os
+from pathlib import Path
 from datetime import datetime, timezone
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -154,10 +157,39 @@ def is_allowed_non_meme_project(project):
     return True
 
 
+DISCOVERY_CACHE_FILE = Path(__file__).resolve().parent / "data" / "discovery_cache.json"
+
+
 def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
                              min_age_days=30, max_projects=20):
-    """Find liquid, mature Solana pairs for a conservative curated token universe."""
+    """Discover candidates with a disk cache to avoid repeated API bursts."""
     found = {}
+    filters = {
+        "min_liquidity": float(min_liquidity),
+        "min_volume_24h": float(min_volume_24h),
+        "min_age_days": int(min_age_days),
+        "max_projects": int(max_projects),
+    }
+    cache_ttl_minutes = max(0, int(os.getenv("DISCOVERY_CACHE_TTL_MINUTES", "45")))
+    cached_projects = []
+    try:
+        cache = json.loads(DISCOVERY_CACHE_FILE.read_text(encoding="utf-8"))
+        if cache.get("filters") == filters and isinstance(cache.get("projects"), list):
+            cached_projects = cache["projects"]
+            cached_at = datetime.fromisoformat(
+                str(cache.get("saved_at", "")).replace("Z", "+00:00")
+            )
+            if cached_at.tzinfo is None:
+                cached_at = cached_at.replace(tzinfo=timezone.utc)
+            age_seconds = (datetime.now(timezone.utc) - cached_at.astimezone(timezone.utc)).total_seconds()
+            if cached_projects and cache_ttl_minutes > 0 and 0 <= age_seconds < cache_ttl_minutes * 60:
+                print(
+                    f"Discovery cache hit: {len(cached_projects)} projects; "
+                    f"age={age_seconds / 60:.1f} min."
+                )
+                return cached_projects[:max_projects]
+    except (OSError, ValueError, TypeError, AttributeError):
+        cached_projects = []
     now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     counts = {"queries": 0, "pairs_seen": 0, "wrong_chain": 0,
               "symbol_rejected": 0, "liquidity_volume_age_rejected": 0}
@@ -220,4 +252,21 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
         project.pop("_score", None)
     print("Discovery diagnostics: " + str(counts))
     print(f"Automatic discovery found {len(projects)} eligible Solana projects.")
+    if projects:
+        try:
+            DISCOVERY_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+            DISCOVERY_CACHE_FILE.write_text(
+                json.dumps({
+                    "saved_at": datetime.now(timezone.utc).isoformat(),
+                    "filters": filters,
+                    "projects": projects[:max_projects],
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8"
+            )
+        except OSError as exc:
+            print(f"Discovery cache write failed: {exc}")
+    elif cached_projects:
+        # API outages/rate limits should not erase a previously known universe.
+        print(f"Discovery returned no projects; using {len(cached_projects)} cached candidates as fallback.")
+        return cached_projects[:max_projects]
     return projects[:max_projects]
