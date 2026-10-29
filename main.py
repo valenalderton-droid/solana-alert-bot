@@ -617,7 +617,6 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
                 "بهترین پروژه قابل رتبه‌بندی این نوبت (نه الزاماً برنده آینده): "
                 f"{project.get('name', 'Unknown')} ({project.get('symbol', '')})\n"
                 f"رتبه امتیازی: {score:.1f}؛ امتیاز استراتژی: {ensemble.get('score', 0)}/100 (احتمال برد نیست)\n"
-                f"قیمت مرجع فعلی: ${price:.8g}\n"
                 f"نقدینگی: ${float(info.get('liquidity') or 0):,.0f}\n"
                 f"حجم ۲۴ ساعته: ${float(info.get('volume24h') or 0):,.0f}\n"
                 + exit_lines
