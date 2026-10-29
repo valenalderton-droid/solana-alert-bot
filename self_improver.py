@@ -270,12 +270,103 @@ def diagnose_failure_modes(predictions, outcomes, min_group_size=3):
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
 
+EXPERIENCE_RULE_DEFINITIONS = {
+    "avoid_entry_chase": {
+        "tag": "entry_chase", "field": "entry_deviation_pct", "operator": "gte",
+        "value": 2.0, "reason": "Repeated losing outcomes after chasing a moved price"
+    },
+    "avoid_thin_liquidity": {
+        "tag": "thin_liquidity", "field": "liquidity_usd", "operator": "lt",
+        "value": 250000.0, "reason": "Repeated losses in thin-liquidity pools"
+    },
+    "avoid_low_volume": {
+        "tag": "low_volume", "field": "volume_24h_usd", "operator": "lt",
+        "value": 250000.0, "reason": "Repeated losses in low-volume markets"
+    },
+    "avoid_weak_ensemble": {
+        "tag": "weak_ensemble", "field": "ensemble_score", "operator": "lt",
+        "value": 65.0, "reason": "Repeated losses when strategy agreement is weak"
+    },
+    "avoid_lower_probability": {
+        "tag": "lower_probability", "field": "probability", "operator": "lt",
+        "value": 0.65, "reason": "Repeated losses on lower-confidence model signals"
+    },
+    "avoid_weak_quality": {
+        "tag": "weak_quality", "field": "quality_score", "operator": "lt",
+        "value": 70.0, "reason": "Repeated losses on weak-quality setups"
+    }
+}
+
+
+def build_experience_rules(diagnostics, minimum_samples=12,
+                           maximum_negative_rate=0.70):
+    """Derive auditable candidate filters from repeated resolved outcomes.
+
+    These are strategy-level rules only. They cannot change meme exclusion,
+    network identity, data validation, or source code. A rule is activated only
+    after a sufficiently large group shows negative net expectancy and a high
+    negative-return rate after estimated costs.
+    """
+    groups = (diagnostics or {}).get("groups", {})
+    rules = []
+    for rule_id, definition in EXPERIENCE_RULE_DEFINITIONS.items():
+        stats = groups.get(definition["tag"])
+        if not isinstance(stats, dict):
+            continue
+        try:
+            n = int(stats.get("n", 0))
+            mean_return = float(stats.get("mean_net_return_pct"))
+            negative_rate = float(stats.get("negative_return_rate"))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if (n < minimum_samples or not math.isfinite(mean_return)
+                or not math.isfinite(negative_rate) or mean_return >= 0
+                or negative_rate < maximum_negative_rate):
+            continue
+        rules.append({
+            "id": rule_id, "enabled": True, "status": "experience_validated",
+            "field": definition["field"], "operator": definition["operator"],
+            "value": definition["value"], "reason": definition["reason"],
+            "evidence": {"samples": n, "mean_net_return_pct": round(mean_return, 4),
+                         "negative_return_rate": round(negative_rate, 4)},
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+    return rules
+
+
+def evaluate_experience_rules(candidate, rules):
+    """Return the first active learned rule that matches a new candidate."""
+    candidate = candidate if isinstance(candidate, dict) else {}
+    for rule in rules or []:
+        if not isinstance(rule, dict) or not rule.get("enabled", False):
+            continue
+        field = rule.get("field")
+        try:
+            value = float(candidate[field])
+            threshold = float(rule["value"])
+        except (KeyError, TypeError, ValueError, OverflowError):
+            continue
+        if not math.isfinite(value) or not math.isfinite(threshold):
+            continue
+        operator = rule.get("operator")
+        matched = (value >= threshold if operator == "gte" else
+                   value < threshold if operator == "lt" else False)
+        if matched:
+            return {"blocked": True, "rule_id": rule.get("id"),
+                    "reason": rule.get("reason", "Matched an experience-derived rule"),
+                    "evidence": rule.get("evidence", {})}
+    return {"blocked": False, "rule_id": None, "reason": "No learned rule matched"}
+
+
 def update_self_improvement(predictions, outcomes, news_observations=None,
                             current_threshold=0.60, now=None):
     """Update the parameter rule registry and save a concise audit trail."""
     now = now or datetime.now(timezone.utc)
     registry = _read_registry()
     registry["learning_diagnostics"] = diagnose_failure_modes(predictions, outcomes)
+    # Rebuild strategy rules from resolved outcomes each run. A rule that no
+    # longer meets the evidence criteria is automatically retired.
+    registry["experience_rules"] = build_experience_rules(registry["learning_diagnostics"])
     rules = registry.setdefault("rules", [])
     active = next((rule for rule in rules
                    if rule.get("id") == "validated_probability_floor"), None)
