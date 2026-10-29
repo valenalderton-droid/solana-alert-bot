@@ -44,14 +44,21 @@ class SelfImproverTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "self_improvement.json"
             with patch.object(self_improver, "IMPROVEMENT_FILE", path):
-                result = self_improver.update_self_improvement(
-                    predictions=[], outcomes=[], current_threshold=0.62,
-                    now=datetime(2026, 10, 29, tzinfo=timezone.utc)
-                )
+                with patch.object(self_improver, "sync_experience_rule_files", return_value={
+                    "created": ["avoid_entry_chase.json"], "edited": [],
+                    "deleted": [], "unchanged": [], "active": ["avoid_entry_chase.json"],
+                    "rejected": []
+                }):
+                    result = self_improver.update_self_improvement(
+                        predictions=[], outcomes=[], current_threshold=0.62,
+                        now=datetime(2026, 10, 29, tzinfo=timezone.utc)
+                    )
                 self.assertGreaterEqual(result["min_probability"], 0.62)
                 saved = path.read_text(encoding="utf-8")
                 self.assertIn("validated_probability_floor", saved)
                 self.assertIn("hard liquidity", saved)
+                self.assertIn("file_editor_audit", saved)
+                self.assertIn("avoid_entry_chase.json", saved)
 
 
     def test_failure_diagnostics_create_research_focus_from_repeated_losses(self):
