@@ -288,6 +288,7 @@ def translate_telegram(message):
         "Model details:": "جزئیات مدل:",
         "This is a status message, not a trading signal.": "این پیام فقط گزارش وضعیت است و سیگنال معاملاتی نیست.",
         "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE": "هشدار بررسی خرید سولانا — خرید خودکار انجام نمی‌شود",
+        "SOLANA TOP-RANKED BUY WATCH — NOT AN AUTOMATIC TRADE": "هشدار جامع ستاپ برتر خرید سولانا — خرید خودکار انجام نمی‌شود",
         "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE": "هشدار فروش / خروج سولانا — معامله خودکار انجام نمی‌شود",
         "Exit reference:": "قیمت مرجع خروج:",
         "Data warning: this exit check uses cached hourly candles; latest candle age:": "هشدار داده: بررسی خروج بر اساس کندل‌های ساعتی ذخیره‌شده است؛ سن آخرین کندل:",
