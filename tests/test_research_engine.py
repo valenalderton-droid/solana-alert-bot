@@ -14,12 +14,19 @@ class ResearchEngineTests(unittest.TestCase):
         self.assertEqual(len(second), 2)
         self.assertTrue(all(row[1] for row in first + second))
         self.assertIn("Jupiter", first[0][1])
+        self.assertIn("Jupiter", second[0][1])
 
     def test_recent_losses_prioritize_risk_research(self):
         outcomes = [{"return_pct": -2.0, "result": "loss"} for _ in range(7)]
         self.assertTrue({"security", "liquidity", "tokenomics", "strategy"}.issubset(
             _performance_topics(outcomes)
         ))
+
+    def test_labeled_losses_prioritize_risk_research_without_numeric_returns(self):
+        outcomes = [{"result": "loss"} for _ in range(7)] + [{"result": "win"} for _ in range(3)]
+        topics = _performance_topics(outcomes)
+        self.assertIn("security", topics)
+        self.assertIn("liquidity", topics)
 
     def test_non_approved_projects_are_not_used_for_custom_search(self):
         state = {}
