@@ -137,6 +137,84 @@ def score_for_core(core_id, candidate):
     return round(_clamp(score), 2)
 
 
+def deliberate_between_cores(candidate, scores):
+    """Structured peer discussion using computed evidence; no external LLM is implied."""
+    pred = candidate.get("prediction") or {}
+    ensemble = pred.get("strategy_ensemble") or candidate.get("ensemble") or {}
+    quality = pred.get("signal_quality") or candidate.get("quality") or {}
+    strategies = ensemble.get("strategies") or {}
+    flags = ensemble.get("risk_flags") or []
+    stop_pct = max(0.0, _num(pred.get("stop_pct"), _num(candidate.get("stop_pct")) * 100))
+    entry_deviation = max(0.0, _num(pred.get("entry_deviation_pct"), _num(candidate.get("entry_deviation_pct"))))
+    liquidity = max(0.0, _num(pred.get("liquidity_usd"), _num(candidate.get("info", {}).get("liquidity"))))
+    volume = max(0.0, _num(pred.get("volume_24h_usd"), _num(candidate.get("info", {}).get("volume24h"))))
+    memos = {}
+    for spec in CORE_SPECS:
+        cid = spec["id"]
+        own = scores.get(cid, 0.0)
+        if cid == "trend":
+            evidence = "trend=" + str(_num(strategies.get("trend_following"), 0)) + ", structure=" + str(_num(strategies.get("market_structure"), 0))
+            question = "آیا روند و ساختار قیمت هم‌جهت‌اند؟"
+        elif cid == "breakout":
+            evidence = "breakout=" + str(_num(strategies.get("breakout"), 0)) + ", volume-flow=" + str(_num(strategies.get("volume_flow"), 0))
+            question = "آیا شکست با حجم تأیید شده است؟"
+        elif cid == "momentum":
+            evidence = "momentum=" + str(_num(strategies.get("momentum"), 0)) + ", trend=" + str(_num(strategies.get("trend_following"), 0))
+            question = "آیا حرکت قیمت قدرت و تداوم دارد؟"
+        elif cid == "volume":
+            evidence = "volume24h=" + str(round(volume)) + ", liquidity=" + str(round(liquidity))
+            question = "آیا حجم و نقدینگی برای ورود کافی‌اند؟"
+        elif cid == "structure":
+            evidence = "structure=" + str(_num(strategies.get("market_structure"), 0)) + ", rejection=" + str(_num(strategies.get("candle_rejection"), 0))
+            question = "سطوح ساختاری قیمت چه می‌گویند؟"
+        elif cid == "risk":
+            evidence = "risk-flags=" + str(len(flags)) + ", stop=" + str(stop_pct) + "%, entry-deviation=" + str(entry_deviation) + "%"
+            question = "آیا ریسک معامله با کیفیت فرصت متناسب است؟"
+        elif cid == "model":
+            evidence = "probability=" + str(_num(pred.get("probability"), 0)) + ", rank=" + str(_num(pred.get("rank_score"), 0))
+            question = "آیا خروجی مدل و اعتبارسنجی آن قابل اتکاست؟"
+        elif cid == "quality":
+            evidence = "quality=" + str(_num(quality.get("score"), 0)) + ", stop=" + str(stop_pct) + "%"
+            question = "آیا سیگنال و نسبت سود به زیان قابل قبول‌اند؟"
+        else:
+            evidence = "regime=" + str(ensemble.get("market_regime", "unknown")) + ", news-items=" + str(len(pred.get("recent_news_context") or []))
+            question = "آیا خبر یا رژیم بازار با سناریو تعارض دارد؟"
+        memos[cid] = {"core": spec["name"], "initial_score": own, "evidence": evidence,
+                      "question_to_peers": question, "peer_feedback": [], "revised_score": own}
+
+    for spec in CORE_SPECS:
+        cid = spec["id"]
+        peers = [other for other in CORE_SPECS if other["id"] != cid]
+        peer_scores = [scores.get(other["id"], 0.0) for other in peers]
+        peer_average = sum(peer_scores) / len(peer_scores) if peer_scores else scores.get(cid, 0.0)
+        memos[cid]["peer_feedback"] = [
+            {"from_core": other["id"], "score": scores.get(other["id"], 0.0),
+             "stance": "support" if scores.get(other["id"], 0.0) >= 58 else
+                       ("objection" if scores.get(other["id"], 0.0) < 45 else "question")}
+            for other in peers
+        ]
+        revised = 0.85 * scores.get(cid, 0.0) + 0.15 * peer_average
+        if cid != "risk" and len(flags) >= 3:
+            revised -= 5
+        if cid != "risk" and (stop_pct > 5 or entry_deviation > 3):
+            revised -= 4
+        memos[cid]["peer_average"] = round(peer_average, 2)
+        memos[cid]["supporting_peers"] = sum(1 for value in peer_scores if value >= 58)
+        memos[cid]["objecting_peers"] = sum(1 for value in peer_scores if value < 45)
+        memos[cid]["revised_score"] = round(_clamp(revised), 2)
+
+    veto_reasons = []
+    if len(flags) >= 4:
+        veto_reasons.append(str(len(flags)) + " risk flags")
+    if stop_pct > 8:
+        veto_reasons.append("stop exceeds 8%")
+    if entry_deviation > 6:
+        veto_reasons.append("entry deviation exceeds 6%")
+    if liquidity > 0 and liquidity < 25000:
+        veto_reasons.append("liquidity below 25000")
+    return {"memos": memos, "risk_veto": bool(veto_reasons), "risk_veto_reasons": veto_reasons}
+
+
 def _core_state(system, core_id):
     core = system["cores"].get(core_id)
     if not isinstance(core, dict):
@@ -183,19 +261,24 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
             scores[spec["id"]] = score
             if score >= spec["threshold"]:
                 votes.append(spec["id"])
-        candidate_scores.append({"candidate": candidate, "scores": scores, "votes": votes,
-                                 "vote_count": len(votes)})
+        discussion = deliberate_between_cores(candidate, scores)
+        adjusted_scores = {cid: memo["revised_score"] for cid, memo in discussion["memos"].items()}
+        candidate_scores.append({"candidate": candidate, "scores": scores,
+                                 "adjusted_scores": adjusted_scores, "discussion": discussion,
+                                 "votes": votes, "vote_count": len(votes)})
 
     # Each core independently picks only its highest-scoring qualified candidate.
     core_choices = {}
     for spec in CORE_SPECS:
-        eligible = [row for row in candidate_scores if row["scores"].get(spec["id"], 0) >= spec["threshold"]]
-        eligible.sort(key=lambda row: row["scores"][spec["id"]], reverse=True)
+        eligible = [row for row in candidate_scores
+                    if not row["discussion"]["risk_veto"]
+                    and row["adjusted_scores"].get(spec["id"], 0) >= spec["threshold"]]
+        eligible.sort(key=lambda row: row["adjusted_scores"][spec["id"]], reverse=True)
         chosen = eligible[0] if eligible else None
         core = _core_state(system, spec["id"])
         if chosen:
             pred = chosen["candidate"]["prediction"]
-            core["last_score"] = chosen["scores"][spec["id"]]
+            core["last_score"] = chosen["adjusted_scores"][spec["id"]]
             core["last_vote"] = "BUY" 
             core["last_candidate"] = pred.get("token_address")
             core["votes"] = 1
@@ -204,7 +287,8 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
             core["portfolio"] = substate["paper_portfolio"]
             core_choices[spec["id"]] = {"token_address": pred["token_address"],
                                         "signal_id": pred["signal_id"],
-                                        "score": core["last_score"], "trade": trade}
+                                        "score": core["last_score"], "trade": trade,
+                                        "peer_feedback_count": len(chosen["discussion"]["memos"][spec["id"]]["peer_feedback"])}
             decision = {"at": timestamp, "vote": "BUY", "token_address": pred["token_address"],
                         "signal_id": pred["signal_id"], "score": core["last_score"],
                         "paper_trade_opened": bool(trade.get("opened"))}
@@ -240,7 +324,9 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
                         "name": row["candidate"]["prediction"].get("name"),
                         "symbol": row["candidate"]["prediction"].get("symbol"),
                         "votes": row["vote_count"], "voting_cores": row["votes"],
-                        "core_scores": row["scores"]} for row in ranked[:10]],
+                        "core_scores": row["scores"],
+                        "adjusted_scores": row["adjusted_scores"],
+                        "discussion": row["discussion"]} for row in ranked[:10]],
         "core_choices": core_choices,
         "shared_data_sources": SHARED_DATA_SOURCES,
         "core_access": {spec["id"]: {"name": spec["name"], "tools": CORE_TOOLSETS[spec["id"]], "uses_shared_scan_data": True, "independent_external_fetch": False} for spec in CORE_SPECS},
@@ -272,6 +358,10 @@ def format_core_result(result):
     else:
         lines.append("هیچ توکنی اکثریت ۵ از ۹ را نگرفت؛ هشدار خرید صادر نشود.")
     lines.append(f"ابزارهای اختصاصی تعریف‌شده: {len(result.get('core_access', {}))}/9 هسته؛ منابع مشترک: {len(result.get('shared_data_sources', []))}")
+    lines.append("تعامل: هر هسته به ۸ هستهٔ دیگر بازخورد می‌دهد؛ امتیازها پس از گفت‌وگو بازبینی می‌شوند.")
     for candidate in result.get("candidates", [])[:5]:
         lines.append(f"{candidate.get('name')} ({candidate.get('symbol')}): {candidate.get('votes')}/9")
+        discussion = candidate.get("discussion") or {}
+        if discussion.get("risk_veto"):
+            lines.append("  وتوی ریسک: " + ", ".join(discussion.get("risk_veto_reasons", [])))
     return "\n".join(lines)
