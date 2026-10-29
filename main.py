@@ -525,6 +525,29 @@ def main():
         "signals": 0, "resolved": 0, "wins": 0, "losses": 0
     })
 
+    # Keep monitoring existing positions even if discovery drops a token from
+    # its top-ranked universe. The same strict non-meme allowlist still applies.
+    known_addresses = {
+        str(project.get("token_address", "")).strip()
+        for project in config.get("projects", [])
+    }
+    for position in state.get("open_positions", []):
+        address = str(position.get("token_address", "")).strip()
+        candidate = {
+            "name": position.get("name", ""),
+            "symbol": position.get("symbol", ""),
+            "token_address": address,
+            "approved_non_meme": True
+        }
+        if address and address not in known_addresses and is_allowed_non_meme_project(candidate):
+            config["projects"].append(candidate)
+            known_addresses.add(address)
+
+    open_position_addresses = {
+        str(position.get("token_address", "")).strip()
+        for position in state.get("open_positions", [])
+    }
+
     # Analyze news internally; Telegram is reserved for BUY/SELL alerts.
     seen_news = state.setdefault("seen_news_ids", [])
     seen_news_set = set(seen_news)
@@ -612,7 +635,13 @@ def main():
             continue
 
         try:
-            pair = get_best_solana_pair(address, MIN_LIQUIDITY)
+            # Existing positions use a lower monitoring threshold so a
+            # liquidity drop does not silently disable their exit checks.
+            required_liquidity = (
+                max(10000.0, MIN_LIQUIDITY * 0.10)
+                if address in open_position_addresses else MIN_LIQUIDITY
+            )
+            pair = get_best_solana_pair(address, required_liquidity)
             if not pair:
                 scan_diagnostics["no_eligible_pair"] += 1
                 print(f"No eligible liquid Solana pair: {project.get('name')}")
