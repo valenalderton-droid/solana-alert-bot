@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T18:01:26.592662+00:00",
+  "last_run_utc": "2026-10-29T18:17:42.977148+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -666,38 +666,57 @@
       "analysis": "Meaning: The headline suggests a risk, delay, selling pressure or a negative catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: BEARISH (rule score -2/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: immediate to days; risk can persist if confirmed\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: inflation. This is a headline-based heuristic, not full-article verification.",
       "title": "Bitcoin Price Outlook 2027: How Inflation and Interest Rates Could Affect Crypto Markets - KuCoin",
       "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQbGVFb2hHaHlyWVpyQUJuanRVeVMxY19rUTBrZFd4emczWmMwN1ljd3ZvNjByTlhhZG9kUW5pd0UxV2sxUTBWa1A4WS1IU1lRNU9wZHVfVDZaQWhDR19qUGhUV2RPeVNRcE5tby14Y3hENVI2NGQ5dTYzbXhCVDJLOTZrR2VBZmpGY1hxNThfazJrUWRpNThmS1lhTkh6WXNYMUx1bWtEYk44VDE1SWFNOTRoV3c3dw?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T18:16:08.925514+00:00",
+      "published_at": "2026-10-23T07:00:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Algorithmic Trading Risk Management: How a Live Algo Trader Handles Fed Days, Correlation and AI - OneBullEx",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9IVjBMUWVodU5jZEFqQ19jRHZjazNaMTJKbFRMNThUeFgwUEdZME5QcGVzbURNWFhyclNMdy1yT1RIc3pkREVkZEo2MjhtOTAzcExHYkNKQ0xLSV9INldjRTNHdmJsNHFPbDJGRWpISXEwLTNP?oc=5",
+      "research_topic": "strategy"
     }
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T18:00:26.821389+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T18:01:26.042498+00:00",
-  "project_scan_cursor": 162,
+  "last_news_refresh_utc": "2026-10-29T18:16:15.938110+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T18:17:42.455468+00:00",
+  "project_scan_cursor": 1,
   "research_status": {
-    "last_tvl_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
-    "last_activity_metrics_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
-    "last_run_utc": "2026-10-29T17:10:12.941838+00:00",
-    "queries_attempted": 2,
-    "new_articles": 8,
+    "last_tvl_refresh_utc": "2026-10-29T18:16:08.925514+00:00",
+    "last_activity_metrics_refresh_utc": "2026-10-29T18:16:08.925514+00:00",
+    "last_run_utc": "2026-10-29T18:16:08.925514+00:00",
+    "queries_attempted": 3,
+    "new_articles": 1,
     "failures": 1,
     "last_topics": [
-      "macro",
-      "geopolitics"
+      "strategy",
+      "strategy",
+      "governance"
     ],
     "query_results": [
       {
-        "topic": "macro",
-        "results": 8,
+        "topic": "strategy",
+        "results": 0,
         "ok": true
       },
       {
-        "topic": "geopolitics",
+        "topic": "strategy",
+        "results": 1,
+        "ok": true
+      },
+      {
+        "topic": "governance",
         "results": 0,
         "ok": true
       }
     ],
-    "total_evidence": 23,
-    "latest_tvl_change_24h_pct": -0.355,
+    "total_evidence": 26,
+    "latest_tvl_change_24h_pct": -0.211,
     "activity_metrics_refreshed": true,
     "activity_metrics_count": 2
   },
@@ -976,49 +995,97 @@
       "url": "https://api.llama.fi/overview/fees/Solana",
       "data_quality": "valid",
       "note": "Ecosystem activity context; not a standalone price prediction."
+    },
+    {
+      "id": "67e8bdd084f6549b411f3f90",
+      "title": "Algorithmic Trading Risk Management: How a Live Algo Trader Handles Fed Days, Correlation and AI - OneBullEx",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9IVjBMUWVodU5jZEFqQ19jRHZjazNaMTJKbFRMNThUeFgwUEdZME5QcGVzbURNWFhyclNMdy1yT1RIc3pkREVkZEo2MjhtOTAzcExHYkNKQ0xLSV9INldjRTNHdmJsNHFPbDJGRWpISXEwLTNP?oc=5",
+      "published_at": "2026-10-23T07:00:00+00:00",
+      "source": "OneBullEx",
+      "description": "Algorithmic Trading Risk Management: How a Live Algo Trader Handles Fed Days, Correlation and AI &nbsp;&nbsp; OneBullEx",
+      "feed_category": "Solana ecosystem",
+      "research_topic": "strategy",
+      "research_query": "Solana crypto trading strategy backtest out-of-sample walk-forward validation",
+      "observed_at": "2026-10-29T18:16:08.925514+00:00",
+      "evidence_quality_score": 65,
+      "keyword_tone": "unclassified",
+      "risk_keywords": [],
+      "positive_keywords": [],
+      "assessment_note": "Keyword triage only; verify article context and primary source before drawing conclusions.",
+      "corroborating_publisher_count": 0,
+      "corroborated": false,
+      "corroboration_note": "No independent publisher corroboration found in this research batch."
+    },
+    {
+      "id": "defillama-solana-dex-volume-498138",
+      "kind": "metric",
+      "metric": "Solana DEX volume",
+      "value_usd": 1733397982.06,
+      "change_24h_pct": 9.5,
+      "observed_at": "2026-10-29T18:16:08.925514+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/dexs/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
+    },
+    {
+      "id": "defillama-solana-fees-498138",
+      "kind": "metric",
+      "metric": "Solana fees",
+      "value_usd": 10347405.24,
+      "change_24h_pct": -7.89,
+      "observed_at": "2026-10-29T18:16:08.925514+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/fees/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
     }
   ],
   "seen_research_ids": [
-    "48f6e6f8ea0db8caeff0b08f",
-    "defillama-solana-dex-volume-498132",
-    "defillama-solana-fees-498137",
+    "defillama-solana-fees-498134",
+    "507d90a8f3f9a96a578b7d6e",
     "68f0054eebea2324d2f7c587",
-    "6da0f87d5326c4ed4ab9ff0f",
+    "67e8bdd084f6549b411f3f90",
+    "defillama-solana-dex-volume-498134",
+    "defillama-solana-tvl-1793232000",
+    "48f6e6f8ea0db8caeff0b08f",
+    "defillama-solana-dex-volume-498138",
+    "defillama-solana-fees-498135",
     "f86123a7a1f53fc2863ccef2",
+    "6ec30d52b9822edbd372b38c",
+    "5d3a48e1dd64273a795ddbb2",
+    "77fac538df29ffa61e07e9d1",
+    "defillama-solana-fees-498138",
+    "72a212867d341f762a9caebd",
+    "bce4e8201ac92858f17b85fc",
+    "defillama-solana-fees-498132",
+    "defillama-solana-fees-498137",
+    "defillama-solana-dex-volume-498137",
+    "4e6f63935b0dece899d71ca8",
+    "9619bfcaffa6b2cc7d5e0e15",
+    "6da0f87d5326c4ed4ab9ff0f",
+    "27a5c8aa52c8ad8b00475135",
+    "defillama-solana-dex-volume-498132",
+    "7cf5cffe6333ef8a77530e3d",
+    "defillama-solana-dex-volume-498135"
+  ],
+  "research_query_cursor": 13,
+  "seen_research_news_ids": [
+    "48f6e6f8ea0db8caeff0b08f",
     "4e6f63935b0dece899d71ca8",
     "507d90a8f3f9a96a578b7d6e",
-    "defillama-solana-dex-volume-498135",
-    "defillama-solana-tvl-1793232000",
-    "bce4e8201ac92858f17b85fc",
     "9619bfcaffa6b2cc7d5e0e15",
-    "27a5c8aa52c8ad8b00475135",
-    "72a212867d341f762a9caebd",
-    "defillama-solana-fees-498135",
-    "defillama-solana-dex-volume-498137",
-    "77fac538df29ffa61e07e9d1",
-    "defillama-solana-fees-498134",
-    "7cf5cffe6333ef8a77530e3d",
-    "6ec30d52b9822edbd372b38c",
-    "defillama-solana-dex-volume-498134",
-    "5d3a48e1dd64273a795ddbb2",
-    "defillama-solana-fees-498132"
-  ],
-  "research_query_cursor": 10,
-  "seen_research_news_ids": [
-    "7cf5cffe6333ef8a77530e3d",
-    "27a5c8aa52c8ad8b00475135",
-    "6ec30d52b9822edbd372b38c",
-    "48f6e6f8ea0db8caeff0b08f",
-    "72a212867d341f762a9caebd",
-    "507d90a8f3f9a96a578b7d6e",
-    "77fac538df29ffa61e07e9d1",
-    "5d3a48e1dd64273a795ddbb2",
-    "6da0f87d5326c4ed4ab9ff0f",
     "68f0054eebea2324d2f7c587",
-    "9619bfcaffa6b2cc7d5e0e15",
     "bce4e8201ac92858f17b85fc",
     "f86123a7a1f53fc2863ccef2",
-    "4e6f63935b0dece899d71ca8"
+    "6ec30d52b9822edbd372b38c",
+    "5d3a48e1dd64273a795ddbb2",
+    "6da0f87d5326c4ed4ab9ff0f",
+    "27a5c8aa52c8ad8b00475135",
+    "77fac538df29ffa61e07e9d1",
+    "67e8bdd084f6549b411f3f90",
+    "7cf5cffe6333ef8a77530e3d",
+    "72a212867d341f762a9caebd"
   ],
   "research_priority_signature": "",
   "paper_open_signals": [
@@ -1131,6 +1198,16 @@
       "entry": 0.007999612437854721,
       "stop": 0.0006855667236217397,
       "target": 0.022627703866320684
+    },
+    {
+      "signal_id": "FJkTpy5rTZYCAUn3FXDzz9hgJYHYwBsxGm5ee75rAZNC:1793289600:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "FJkTpy5rTZYCAUn3FXDzz9hgJYHYwBsxGm5ee75rAZNC",
+      "name": "Raydium",
+      "timestamp": 1793289600,
+      "entry": 2.071968130140871,
+      "stop": 2.0602753257021553,
+      "target": 2.0953537390183024
     }
   ],
   "paper_portfolio": {
@@ -1144,6 +1221,6 @@
     "peak_equity_usd": 10000.0,
     "max_drawdown_pct": 0.0,
     "created_at": "2026-10-29T18:00:31.732092+00:00",
-    "updated_at": "2026-10-29T18:00:31.732131+00:00"
+    "updated_at": "2026-10-29T18:16:21.583384+00:00"
   }
 }

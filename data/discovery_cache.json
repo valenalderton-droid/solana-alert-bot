@@ -1,5 +1,5 @@
 {
-  "saved_at": "2026-10-29T17:19:37.286741+00:00",
+  "saved_at": "2026-10-29T18:16:15.899804+00:00",
   "filters": {
     "discovery_version": 4,
     "min_liquidity": 0.0,
@@ -20,8 +20,8 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 2069709740.13,
-      "volume_24h_usd_at_discovery": 289561.04,
-      "pair_age_days_at_discovery": 34.04
+      "volume_24h_usd_at_discovery": 289560.73,
+      "pair_age_days_at_discovery": 34.08
     },
     {
       "name": "Solana",
@@ -34,9 +34,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 2191052987.55,
-      "volume_24h_usd_at_discovery": 289001.46,
-      "pair_age_days_at_discovery": 6.48
+      "liquidity_usd_at_discovery": 2191052992.03,
+      "volume_24h_usd_at_discovery": 289401.65,
+      "pair_age_days_at_discovery": 6.52
     },
     {
       "name": "Render",
@@ -51,7 +51,22 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 1709830971.77,
       "volume_24h_usd_at_discovery": 161936.44,
-      "pair_age_days_at_discovery": 38.46
+      "pair_age_days_at_discovery": 38.5
+    },
+    {
+      "name": "Solana",
+      "symbol": "SOL",
+      "token_address": "5vhw96LZoKA4K8kbBkTJXBYvJSN1RWJzJgJbYEorBChv",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana governance DAO protocol",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 1597167486.64,
+      "volume_24h_usd_at_discovery": 141605.61,
+      "pair_age_days_at_discovery": 77.55
     },
     {
       "name": "Helium",
@@ -66,22 +81,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 664291225.41,
       "volume_24h_usd_at_discovery": 288930.06,
-      "pair_age_days_at_discovery": 60.5
-    },
-    {
-      "name": "Solana",
-      "symbol": "SOL",
-      "token_address": "5vhw96LZoKA4K8kbBkTJXBYvJSN1RWJzJgJbYEorBChv",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana governance DAO protocol",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 1597167483.72,
-      "volume_24h_usd_at_discovery": 112532.88,
-      "pair_age_days_at_discovery": 77.51
+      "pair_age_days_at_discovery": 60.54
     },
     {
       "name": "Collector Crypt",
@@ -94,9 +94,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 4267393.32,
-      "volume_24h_usd_at_discovery": 2284742.56,
-      "pair_age_days_at_discovery": 425.93
+      "liquidity_usd_at_discovery": 4219747.16,
+      "volume_24h_usd_at_discovery": 2341157.07,
+      "pair_age_days_at_discovery": 425.97
     },
     {
       "name": "STONK",
@@ -109,9 +109,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 2913294.6,
-      "volume_24h_usd_at_discovery": 2907105.86,
-      "pair_age_days_at_discovery": 78.27
+      "liquidity_usd_at_discovery": 2880292.02,
+      "volume_24h_usd_at_discovery": 2786247.69,
+      "pair_age_days_at_discovery": 78.31
     },
     {
       "name": "cat in a dogs world",
@@ -124,9 +124,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 9178836.57,
-      "volume_24h_usd_at_discovery": 766744.48,
-      "pair_age_days_at_discovery": 947.5
+      "liquidity_usd_at_discovery": 9061883.45,
+      "volume_24h_usd_at_discovery": 814089.13,
+      "pair_age_days_at_discovery": 947.54
     },
     {
       "name": "Raydium",
@@ -139,9 +139,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 2206412.12,
-      "volume_24h_usd_at_discovery": 5267949.25,
-      "pair_age_days_at_discovery": 805.5
+      "liquidity_usd_at_discovery": 2191974.09,
+      "volume_24h_usd_at_discovery": 5432995.71,
+      "pair_age_days_at_discovery": 805.54
     },
     {
       "name": "Render",
@@ -155,8 +155,8 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 159802737.84,
-      "volume_24h_usd_at_discovery": 112534.48,
-      "pair_age_days_at_discovery": 127.35
+      "volume_24h_usd_at_discovery": 112519.67,
+      "pair_age_days_at_discovery": 127.39
     },
     {
       "name": "Jupiter",
@@ -169,9 +169,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 2021381.84,
-      "volume_24h_usd_at_discovery": 968962.32,
-      "pair_age_days_at_discovery": 1002.1
+      "liquidity_usd_at_discovery": 1994750.85,
+      "volume_24h_usd_at_discovery": 1013743.12,
+      "pair_age_days_at_discovery": 1002.14
     },
     {
       "name": "Kamino",
@@ -184,24 +184,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 1935167.6,
-      "volume_24h_usd_at_discovery": 3257002.56,
-      "pair_age_days_at_discovery": 749.29
-    },
-    {
-      "name": "Metaplex Token",
-      "symbol": "MPLX",
-      "token_address": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 2682674.44,
-      "volume_24h_usd_at_discovery": 4020635.7,
-      "pair_age_days_at_discovery": 373.36
+      "liquidity_usd_at_discovery": 1922783.36,
+      "volume_24h_usd_at_discovery": 3152454.44,
+      "pair_age_days_at_discovery": 749.33
     },
     {
       "name": "GTA VI",
@@ -214,9 +199,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 470403.15,
-      "volume_24h_usd_at_discovery": 2530353.64,
-      "pair_age_days_at_discovery": 84.16
+      "liquidity_usd_at_discovery": 485196.57,
+      "volume_24h_usd_at_discovery": 2540662.16,
+      "pair_age_days_at_discovery": 84.19
+    },
+    {
+      "name": "Metaplex Token",
+      "symbol": "MPLX",
+      "token_address": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "curated_symbol_search",
+      "discovery_category": "known_ecosystem_symbol",
+      "discovery_confidence": 1.0,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 2665176.15,
+      "volume_24h_usd_at_discovery": 3805352.09,
+      "pair_age_days_at_discovery": 373.39
     },
     {
       "name": "deBridge",
@@ -229,9 +229,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 5051456.84,
-      "volume_24h_usd_at_discovery": 212897.51,
-      "pair_age_days_at_discovery": 743.08
+      "liquidity_usd_at_discovery": 5053358.07,
+      "volume_24h_usd_at_discovery": 211625.85,
+      "pair_age_days_at_discovery": 743.12
     },
     {
       "name": "Dessa",
@@ -244,9 +244,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 259058.9,
-      "volume_24h_usd_at_discovery": 3222679.79,
-      "pair_age_days_at_discovery": 3.18
+      "liquidity_usd_at_discovery": 307800.79,
+      "volume_24h_usd_at_discovery": 3705480.95,
+      "pair_age_days_at_discovery": 3.22
     },
     {
       "name": "Dacity Coin",
@@ -259,9 +259,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 389292.55,
-      "volume_24h_usd_at_discovery": 1858363.2,
-      "pair_age_days_at_discovery": 18.25
+      "liquidity_usd_at_discovery": 377640.89,
+      "volume_24h_usd_at_discovery": 1915928.17,
+      "pair_age_days_at_discovery": 18.29
     },
     {
       "name": "Jupiter Perps LP",
@@ -274,9 +274,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 2218722.53,
-      "volume_24h_usd_at_discovery": 1152970.49,
-      "pair_age_days_at_discovery": 966.6
+      "liquidity_usd_at_discovery": 2209576.75,
+      "volume_24h_usd_at_discovery": 1120357.0,
+      "pair_age_days_at_discovery": 966.64
     },
     {
       "name": "Orca",
@@ -289,9 +289,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 695308.17,
-      "volume_24h_usd_at_discovery": 424021.98,
-      "pair_age_days_at_discovery": 1028.86
+      "liquidity_usd_at_discovery": 690043.14,
+      "volume_24h_usd_at_discovery": 401132.3,
+      "pair_age_days_at_discovery": 1028.9
     },
     {
       "name": "Pyth Network",
@@ -304,24 +304,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 407368.7,
-      "volume_24h_usd_at_discovery": 622974.18,
-      "pair_age_days_at_discovery": 805.48
-    },
-    {
-      "name": "United States Dividend Fund🌟",
-      "symbol": "USDF",
-      "token_address": "3LC3gGxSFKCPeEeo1ruQ4nHcaSBATZvS7srefotEpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 591395.7,
-      "volume_24h_usd_at_discovery": 445649.16,
-      "pair_age_days_at_discovery": 1.88
+      "liquidity_usd_at_discovery": 403075.64,
+      "volume_24h_usd_at_discovery": 646575.17,
+      "pair_age_days_at_discovery": 805.52
     },
     {
       "name": "Parcl",
@@ -334,9 +319,24 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 9647842.26,
-      "volume_24h_usd_at_discovery": 112532.88,
-      "pair_age_days_at_discovery": 71.49
+      "liquidity_usd_at_discovery": 9647845.18,
+      "volume_24h_usd_at_discovery": 141605.93,
+      "pair_age_days_at_discovery": 71.53
+    },
+    {
+      "name": "Sixth Sense Labs",
+      "symbol": "SENSE",
+      "token_address": "GydpvgKppv8a4gGQqAQsyQJxtQN4S6Ym9gKxjnN3mfun",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 76937.6,
+      "volume_24h_usd_at_discovery": 1751907.04,
+      "pair_age_days_at_discovery": 0.15
     },
     {
       "name": "Marinade staked SOL (mSOL)",
@@ -349,9 +349,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 813454.73,
-      "volume_24h_usd_at_discovery": 1165278.37,
-      "pair_age_days_at_discovery": 805.5
+      "liquidity_usd_at_discovery": 808412.74,
+      "volume_24h_usd_at_discovery": 1164489.86,
+      "pair_age_days_at_discovery": 805.54
     },
     {
       "name": "AgenC SI Beauty",
@@ -364,9 +364,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 64524.73,
-      "volume_24h_usd_at_discovery": 1722606.48,
-      "pair_age_days_at_discovery": 0.04
+      "liquidity_usd_at_discovery": 65716.6,
+      "volume_24h_usd_at_discovery": 1872845.87,
+      "pair_age_days_at_discovery": 0.08
     },
     {
       "name": "Houseworming",
@@ -379,9 +379,39 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 73901.63,
-      "volume_24h_usd_at_discovery": 1177349.72,
+      "liquidity_usd_at_discovery": 69706.78,
+      "volume_24h_usd_at_discovery": 1346897.3,
+      "pair_age_days_at_discovery": 0.1
+    },
+    {
+      "name": "Hexncoin",
+      "symbol": "HEXN",
+      "token_address": "ANVLA6eKiAq4nstD2Sg3SZhfVkSEwfnGccn12UQWpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 70330.98,
+      "volume_24h_usd_at_discovery": 893718.26,
       "pair_age_days_at_discovery": 0.06
+    },
+    {
+      "name": "Oren",
+      "symbol": "OREN",
+      "token_address": "57vAaMsnAJXkvULtAz7fsi6gRn3bHRJFJsJV1okNpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 35225.35,
+      "volume_24h_usd_at_discovery": 1543546.09,
+      "pair_age_days_at_discovery": 0.26
     },
     {
       "name": "NeverZero",
@@ -394,24 +424,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 26411584.54,
-      "volume_24h_usd_at_discovery": 7467.5,
-      "pair_age_days_at_discovery": 197.75
-    },
-    {
-      "name": "Infinite Money Glitch",
-      "symbol": "GLITCH",
-      "token_address": "8Xg89xT8Ve34sKiYqYuMs46mycREsCA2F362UscRpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana borrow money market",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 163269.53,
-      "volume_24h_usd_at_discovery": 302862.77,
-      "pair_age_days_at_discovery": 13.07
+      "liquidity_usd_at_discovery": 26263457.04,
+      "volume_24h_usd_at_discovery": 7486.92,
+      "pair_age_days_at_discovery": 197.79
     },
     {
       "name": "SNARKS Launchpad",
@@ -424,24 +439,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 37859.78,
-      "volume_24h_usd_at_discovery": 1237756.88,
-      "pair_age_days_at_discovery": 17.79
+      "liquidity_usd_at_discovery": 35316.21,
+      "volume_24h_usd_at_discovery": 1240499.1,
+      "pair_age_days_at_discovery": 17.83
     },
     {
-      "name": "Sixth Sense Labs",
-      "symbol": "SENSE",
-      "token_address": "GydpvgKppv8a4gGQqAQsyQJxtQN4S6Ym9gKxjnN3mfun",
+      "name": "Infinite Money Glitch",
+      "symbol": "GLITCH",
+      "token_address": "8Xg89xT8Ve34sKiYqYuMs46mycREsCA2F362UscRpump",
       "chain": "solana",
       "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana borrow money market",
       "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 125148.65,
-      "volume_24h_usd_at_discovery": 1651081.0,
-      "pair_age_days_at_discovery": 0.11
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 157789.67,
+      "volume_24h_usd_at_discovery": 267589.33,
+      "pair_age_days_at_discovery": 13.11
     },
     {
       "name": "JITO",
@@ -454,9 +469,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 1083744.0,
-      "volume_24h_usd_at_discovery": 156881.64,
-      "pair_age_days_at_discovery": 1057.6
+      "liquidity_usd_at_discovery": 1077466.02,
+      "volume_24h_usd_at_discovery": 155431.33,
+      "pair_age_days_at_discovery": 1057.63
     },
     {
       "name": "AudaCity",
@@ -469,9 +484,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 87478.71,
-      "volume_24h_usd_at_discovery": 306674.43,
-      "pair_age_days_at_discovery": 14.16
+      "liquidity_usd_at_discovery": 87919.97,
+      "volume_24h_usd_at_discovery": 304033.94,
+      "pair_age_days_at_discovery": 14.2
+    },
+    {
+      "name": "50K",
+      "symbol": "50K",
+      "token_address": "HuRqh4ddfRGwcWRD6UaXKGha8ycaDcw6gP6NbFc66uNy",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 57896.72,
+      "volume_24h_usd_at_discovery": 280809.49,
+      "pair_age_days_at_discovery": 0.02
     },
     {
       "name": "Macca The Gator",
@@ -484,9 +514,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 98080.62,
-      "volume_24h_usd_at_discovery": 184481.96,
-      "pair_age_days_at_discovery": 14.15
+      "liquidity_usd_at_discovery": 101376.79,
+      "volume_24h_usd_at_discovery": 188656.37,
+      "pair_age_days_at_discovery": 14.19
     },
     {
       "name": "Larpcheck",
@@ -499,9 +529,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 80923.46,
-      "volume_24h_usd_at_discovery": 158948.58,
-      "pair_age_days_at_discovery": 18.82
+      "liquidity_usd_at_discovery": 81902.91,
+      "volume_24h_usd_at_discovery": 152631.45,
+      "pair_age_days_at_discovery": 18.86
     },
     {
       "name": "Shadow Token",
@@ -514,39 +544,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 656383.98,
-      "volume_24h_usd_at_discovery": 12049.36,
-      "pair_age_days_at_discovery": 1431.61
-    },
-    {
-      "name": "Catpoop Coin",
-      "symbol": "CATPOOP",
-      "token_address": "7eCffjPZzRqFFDog8RN5cWsu2JNRH4Qm1iMPAREUpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 32205.17,
-      "volume_24h_usd_at_discovery": 268412.43,
-      "pair_age_days_at_discovery": 0.03
-    },
-    {
-      "name": "Cartoon Money",
-      "symbol": "CBUCKS",
-      "token_address": "DtcicPCKTKeAh7TDEzTym3hXeoHAoMiBdYJhMYxZpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 104099.82,
-      "volume_24h_usd_at_discovery": 80659.09,
-      "pair_age_days_at_discovery": 22.95
+      "liquidity_usd_at_discovery": 658480.68,
+      "volume_24h_usd_at_discovery": 11991.23,
+      "pair_age_days_at_discovery": 1431.65
     },
     {
       "name": "Cloud",
@@ -559,9 +559,39 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 435777.63,
-      "volume_24h_usd_at_discovery": 15795.23,
-      "pair_age_days_at_discovery": 833.04
+      "liquidity_usd_at_discovery": 435177.95,
+      "volume_24h_usd_at_discovery": 16146.36,
+      "pair_age_days_at_discovery": 833.08
+    },
+    {
+      "name": "Cartoon Money",
+      "symbol": "CBUCKS",
+      "token_address": "DtcicPCKTKeAh7TDEzTym3hXeoHAoMiBdYJhMYxZpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 101870.85,
+      "volume_24h_usd_at_discovery": 76712.28,
+      "pair_age_days_at_discovery": 22.99
+    },
+    {
+      "name": "Vouchmarket",
+      "symbol": "VOUCH",
+      "token_address": "GXQVzSaNGQiSy7Kxpvox3HE4bJujFa666E2wvbrrpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 26958.31,
+      "volume_24h_usd_at_discovery": 273573.17,
+      "pair_age_days_at_discovery": 0.02
     },
     {
       "name": "Render Token",
@@ -574,9 +604,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 356681.63,
-      "volume_24h_usd_at_discovery": 133471.23,
-      "pair_age_days_at_discovery": 805.5
+      "liquidity_usd_at_discovery": 355106.63,
+      "volume_24h_usd_at_discovery": 136580.9,
+      "pair_age_days_at_discovery": 805.53
     },
     {
       "name": "BlazeStake Staked SOL (bSOL)",
@@ -589,24 +619,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 594977.76,
-      "volume_24h_usd_at_discovery": 75983.04,
-      "pair_age_days_at_discovery": 1422.75
-    },
-    {
-      "name": "Pump Tie",
-      "symbol": "PTIE",
-      "token_address": "TiekuH4XWKE1Npap3NdDcFTwbpQDG9Zee6zg9YBpqE2",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 2930.25,
-      "volume_24h_usd_at_discovery": 1789477.93,
-      "pair_age_days_at_discovery": 0.07
+      "liquidity_usd_at_discovery": 592221.8,
+      "volume_24h_usd_at_discovery": 68846.72,
+      "pair_age_days_at_discovery": 1422.79
     },
     {
       "name": "multiple.cash",
@@ -619,24 +634,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 5669.91,
-      "volume_24h_usd_at_discovery": 859568.08,
-      "pair_age_days_at_discovery": 0.28
-    },
-    {
-      "name": "AntMiner",
-      "symbol": "ANT",
-      "token_address": "7ypCq2CJ4fnbtS3z2B1W1UT2he5E3u7Md6Gy1ri7uGrQ",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana NFT infrastructure marketplace",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 82946.41,
-      "volume_24h_usd_at_discovery": 49839.1,
-      "pair_age_days_at_discovery": 37.61
+      "liquidity_usd_at_discovery": 5784.95,
+      "volume_24h_usd_at_discovery": 863076.19,
+      "pair_age_days_at_discovery": 0.32
     },
     {
       "name": "Jason Duval",
@@ -649,9 +649,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 39992.14,
-      "volume_24h_usd_at_discovery": 101433.37,
-      "pair_age_days_at_discovery": 78.47
+      "liquidity_usd_at_discovery": 39954.85,
+      "volume_24h_usd_at_discovery": 104294.28,
+      "pair_age_days_at_discovery": 78.51
+    },
+    {
+      "name": "AntMiner",
+      "symbol": "ANT",
+      "token_address": "7ypCq2CJ4fnbtS3z2B1W1UT2he5E3u7Md6Gy1ri7uGrQ",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana NFT infrastructure marketplace",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 81781.77,
+      "volume_24h_usd_at_discovery": 49927.93,
+      "pair_age_days_at_discovery": 37.65
     },
     {
       "name": "Grail Break",
@@ -664,24 +679,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 76117.25,
-      "volume_24h_usd_at_discovery": 61519.41,
-      "pair_age_days_at_discovery": 12.63
-    },
-    {
-      "name": "Helium Network Token",
-      "symbol": "HNT",
-      "token_address": "hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 339980.42,
-      "volume_24h_usd_at_discovery": 66455.07,
-      "pair_age_days_at_discovery": 1285.99
+      "liquidity_usd_at_discovery": 73477.69,
+      "volume_24h_usd_at_discovery": 58431.96,
+      "pair_age_days_at_discovery": 12.67
     },
     {
       "name": "Network Coin",
@@ -694,9 +694,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 29583.6,
-      "volume_24h_usd_at_discovery": 127053.68,
-      "pair_age_days_at_discovery": 4.81
+      "liquidity_usd_at_discovery": 29964.15,
+      "volume_24h_usd_at_discovery": 129857.42,
+      "pair_age_days_at_discovery": 4.85
+    },
+    {
+      "name": "Helium Network Token",
+      "symbol": "HNT",
+      "token_address": "hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "curated_symbol_search",
+      "discovery_category": "known_ecosystem_symbol",
+      "discovery_confidence": 1.0,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 337362.06,
+      "volume_24h_usd_at_discovery": 60902.74,
+      "pair_age_days_at_discovery": 1286.03
     },
     {
       "name": "The Bouncer",
@@ -709,9 +724,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 45680.93,
-      "volume_24h_usd_at_discovery": 69057.09,
-      "pair_age_days_at_discovery": 8.33
+      "liquidity_usd_at_discovery": 44121.27,
+      "volume_24h_usd_at_discovery": 68875.92,
+      "pair_age_days_at_discovery": 8.37
+    },
+    {
+      "name": "Solana Name Service",
+      "symbol": "SNS",
+      "token_address": "SNS8DJbHc34nKySHVhLGMUUE72ho6igvJaxtq9T3cX3",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana lending borrowing",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 453360.97,
+      "volume_24h_usd_at_discovery": 4539.58,
+      "pair_age_days_at_discovery": 36.76
     },
     {
       "name": "oracle7",
@@ -724,9 +754,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 25548.11,
-      "volume_24h_usd_at_discovery": 69670.83,
-      "pair_age_days_at_discovery": 64.38
+      "liquidity_usd_at_discovery": 24627.56,
+      "volume_24h_usd_at_discovery": 69967.79,
+      "pair_age_days_at_discovery": 64.42
     },
     {
       "name": "Tangibles",
@@ -739,9 +769,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 66274.09,
-      "volume_24h_usd_at_discovery": 32188.08,
-      "pair_age_days_at_discovery": 23.94
+      "liquidity_usd_at_discovery": 65467.88,
+      "volume_24h_usd_at_discovery": 29939.98,
+      "pair_age_days_at_discovery": 23.98
     },
     {
       "name": "STANK",
@@ -754,9 +784,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 27587.28,
-      "volume_24h_usd_at_discovery": 245308.28,
-      "pair_age_days_at_discovery": 0.14
+      "liquidity_usd_at_discovery": 25922.48,
+      "volume_24h_usd_at_discovery": 270712.27,
+      "pair_age_days_at_discovery": 0.18
     },
     {
       "name": "Decentralized Compute Company",
@@ -770,23 +800,38 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 73291.76,
-      "volume_24h_usd_at_discovery": 16657.93,
-      "pair_age_days_at_discovery": 98.84
+      "volume_24h_usd_at_discovery": 16619.12,
+      "pair_age_days_at_discovery": 98.88
     },
     {
-      "name": "Solana Name Service",
-      "symbol": "SNS",
-      "token_address": "SNS8DJbHc34nKySHVhLGMUUE72ho6igvJaxtq9T3cX3",
+      "name": "Grand Theft Auto VI -Vicecity",
+      "symbol": "VICECITY",
+      "token_address": "25NVbDfwuAVhb2XADxGCs6WQuPjU1RsgDfUG6GV132Tm",
       "chain": "solana",
       "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana lending borrowing",
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 444486.35,
-      "volume_24h_usd_at_discovery": 2440.25,
-      "pair_age_days_at_discovery": 36.73
+      "liquidity_usd_at_discovery": 20239.63,
+      "volume_24h_usd_at_discovery": 56165.47,
+      "pair_age_days_at_discovery": 0.16
+    },
+    {
+      "name": "GTA VI",
+      "symbol": "GTA6",
+      "token_address": "2gVNeu8dP7XiLoaWfUvUJXUM5AdXY8418aft8xhUpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana MEV validator staking",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 28448.97,
+      "volume_24h_usd_at_discovery": 221789.0,
+      "pair_age_days_at_discovery": 11.9
     },
     {
       "name": "Lucia",
@@ -799,9 +844,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 57163.34,
-      "volume_24h_usd_at_discovery": 74202.69,
-      "pair_age_days_at_discovery": 46.87
+      "liquidity_usd_at_discovery": 53913.4,
+      "volume_24h_usd_at_discovery": 80675.05,
+      "pair_age_days_at_discovery": 46.91
     },
     {
       "name": "Zebec Network",
@@ -815,23 +860,8 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 196968.37,
-      "volume_24h_usd_at_discovery": 35316.78,
-      "pair_age_days_at_discovery": 522.14
-    },
-    {
-      "name": "Tensor",
-      "symbol": "TNSR",
-      "token_address": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 65422.37,
-      "volume_24h_usd_at_discovery": 12118.82,
-      "pair_age_days_at_discovery": 580.89
+      "volume_24h_usd_at_discovery": 33982.4,
+      "pair_age_days_at_discovery": 522.18
     },
     {
       "name": "SOLANA ACCELERATE",
@@ -840,28 +870,13 @@
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana yield vaults",
+      "discovery_category": "Solana restaking",
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 125700.66,
-      "volume_24h_usd_at_discovery": 72547.56,
-      "pair_age_days_at_discovery": 3.63
-    },
-    {
-      "name": "offgrid",
-      "symbol": "OFFGRID",
-      "token_address": "7x8FSbwgJGrXXbk6BgSpXjiW25rzzzNu2wBhsDJbAjUi",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 4332.8,
-      "volume_24h_usd_at_discovery": 198111.57,
-      "pair_age_days_at_discovery": 0.06
+      "liquidity_usd_at_discovery": 126764.44,
+      "volume_24h_usd_at_discovery": 72712.09,
+      "pair_age_days_at_discovery": 3.67
     },
     {
       "name": "Marinade",
@@ -874,14 +889,29 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 83298.79,
-      "volume_24h_usd_at_discovery": 9150.03,
-      "pair_age_days_at_discovery": 1385.71
+      "liquidity_usd_at_discovery": 83459.87,
+      "volume_24h_usd_at_discovery": 9573.35,
+      "pair_age_days_at_discovery": 1385.75
     },
     {
-      "name": "Gigantic Tits & Ass",
-      "symbol": "GTA",
-      "token_address": "FViKbzdiHbBYXnVGfkdHAzJD6PcSPDGQHRQ4GY8zpump",
+      "name": "Tensor",
+      "symbol": "TNSR",
+      "token_address": "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "curated_symbol_search",
+      "discovery_category": "known_ecosystem_symbol",
+      "discovery_confidence": 1.0,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 65293.63,
+      "volume_24h_usd_at_discovery": 11846.75,
+      "pair_age_days_at_discovery": 580.93
+    },
+    {
+      "name": "PEPEween",
+      "symbol": "PEPEWEEN",
+      "token_address": "5C5K1ZetdvGoF5QRcyRbVMiVLhkJzS8RkH8UL2pwpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_profile_or_boost",
@@ -889,9 +919,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 1972.28,
-      "volume_24h_usd_at_discovery": 360540.46,
-      "pair_age_days_at_discovery": 0.06
+      "liquidity_usd_at_discovery": 14417.56,
+      "volume_24h_usd_at_discovery": 54885.98,
+      "pair_age_days_at_discovery": 1.0
     },
     {
       "name": "Clapping Cat",
@@ -904,9 +934,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 35730.84,
-      "volume_24h_usd_at_discovery": 66574.69,
-      "pair_age_days_at_discovery": 30.93
+      "liquidity_usd_at_discovery": 34505.45,
+      "volume_24h_usd_at_discovery": 64490.85,
+      "pair_age_days_at_discovery": 30.96
     },
     {
       "name": "RINO",
@@ -919,9 +949,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 1558403.78,
-      "volume_24h_usd_at_discovery": 369.61,
-      "pair_age_days_at_discovery": 210.14
+      "liquidity_usd_at_discovery": 1538330.59,
+      "volume_24h_usd_at_discovery": 369.68,
+      "pair_age_days_at_discovery": 210.18
     },
     {
       "name": "SolanaDEX Token",
@@ -936,42 +966,12 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 59912.09,
       "volume_24h_usd_at_discovery": 8880.67,
-      "pair_age_days_at_discovery": 82.21
+      "pair_age_days_at_discovery": 82.25
     },
     {
-      "name": "Grokkies",
-      "symbol": "GROKKIES",
-      "token_address": "8NTU6e46S8c8VD3uscMAgz8sQYjF2GofuZy4znQwpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 16293.08,
-      "volume_24h_usd_at_discovery": 34001.63,
-      "pair_age_days_at_discovery": 0.01
-    },
-    {
-      "name": "Real World AI",
-      "symbol": "RWA",
-      "token_address": "G8aVC4nk5oPWzTHp4PDm3kAuixCebv9WRQMD93h9pump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana real world assets RWA",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 161074.89,
-      "volume_24h_usd_at_discovery": 2862.87,
-      "pair_age_days_at_discovery": 735.66
-    },
-    {
-      "name": "Thunderhead",
-      "symbol": "HELMET",
-      "token_address": "FuGnvoCBa6FRzg7D3yQCutGTJiBX3DPKenRmTc4dpump",
+      "name": "Stanley Duckenmiller",
+      "symbol": "DUCKENMILLER",
+      "token_address": "3ppdhqiqoU3RCHsuSbnhTMCrMbgwHMsYpYsUxA8RkpeW",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_profile_or_boost",
@@ -979,9 +979,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 16189.24,
-      "volume_24h_usd_at_discovery": 128459.65,
-      "pair_age_days_at_discovery": 0.02
+      "liquidity_usd_at_discovery": 12432.67,
+      "volume_24h_usd_at_discovery": 191817.83,
+      "pair_age_days_at_discovery": 0.03
+    },
+    {
+      "name": "Hypertag",
+      "symbol": "HYPERTAG",
+      "token_address": "8WmbpB3Y8ZkGBGtXZX8q7GYHbv8Ac87ARCfgkW3Xpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 18259.59,
+      "volume_24h_usd_at_discovery": 21911.93,
+      "pair_age_days_at_discovery": 0.0
     },
     {
       "name": "Ace Data Cloud",
@@ -994,9 +1009,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 65854.43,
-      "volume_24h_usd_at_discovery": 4806.61,
-      "pair_age_days_at_discovery": 309.51
+      "liquidity_usd_at_discovery": 66045.31,
+      "volume_24h_usd_at_discovery": 5052.15,
+      "pair_age_days_at_discovery": 309.55
+    },
+    {
+      "name": "Real World AI",
+      "symbol": "RWA",
+      "token_address": "G8aVC4nk5oPWzTHp4PDm3kAuixCebv9WRQMD93h9pump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana real world assets RWA",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 161429.06,
+      "volume_24h_usd_at_discovery": 1901.94,
+      "pair_age_days_at_discovery": 735.7
     },
     {
       "name": "JUP",
@@ -1011,7 +1041,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 40462995.12,
       "volume_24h_usd_at_discovery": 51.41,
-      "pair_age_days_at_discovery": 164.25
+      "pair_age_days_at_discovery": 164.29
     },
     {
       "name": "Render",
@@ -1026,12 +1056,12 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 38440354.09,
       "volume_24h_usd_at_discovery": 51.41,
-      "pair_age_days_at_discovery": 177.26
+      "pair_age_days_at_discovery": 177.3
     },
     {
-      "name": "KATT",
-      "symbol": "KATT",
-      "token_address": "3L5svTNje1iNnYJEXLxgiZqaCkYQZ87FTXCt2JRFZyS7",
+      "name": "Lumen Privacy",
+      "symbol": "LUMEN",
+      "token_address": "BtAe3p7i1jig8vAAob1QuUkDZwLugqoGGXHrYBEKpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_profile_or_boost",
@@ -1039,8 +1069,8 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 2611.82,
-      "volume_24h_usd_at_discovery": 85867.79,
+      "liquidity_usd_at_discovery": 2103.54,
+      "volume_24h_usd_at_discovery": 105413.93,
       "pair_age_days_at_discovery": 0.03
     },
     {
@@ -1054,9 +1084,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 23513.16,
-      "volume_24h_usd_at_discovery": 30830.07,
-      "pair_age_days_at_discovery": 31.12
+      "liquidity_usd_at_discovery": 23569.07,
+      "volume_24h_usd_at_discovery": 31475.38,
+      "pair_age_days_at_discovery": 31.16
     },
     {
       "name": "SLERF",
@@ -1069,39 +1099,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 130287.59,
-      "volume_24h_usd_at_discovery": 1311.46,
-      "pair_age_days_at_discovery": 342.21
-    },
-    {
-      "name": "Grand Theft Auto VI -Vicecity",
-      "symbol": "VICECITY",
-      "token_address": "25NVbDfwuAVhb2XADxGCs6WQuPjU1RsgDfUG6GV132Tm",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 17239.87,
-      "volume_24h_usd_at_discovery": 52015.09,
-      "pair_age_days_at_discovery": 0.12
-    },
-    {
-      "name": "WiSP",
-      "symbol": "WISP",
-      "token_address": "USEu5qroduzuvrSZfvs3xM1MwyU83joapQF5LMyWiSP",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 17596.92,
-      "volume_24h_usd_at_discovery": 9582.2,
-      "pair_age_days_at_discovery": 9.15
+      "liquidity_usd_at_discovery": 127100.07,
+      "volume_24h_usd_at_discovery": 1383.13,
+      "pair_age_days_at_discovery": 342.25
     },
     {
       "name": "Rogue Network",
@@ -1114,9 +1114,24 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 7696.71,
-      "volume_24h_usd_at_discovery": 18150.9,
-      "pair_age_days_at_discovery": 2.55
+      "liquidity_usd_at_discovery": 9150.1,
+      "volume_24h_usd_at_discovery": 20566.11,
+      "pair_age_days_at_discovery": 2.59
+    },
+    {
+      "name": "WiSP",
+      "symbol": "WISP",
+      "token_address": "USEu5qroduzuvrSZfvs3xM1MwyU83joapQF5LMyWiSP",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 17214.27,
+      "volume_24h_usd_at_discovery": 9775.35,
+      "pair_age_days_at_discovery": 9.19
     },
     {
       "name": "Solana",
@@ -1131,7 +1146,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 18030742.7,
       "volume_24h_usd_at_discovery": 51.41,
-      "pair_age_days_at_discovery": 186.24
+      "pair_age_days_at_discovery": 186.28
     },
     {
       "name": "solanaclawd",
@@ -1144,9 +1159,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 38172.25,
-      "volume_24h_usd_at_discovery": 1412.05,
-      "pair_age_days_at_discovery": 204.6
+      "liquidity_usd_at_discovery": 38209.55,
+      "volume_24h_usd_at_discovery": 1408.8,
+      "pair_age_days_at_discovery": 204.64
     },
     {
       "name": "Drift",
@@ -1159,9 +1174,24 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 12563.55,
-      "volume_24h_usd_at_discovery": 12965.36,
-      "pair_age_days_at_discovery": 896.47
+      "liquidity_usd_at_discovery": 12421.25,
+      "volume_24h_usd_at_discovery": 12922.89,
+      "pair_age_days_at_discovery": 896.51
+    },
+    {
+      "name": "X",
+      "symbol": "X",
+      "token_address": "7iXEe4CjF8rWJCcpF2nwbmvxzUUTTFxnEMaKmLDMpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 2361.08,
+      "volume_24h_usd_at_discovery": 130696.7,
+      "pair_age_days_at_discovery": 0.04
     },
     {
       "name": "Satoshi a BTC Stablecoin",
@@ -1176,7 +1206,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 143919.1,
       "volume_24h_usd_at_discovery": 229.49,
-      "pair_age_days_at_discovery": 395.43
+      "pair_age_days_at_discovery": 395.46
     },
     {
       "name": "Noiz",
@@ -1189,9 +1219,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 11582.84,
-      "volume_24h_usd_at_discovery": 2207.81,
-      "pair_age_days_at_discovery": 46.93
+      "liquidity_usd_at_discovery": 11466.71,
+      "volume_24h_usd_at_discovery": 2270.63,
+      "pair_age_days_at_discovery": 46.97
     },
     {
       "name": "Play Solana",
@@ -1204,9 +1234,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 102164.39,
-      "volume_24h_usd_at_discovery": 308.33,
-      "pair_age_days_at_discovery": 349.24
+      "liquidity_usd_at_discovery": 101219.28,
+      "volume_24h_usd_at_discovery": 314.89,
+      "pair_age_days_at_discovery": 349.28
     },
     {
       "name": "NPC Solana",
@@ -1219,9 +1249,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 113522.73,
-      "volume_24h_usd_at_discovery": 266.24,
-      "pair_age_days_at_discovery": 861.29
+      "liquidity_usd_at_discovery": 112475.67,
+      "volume_24h_usd_at_discovery": 266.29,
+      "pair_age_days_at_discovery": 861.32
     },
     {
       "name": "Solana Social Explorer",
@@ -1236,7 +1266,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 81627.87,
       "volume_24h_usd_at_discovery": 307.25,
-      "pair_age_days_at_discovery": 631.48
+      "pair_age_days_at_discovery": 631.52
     },
     {
       "name": "Solana Deads",
@@ -1245,13 +1275,13 @@
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana restaking",
+      "discovery_category": "Solana lending borrowing",
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 35219.87,
-      "volume_24h_usd_at_discovery": 260.56,
-      "pair_age_days_at_discovery": 388.84
+      "volume_24h_usd_at_discovery": 256.45,
+      "pair_age_days_at_discovery": 388.87
     },
     {
       "name": "Parcl",
@@ -1264,24 +1294,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 33694.91,
-      "volume_24h_usd_at_discovery": 997.65,
-      "pair_age_days_at_discovery": 926.56
-    },
-    {
-      "name": "Real World Asses",
-      "symbol": "RWA",
-      "token_address": "HTsE1sb3FKvvdMi6tDsnXTbNP5qAg2L3P6fS3JVT8jDm",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana real world assets RWA",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 14175.5,
-      "volume_24h_usd_at_discovery": 378.76,
-      "pair_age_days_at_discovery": 48.65
+      "liquidity_usd_at_discovery": 33675.03,
+      "volume_24h_usd_at_discovery": 971.48,
+      "pair_age_days_at_discovery": 926.6
     },
     {
       "name": "Real",
@@ -1290,13 +1305,13 @@
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana real world asset tokenization",
+      "discovery_category": "Solana real world assets RWA",
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 235910.56,
       "volume_24h_usd_at_discovery": 11.23,
-      "pair_age_days_at_discovery": 401.9
+      "pair_age_days_at_discovery": 401.94
     },
     {
       "name": "nub",
@@ -1311,22 +1326,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 40448.37,
       "volume_24h_usd_at_discovery": 91.21,
-      "pair_age_days_at_discovery": 0.35
-    },
-    {
-      "name": "Lucky Legend",
-      "symbol": "LLD",
-      "token_address": "64MWN63e19qaw2HEecX6btUJSSbWwZgrw74bjFVVpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 19184.55,
-      "volume_24h_usd_at_discovery": 94.85,
-      "pair_age_days_at_discovery": 257.83
+      "pair_age_days_at_discovery": 0.39
     },
     {
       "name": "Helium Mobile",
@@ -1339,9 +1339,9 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 13750.91,
-      "volume_24h_usd_at_discovery": 972.29,
-      "pair_age_days_at_discovery": 1289.48
+      "liquidity_usd_at_discovery": 13452.5,
+      "volume_24h_usd_at_discovery": 961.84,
+      "pair_age_days_at_discovery": 1289.52
     },
     {
       "name": "Liquid Staking Token",
@@ -1354,9 +1354,39 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 191927.18,
-      "volume_24h_usd_at_discovery": 53.42,
-      "pair_age_days_at_discovery": 1043.14
+      "liquidity_usd_at_discovery": 192173.0,
+      "volume_24h_usd_at_discovery": 57.69,
+      "pair_age_days_at_discovery": 1043.18
+    },
+    {
+      "name": "Real World Asses",
+      "symbol": "RWA",
+      "token_address": "HTsE1sb3FKvvdMi6tDsnXTbNP5qAg2L3P6fS3JVT8jDm",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana real world assets RWA",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 14175.5,
+      "volume_24h_usd_at_discovery": 150.07,
+      "pair_age_days_at_discovery": 48.69
+    },
+    {
+      "name": "Solana",
+      "symbol": "SOL",
+      "token_address": "soCLGVqNFx63FcSwc89eTLABLXAg2tAoHJhDthz8ExZ",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana restaking",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 1250451.94,
+      "volume_24h_usd_at_discovery": 6.09,
+      "pair_age_days_at_discovery": 301.24
     },
     {
       "name": "AGENTLAUNCHER Token",
@@ -1371,7 +1401,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 39325.81,
       "volume_24h_usd_at_discovery": 24.03,
-      "pair_age_days_at_discovery": 618.06
+      "pair_age_days_at_discovery": 618.1
     },
     {
       "name": "AntCoin",
@@ -1386,7 +1416,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 1681354.52,
       "volume_24h_usd_at_discovery": 1.45,
-      "pair_age_days_at_discovery": 206.87
+      "pair_age_days_at_discovery": 206.91
     },
     {
       "name": "Solana ID",
@@ -1395,13 +1425,13 @@
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana lending protocol token",
+      "discovery_category": "Solana DeFi TVL protocol token",
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 16544.9,
       "volume_24h_usd_at_discovery": 21.54,
-      "pair_age_days_at_discovery": 678.96
+      "pair_age_days_at_discovery": 679.0
     },
     {
       "name": "Bonfida",
@@ -1414,9 +1444,39 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 4952.46,
-      "volume_24h_usd_at_discovery": 554.58,
-      "pair_age_days_at_discovery": 1431.62
+      "liquidity_usd_at_discovery": 4947.51,
+      "volume_24h_usd_at_discovery": 552.22,
+      "pair_age_days_at_discovery": 1431.66
+    },
+    {
+      "name": "hyperdih",
+      "symbol": "HYPERDIH",
+      "token_address": "5zx789A7T79ZEmFkmzr66cbacaDkVojmVCDr1CnKpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 69.3,
+      "volume_24h_usd_at_discovery": 35926.12,
+      "pair_age_days_at_discovery": 0.04
+    },
+    {
+      "name": "Token Index Protocol",
+      "symbol": "TIP",
+      "token_address": "AJadr1WdCEpUHKGf9rQ9UD5dDPgFEzM6qvYmEGCX9mjW",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana DeFi TVL protocol token",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 137562.1,
+      "volume_24h_usd_at_discovery": 9.64,
+      "pair_age_days_at_discovery": 586.37
     },
     {
       "name": "Solana Poker",
@@ -1429,24 +1489,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 50866.06,
-      "volume_24h_usd_at_discovery": 2.7,
-      "pair_age_days_at_discovery": 827.78
-    },
-    {
-      "name": "Token Index Protocol",
-      "symbol": "TIP",
-      "token_address": "AJadr1WdCEpUHKGf9rQ9UD5dDPgFEzM6qvYmEGCX9mjW",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana lending protocol token",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 137562.1,
-      "volume_24h_usd_at_discovery": 9.64,
-      "pair_age_days_at_discovery": 586.33
+      "liquidity_usd_at_discovery": 50233.3,
+      "volume_24h_usd_at_discovery": 2.47,
+      "pair_age_days_at_discovery": 827.82
     },
     {
       "name": "Solana World Assets",
@@ -1461,22 +1506,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 2613.02,
       "volume_24h_usd_at_discovery": 62.66,
-      "pair_age_days_at_discovery": 92.84
-    },
-    {
-      "name": "KATT",
-      "symbol": "KATT",
-      "token_address": "FWsS6gh2DcQUq9kgQskB7EMFXR5oK4sqeYEnF7ggpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 163112.73,
-      "pair_age_days_at_discovery": 0.04
+      "pair_age_days_at_discovery": 92.88
     },
     {
       "name": "Akiro Real-world Asset",
@@ -1491,7 +1521,22 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 17560.26,
       "volume_24h_usd_at_discovery": 4.48,
-      "pair_age_days_at_discovery": 489.51
+      "pair_age_days_at_discovery": 489.55
+    },
+    {
+      "name": "HYPE FAUCET",
+      "symbol": "HYPEFAUCET",
+      "token_address": "HyPESTUwRbb21wH4Qyw9ayKhb9AC7bWciqGbnGp7dRip",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 104380.73,
+      "pair_age_days_at_discovery": 0.03
     },
     {
       "name": "Drift",
@@ -1506,12 +1551,12 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 3301.96,
       "volume_24h_usd_at_discovery": 254.03,
-      "pair_age_days_at_discovery": 3.61
+      "pair_age_days_at_discovery": 3.65
     },
     {
-      "name": "hyper",
-      "symbol": "HYPER",
-      "token_address": "6PrGQt7iBSup9jkakVwDUYoZ2vUUqNM8HbZgYQ4Mpump",
+      "name": "Red Baron Guy",
+      "symbol": "WALT",
+      "token_address": "BW8QuaDC1Tw7jRv2Hm5FbkYkitFrgS8itknXy3Avpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_profile_or_boost",
@@ -1520,43 +1565,13 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 76782.1,
-      "pair_age_days_at_discovery": 0.05
-    },
-    {
-      "name": "Colum Coin",
-      "symbol": "COLUM",
-      "token_address": "3SFK79ZtgiCZrz1jf3hnzMJDQyaYPZY6eic8TBdtpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 65749.14,
+      "volume_24h_usd_at_discovery": 80559.18,
       "pair_age_days_at_discovery": 0.01
     },
     {
-      "name": "HQ Solana",
-      "symbol": "HQ",
-      "token_address": "EDTmJjr4VoV9S8ftCQFt4ZBvmDy9s1tBoiWVrmDApump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana borrow money market",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 764.33,
-      "volume_24h_usd_at_discovery": 57.89,
-      "pair_age_days_at_discovery": 35.11
-    },
-    {
-      "name": "DogBoy Bebop",
-      "symbol": "DOGBOY",
-      "token_address": "7hjmNRSPGoawymsMnrzSwECJu9bxbkPwpmf85P8Upump",
+      "name": "Chameleon Jeff",
+      "symbol": "JEFF",
+      "token_address": "3j77Xp3RgZRpb2e5jWz1VdSHwfo5MCTCMU562XbHpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_profile_or_boost",
@@ -1565,23 +1580,8 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 38307.28,
-      "pair_age_days_at_discovery": 0.13
-    },
-    {
-      "name": "Viper",
-      "symbol": "VIPER",
-      "token_address": "2siF8D7MYZeZydYhjkr3TPEiF6kZjVk1qywk2Q92v2P9",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 32271.87,
-      "pair_age_days_at_discovery": 0.03
+      "volume_24h_usd_at_discovery": 73218.62,
+      "pair_age_days_at_discovery": 0.01
     },
     {
       "name": "minebox.fun",
@@ -1595,7 +1595,97 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 31008.83,
+      "volume_24h_usd_at_discovery": 60778.19,
+      "pair_age_days_at_discovery": 0.05
+    },
+    {
+      "name": "PULLS",
+      "symbol": "PULLS",
+      "token_address": "EjRpSxNVmaLReVwRLds549ZbvMdPVW9ZB4xNhe9KejA3",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 50644.75,
+      "pair_age_days_at_discovery": 0.03
+    },
+    {
+      "name": "The Hyperliquid Bull",
+      "symbol": "STANLEY",
+      "token_address": "9ByTee2HLhxQZYbn2i2A5UnaBY2gtEPYkKdEsLgfpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 49274.64,
+      "pair_age_days_at_discovery": 0.03
+    },
+    {
+      "name": "HQ Solana",
+      "symbol": "HQ",
+      "token_address": "EDTmJjr4VoV9S8ftCQFt4ZBvmDy9s1tBoiWVrmDApump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana borrow money market",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 764.33,
+      "volume_24h_usd_at_discovery": 49.36,
+      "pair_age_days_at_discovery": 35.15
+    },
+    {
+      "name": "RecompLauncher",
+      "symbol": "RL",
+      "token_address": "58gj8ENdAg6pvEuaro6GrgZtRv4tpnsPJJcYMzCpjWmX",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 42626.75,
+      "pair_age_days_at_discovery": 1.46
+    },
+    {
+      "name": "DogBoy Bebop",
+      "symbol": "DOGBOY",
+      "token_address": "7hjmNRSPGoawymsMnrzSwECJu9bxbkPwpmf85P8Upump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 38706.2,
+      "pair_age_days_at_discovery": 0.17
+    },
+    {
+      "name": "GrokCoin",
+      "symbol": "GROKCOIN",
+      "token_address": "DdUWzDPNXzLEAjUoULPx63F2u3AxUMi3vRgJJdbDpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 34047.79,
       "pair_age_days_at_discovery": 0.01
     },
     {
@@ -1610,8 +1700,8 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 30627.64,
-      "pair_age_days_at_discovery": 0.14
+      "volume_24h_usd_at_discovery": 30638.53,
+      "pair_age_days_at_discovery": 0.18
     },
     {
       "name": "CLUCKIN’ BELL",
@@ -1625,23 +1715,53 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 35466.02,
-      "pair_age_days_at_discovery": 0.65
+      "volume_24h_usd_at_discovery": 36696.91,
+      "pair_age_days_at_discovery": 0.69
     },
     {
-      "name": "qwid",
-      "symbol": "QWID",
-      "token_address": "66XAgVbdHVZWMZMWvBpCYX8Thwb7bzbL92qxD6mEpump",
+      "name": "Sol of War",
+      "symbol": "SOLOFWAR",
+      "token_address": "4KdB5zg8VuuUKJEk4DvkVZnrT9DJQxvWbjfDRF4cpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_profile_or_boost",
       "discovery_category": "latest_profiles_and_boosts",
       "discovery_confidence": 0.8,
-      "has_project_website": false,
+      "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 114726.74,
-      "pair_age_days_at_discovery": 0.06
+      "volume_24h_usd_at_discovery": 22372.07,
+      "pair_age_days_at_discovery": 0.01
+    },
+    {
+      "name": "Hyperpussy",
+      "symbol": "PUSSY",
+      "token_address": "FqT3J8FuNpyzfPFjJWaDHzaAQcXxhskxaAdAteraXTYE",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 19074.31,
+      "pair_age_days_at_discovery": 0.03
+    },
+    {
+      "name": "voxID",
+      "symbol": "VOX",
+      "token_address": "nKoyPUbeu2yEaE8aCLMruxvCzALxpj4kSPczudT5vox",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 18399.64,
+      "pair_age_days_at_discovery": 0.01
     },
     {
       "name": "Summoning Intelligence",
@@ -1655,8 +1775,23 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 15539.37,
-      "pair_age_days_at_discovery": 1.52
+      "volume_24h_usd_at_discovery": 15054.24,
+      "pair_age_days_at_discovery": 1.56
+    },
+    {
+      "name": "Anakin Skywalker",
+      "symbol": "ANAKIN",
+      "token_address": "ExxzYBTt3jwU5MUxuw2F4toYbTLdFwThSjyaCn6Xpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 66605.02,
+      "pair_age_days_at_discovery": 0.02
     },
     {
       "name": "Solana Money Glitch",
@@ -1671,7 +1806,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 8763.53,
       "volume_24h_usd_at_discovery": 0.13,
-      "pair_age_days_at_discovery": 614.98
+      "pair_age_days_at_discovery": 615.02
     },
     {
       "name": "World 2D Games",
@@ -1686,7 +1821,37 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 10941.83,
-      "pair_age_days_at_discovery": 6.02
+      "pair_age_days_at_discovery": 6.06
+    },
+    {
+      "name": "New Lingo",
+      "symbol": "LINGO",
+      "token_address": "5qc24MU4dVUzQUH9YmCciSPdAVWf46yNo3duiGZkpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 45225.02,
+      "pair_age_days_at_discovery": 0.63
+    },
+    {
+      "name": "McPokémon",
+      "symbol": "MCPOKÉ",
+      "token_address": "7jDYkD5FT2Sku9gpDiqcpaGfLk2VDhha528ne8HMpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 42456.16,
+      "pair_age_days_at_discovery": 0.02
     },
     {
       "name": "Solana Stock Index",
@@ -1701,7 +1866,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 5526.71,
       "volume_24h_usd_at_discovery": 0.22,
-      "pair_age_days_at_discovery": 53.32
+      "pair_age_days_at_discovery": 53.36
     },
     {
       "name": "hyUSD",
@@ -1714,9 +1879,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 171.57,
-      "volume_24h_usd_at_discovery": 291.09,
-      "pair_age_days_at_discovery": 369.14
+      "liquidity_usd_at_discovery": 171.56,
+      "volume_24h_usd_at_discovery": 292.64,
+      "pair_age_days_at_discovery": 369.18
     },
     {
       "name": "Solana's Stablecoin",
@@ -1731,22 +1896,22 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 5959.16,
       "volume_24h_usd_at_discovery": 0.0,
-      "pair_age_days_at_discovery": 523.8
+      "pair_age_days_at_discovery": 523.84
     },
     {
-      "name": "DacityCoin",
-      "symbol": "ADC",
-      "token_address": "7G5bEaEsixKGm2eC9d6dRwuKYQrc3cEJPrzxvbh1pump",
+      "name": "Furnace",
+      "symbol": "FURN",
+      "token_address": "Dg1YyVnCJtBZN8Fy1mSbUrQmKCJ7SZPApdr3XtWMpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana MEV validator staking",
+      "discovery_category": "Solana developer tooling RPC indexing",
       "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
+      "has_project_website": true,
+      "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 59346.13,
-      "pair_age_days_at_discovery": 14.16
+      "volume_24h_usd_at_discovery": 7466.52,
+      "pair_age_days_at_discovery": 9.01
     },
     {
       "name": "exchange.fun",
@@ -1760,8 +1925,23 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 57120.21,
-      "pair_age_days_at_discovery": 0.07
+      "volume_24h_usd_at_discovery": 60953.74,
+      "pair_age_days_at_discovery": 0.11
+    },
+    {
+      "name": "DacityCoin",
+      "symbol": "ADC",
+      "token_address": "7G5bEaEsixKGm2eC9d6dRwuKYQrc3cEJPrzxvbh1pump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana MEV validator staking",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 59347.98,
+      "pair_age_days_at_discovery": 14.2
     },
     {
       "name": "Huge Yams Perpetual Exchange",
@@ -1770,13 +1950,13 @@
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana DEX exchange",
+      "discovery_category": "Solana perpetual futures derivatives",
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 32744.14,
-      "pair_age_days_at_discovery": 1.08
+      "volume_24h_usd_at_discovery": 31763.35,
+      "pair_age_days_at_discovery": 1.12
     },
     {
       "name": "Blockasset",
@@ -1791,7 +1971,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 637.02,
       "volume_24h_usd_at_discovery": 6.52,
-      "pair_age_days_at_discovery": 444.05
+      "pair_age_days_at_discovery": 444.09
     },
     {
       "name": "Money Spread",
@@ -1805,8 +1985,8 @@
       "has_project_website": false,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 31509.65,
-      "pair_age_days_at_discovery": 1.84
+      "volume_24h_usd_at_discovery": 30043.56,
+      "pair_age_days_at_discovery": 1.88
     },
     {
       "name": "Only Possible On Solana",
@@ -1819,9 +1999,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 945.25,
-      "volume_24h_usd_at_discovery": 34.14,
-      "pair_age_days_at_discovery": 66.23
+      "liquidity_usd_at_discovery": 926.36,
+      "volume_24h_usd_at_discovery": 37.22,
+      "pair_age_days_at_discovery": 66.27
     },
     {
       "name": "𝕏 Card",
@@ -1835,23 +2015,8 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 40179.33,
-      "pair_age_days_at_discovery": 0.69
-    },
-    {
-      "name": "Lumen Privacy",
-      "symbol": "LUMEN",
-      "token_address": "BtAe3p7i1jig8vAAob1QuUkDZwLugqoGGXHrYBEKpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana privacy security",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 36882.72,
-      "pair_age_days_at_discovery": 0.01
+      "volume_24h_usd_at_discovery": 40233.43,
+      "pair_age_days_at_discovery": 0.73
     },
     {
       "name": "Real World Asses",
@@ -1866,7 +2031,37 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 9203.84,
       "volume_24h_usd_at_discovery": 0.63,
-      "pair_age_days_at_discovery": 562.56
+      "pair_age_days_at_discovery": 562.6
+    },
+    {
+      "name": "Shibetoshi Nakamoto",
+      "symbol": "BILLY",
+      "token_address": "EcQPPd9tKtPxiQULnFW3XA3URpebdAzLoVH7pgobo5w4",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana NFT infrastructure marketplace",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 29992.9,
+      "pair_age_days_at_discovery": 0.44
+    },
+    {
+      "name": "Solana Network Service",
+      "symbol": "SNS",
+      "token_address": "7A6bQCwoCc9o9YQNrc2Mdg3Y4sRCVdC8FuX77qqgQJav",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana DePIN network",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 663.3,
+      "volume_24h_usd_at_discovery": 2.84,
+      "pair_age_days_at_discovery": 922.59
     },
     {
       "name": "Solana Stability Protocol",
@@ -1881,22 +2076,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 2313.08,
       "volume_24h_usd_at_discovery": 11.36,
-      "pair_age_days_at_discovery": 6.67
-    },
-    {
-      "name": "Gta Money Cheat",
-      "symbol": "R1R2L1R2",
-      "token_address": "5iRj9L9BBPLKfmoCAKd2fSfZHb583RwMiPvddvNrpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana borrow money market",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 16349.89,
-      "pair_age_days_at_discovery": 2.45
+      "pair_age_days_at_discovery": 6.71
     },
     {
       "name": "CROWN Token",
@@ -1911,7 +2091,37 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 736.31,
       "volume_24h_usd_at_discovery": 1.5,
-      "pair_age_days_at_discovery": 1109.41
+      "pair_age_days_at_discovery": 1109.45
+    },
+    {
+      "name": "PIGSEM",
+      "symbol": "$PIGSEM",
+      "token_address": "FNpZa5dmxtyt1HPkuB5kjmRAa4id7M21qYaxR2vapump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_profile_or_boost",
+      "discovery_category": "latest_profiles_and_boosts",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": true,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 1472.08,
+      "pair_age_days_at_discovery": 2.03
+    },
+    {
+      "name": "Perps On Cardano",
+      "symbol": "POC",
+      "token_address": "6Qjb4ewW5Z7BbdUxWSM9uYwR33omri44imydnmA6HXVb",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana payments card fintech",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 12328.73,
+      "pair_age_days_at_discovery": 0.05
     },
     {
       "name": "Real World Asset",
@@ -1926,7 +2136,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 3492.41,
       "volume_24h_usd_at_discovery": 1.46,
-      "pair_age_days_at_discovery": 275.78
+      "pair_age_days_at_discovery": 275.82
     },
     {
       "name": "SCAM STOMPER",
@@ -1940,8 +2150,8 @@
       "has_project_website": true,
       "has_project_social": true,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 774.91,
-      "pair_age_days_at_discovery": 279.97
+      "volume_24h_usd_at_discovery": 773.99,
+      "pair_age_days_at_discovery": 280.01
     },
     {
       "name": "realworld.quest",
@@ -1955,8 +2165,8 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 9859.94,
-      "pair_age_days_at_discovery": 10.73
+      "volume_24h_usd_at_discovery": 9590.13,
+      "pair_age_days_at_discovery": 10.77
     },
     {
       "name": "Real World Assets Registry",
@@ -1971,37 +2181,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 7524.27,
-      "pair_age_days_at_discovery": 0.21
-    },
-    {
-      "name": "Solanaween",
-      "symbol": "SOLANAWEEN",
-      "token_address": "9dXPgyPVpfxVYRtsBYaENQF7qAPEtWQXykQeQxr9pump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana lending borrowing",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 5099.81,
-      "pair_age_days_at_discovery": null
-    },
-    {
-      "name": "Scaredy Cat",
-      "symbol": "SCDC",
-      "token_address": "5gSARXKnyizq3kn64NyPfn14RcLPQ7rtUuL9KLrdBAGS",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_profile_or_boost",
-      "discovery_category": "latest_profiles_and_boosts",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 2000.83,
-      "pair_age_days_at_discovery": 0.16
+      "pair_age_days_at_discovery": 0.25
     },
     {
       "name": "The Great Cloud",
@@ -2016,7 +2196,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 1967.14,
       "volume_24h_usd_at_discovery": 0.58,
-      "pair_age_days_at_discovery": 91.02
+      "pair_age_days_at_discovery": 91.06
     },
     {
       "name": "Real World Assets",
@@ -2031,22 +2211,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 4217.73,
-      "pair_age_days_at_discovery": 0.26
-    },
-    {
-      "name": "Hype Internet Money",
-      "symbol": "HIM",
-      "token_address": "BgKeVdzmzQFJeZsZPv3oS45uPatdjhWn85GEjv4ppump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana borrow money market",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 3561.53,
-      "pair_age_days_at_discovery": 0.0
+      "pair_age_days_at_discovery": 0.3
     },
     {
       "name": "Codex Pet",
@@ -2061,22 +2226,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 2861.8,
       "volume_24h_usd_at_discovery": 0.23,
-      "pair_age_days_at_discovery": 3.06
-    },
-    {
-      "name": "ah shit, here we go again",
-      "symbol": "AGAIN",
-      "token_address": "CR62YLhF8WVtRs6LJmqRyeAduLSvcuvGaqYbfm48pump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana MEV validator staking",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 3506.04,
-      "pair_age_days_at_discovery": 18.23
+      "pair_age_days_at_discovery": 3.1
     },
     {
       "name": "Zebec Network",
@@ -2091,7 +2241,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 1774.79,
       "volume_24h_usd_at_discovery": 0.97,
-      "pair_age_days_at_discovery": 2.5
+      "pair_age_days_at_discovery": 2.54
     },
     {
       "name": "Real World Assets",
@@ -2105,38 +2255,8 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 3182.15,
-      "pair_age_days_at_discovery": 0.21
-    },
-    {
-      "name": "Snapmatic",
-      "symbol": "SNAPMATIC",
-      "token_address": "GerDDv6LzFb3hNprAsRi6Tv81vVTV5hUWu56yVCpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana MEV validator staking",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 2379.65,
-      "pair_age_days_at_discovery": 7.75
-    },
-    {
-      "name": "Bibi choose solana",
-      "symbol": "BIBICOIN",
-      "token_address": "4mHHQkDAoP77mzm6aqeWL1ChsUDLk9ik2vHzcnXWySsK",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana governance DAO protocol",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.98,
-      "volume_24h_usd_at_discovery": 1171.04,
-      "pair_age_days_at_discovery": 0.97
+      "volume_24h_usd_at_discovery": 3182.65,
+      "pair_age_days_at_discovery": 0.25
     },
     {
       "name": "Real World Assets",
@@ -2151,7 +2271,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 2041.85,
-      "pair_age_days_at_discovery": 0.26
+      "pair_age_days_at_discovery": 0.3
     },
     {
       "name": "JPOOL Solana Token",
@@ -2164,9 +2284,9 @@
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 180.54,
-      "volume_24h_usd_at_discovery": 6.42,
-      "pair_age_days_at_discovery": 1043.14
+      "liquidity_usd_at_discovery": 180.87,
+      "volume_24h_usd_at_discovery": 6.48,
+      "pair_age_days_at_discovery": 1043.18
     },
     {
       "name": "Blackout",
@@ -2181,12 +2301,12 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 1827.95,
-      "pair_age_days_at_discovery": 0.87
+      "pair_age_days_at_discovery": 0.9
     },
     {
-      "name": "Cal Hampton",
-      "symbol": "CAL",
-      "token_address": "4zzYW1Y12EJDPCSLN36FAZJzh115HznkSKqwhiWHpump",
+      "name": "Raul Bautista",
+      "symbol": "RAUL",
+      "token_address": "C1dNqHWwrLC6Hmtbr75BL3FmH4UCN3ztam7VDtwhpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
@@ -2195,38 +2315,8 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 1644.72,
-      "pair_age_days_at_discovery": 17.95
-    },
-    {
-      "name": "happy birthday BSOL",
-      "symbol": "BSOL",
-      "token_address": "ChqgHecpy5Ds8M5Cad1ZZ4raMN2Ww6PjAuNbPgtpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 1032.82,
-      "pair_age_days_at_discovery": 0.98
-    },
-    {
-      "name": "Vice City Narcos",
-      "symbol": "NARCOS",
-      "token_address": "8Y3ZTuEmMYQzptZp8ENo8waYmp2HJMc253FbbDzspump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana MEV validator staking",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 1029.7,
-      "pair_age_days_at_discovery": 7.91
+      "volume_24h_usd_at_discovery": 1054.16,
+      "pair_age_days_at_discovery": 16.12
     },
     {
       "name": "Infinite Liquidity Router",
@@ -2241,7 +2331,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 327.09,
       "volume_24h_usd_at_discovery": 0.84,
-      "pair_age_days_at_discovery": 34.65
+      "pair_age_days_at_discovery": 34.69
     },
     {
       "name": "Lodestar Liquidity Router",
@@ -2256,7 +2346,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 301.91,
       "volume_24h_usd_at_discovery": 0.7,
-      "pair_age_days_at_discovery": 33.6
+      "pair_age_days_at_discovery": 33.64
     },
     {
       "name": "SOLCARD",
@@ -2271,7 +2361,22 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 635.27,
-      "pair_age_days_at_discovery": 0.16
+      "pair_age_days_at_discovery": 0.2
+    },
+    {
+      "name": "X Card Payments",
+      "symbol": "XCARD",
+      "token_address": "FFDazbw36AAdDV7tDhP5zKCtNjsNWZNe1KfBr4gXpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana payments card fintech",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 593.09,
+      "pair_age_days_at_discovery": null
     },
     {
       "name": "SOLCARD",
@@ -2286,7 +2391,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 512.02,
-      "pair_age_days_at_discovery": 0.17
+      "pair_age_days_at_discovery": 0.21
     },
     {
       "name": "Seraphic Liquidity Router",
@@ -2301,7 +2406,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 205.26,
       "volume_24h_usd_at_discovery": 0.25,
-      "pair_age_days_at_discovery": 33.6
+      "pair_age_days_at_discovery": 33.64
     },
     {
       "name": "Elysian Solana Router",
@@ -2316,22 +2421,22 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 82.7,
       "volume_24h_usd_at_discovery": 2.66,
-      "pair_age_days_at_discovery": 22.94
+      "pair_age_days_at_discovery": 22.98
     },
     {
-      "name": "TokenTime",
-      "symbol": "TT",
-      "token_address": "5dSW7m4EN1DWXk6782P1UYSddDz3xTQEAtL6gtZmpump",
+      "name": "Jato",
+      "symbol": "JTO",
+      "token_address": "6w6fwBDM92k64WEvTJ4LCKzKBqJo8VUSTsRYUfZypump",
       "chain": "solana",
       "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana real world assets RWA",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
+      "discovery_source": "curated_symbol_search",
+      "discovery_category": "known_ecosystem_symbol",
+      "discovery_confidence": 1.0,
+      "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 31.74,
-      "volume_24h_usd_at_discovery": 0.23,
-      "pair_age_days_at_discovery": 692.89
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 277.3,
+      "pair_age_days_at_discovery": 0.0
     },
     {
       "name": "Indexed Solana",
@@ -2346,7 +2451,22 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 62.33,
       "volume_24h_usd_at_discovery": 1.74,
-      "pair_age_days_at_discovery": 1040.67
+      "pair_age_days_at_discovery": 1040.7
+    },
+    {
+      "name": "TokenTime",
+      "symbol": "TT",
+      "token_address": "5dSW7m4EN1DWXk6782P1UYSddDz3xTQEAtL6gtZmpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana real world assets RWA",
+      "discovery_confidence": 0.8,
+      "has_project_website": true,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 31.74,
+      "volume_24h_usd_at_discovery": 0.11,
+      "pair_age_days_at_discovery": 692.93
     },
     {
       "name": "Luminous Solana Router",
@@ -2361,22 +2481,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 83.89,
       "volume_24h_usd_at_discovery": 1.54,
-      "pair_age_days_at_discovery": 22.94
-    },
-    {
-      "name": "X Card Payments",
-      "symbol": "XCARD",
-      "token_address": "FFDazbw36AAdDV7tDhP5zKCtNjsNWZNe1KfBr4gXpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana payments card fintech",
-      "discovery_confidence": 0.8,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 196.44,
-      "pair_age_days_at_discovery": null
+      "pair_age_days_at_discovery": 22.98
     },
     {
       "name": "SnakeOfSolana",
@@ -2391,7 +2496,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 13.91,
       "volume_24h_usd_at_discovery": 0.03,
-      "pair_age_days_at_discovery": 526.51
+      "pair_age_days_at_discovery": 526.55
     },
     {
       "name": "SOLCARD",
@@ -2406,22 +2511,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 123.58,
-      "pair_age_days_at_discovery": 0.16
-    },
-    {
-      "name": "Birthday SOL",
-      "symbol": "BSOL",
-      "token_address": "2PJ6a62MRhkqb5pFhqJK1xn7yPqmXa2bY53sW9iGpump",
-      "chain": "solana",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 82.33,
-      "pair_age_days_at_discovery": 591.69
+      "pair_age_days_at_discovery": 0.2
     },
     {
       "name": "SOLCARD",
@@ -2436,7 +2526,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 74.41,
-      "pair_age_days_at_discovery": 0.17
+      "pair_age_days_at_discovery": 0.2
     },
     {
       "name": "Solana Stock Index",
@@ -2451,7 +2541,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 3.87,
       "volume_24h_usd_at_discovery": 0.0,
-      "pair_age_days_at_discovery": 420.1
+      "pair_age_days_at_discovery": 420.14
     },
     {
       "name": "Empyrean Liquidity Gateway",
@@ -2466,22 +2556,22 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 31.68,
       "volume_24h_usd_at_discovery": 0.07,
-      "pair_age_days_at_discovery": 94.1
+      "pair_age_days_at_discovery": 94.14
     },
     {
-      "name": "Real World Assets",
-      "symbol": "RWA",
-      "token_address": "2Luish1srjhcEYo1araFcEq8SANWZ8YeMmpFMRtNpump",
+      "name": "Kintsugi Network",
+      "symbol": "KINTSUGI",
+      "token_address": "CNtoWJSfXVfwcK8Yc5KR6vY7Dw5yBqMWvGeUFKiVpump",
       "chain": "solana",
       "approved_non_meme": true,
       "discovery_source": "dexscreener_search",
-      "discovery_category": "Solana real world assets RWA",
+      "discovery_category": "Solana DePIN network",
       "discovery_confidence": 0.8,
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
-      "volume_24h_usd_at_discovery": 20.2,
-      "pair_age_days_at_discovery": 275.83
+      "volume_24h_usd_at_discovery": 25.56,
+      "pair_age_days_at_discovery": 31.0
     },
     {
       "name": "King Solana Money",
@@ -2496,7 +2586,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 23.47,
-      "pair_age_days_at_discovery": 1.09
+      "pair_age_days_at_discovery": 1.13
     },
     {
       "name": "NRV Network on Solana",
@@ -2511,7 +2601,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 15.42,
-      "pair_age_days_at_discovery": 12.91
+      "pair_age_days_at_discovery": 12.95
     },
     {
       "name": "Baby Solana",
@@ -2526,7 +2616,7 @@
       "has_project_social": true,
       "liquidity_usd_at_discovery": 5.07,
       "volume_24h_usd_at_discovery": 0.1,
-      "pair_age_days_at_discovery": 1072.83
+      "pair_age_days_at_discovery": 1072.87
     },
     {
       "name": "DropYourSolanaWallet",
@@ -2541,7 +2631,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 10.47,
       "volume_24h_usd_at_discovery": 0.21,
-      "pair_age_days_at_discovery": 7.74
+      "pair_age_days_at_discovery": 7.78
     },
     {
       "name": "Drift",
@@ -2556,7 +2646,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 5.9,
-      "pair_age_days_at_discovery": 276.89
+      "pair_age_days_at_discovery": 276.93
     },
     {
       "name": "BaldApeTittiesSolanaWinnie6900",
@@ -2571,7 +2661,22 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 5.39,
-      "pair_age_days_at_discovery": 157.86
+      "pair_age_days_at_discovery": 157.9
+    },
+    {
+      "name": "Shadowpad",
+      "symbol": "SHDW",
+      "token_address": "7k3Hnt3GLSDsondyDF1DWMvaVXK3cXhPCZG9J65wpump",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "curated_symbol_search",
+      "discovery_category": "known_ecosystem_symbol",
+      "discovery_confidence": 1.0,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 0.0,
+      "volume_24h_usd_at_discovery": 7.8,
+      "pair_age_days_at_discovery": 13.93
     },
     {
       "name": "Solana Money Machine",
@@ -2586,7 +2691,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 4.6,
-      "pair_age_days_at_discovery": 59.17
+      "pair_age_days_at_discovery": 59.21
     },
     {
       "name": "og with dex 2h go",
@@ -2601,7 +2706,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 6.69,
-      "pair_age_days_at_discovery": 0.94
+      "pair_age_days_at_discovery": 0.98
     },
     {
       "name": "GTA V Mobile",
@@ -2616,7 +2721,52 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 6.47,
-      "pair_age_days_at_discovery": 9.73
+      "pair_age_days_at_discovery": 9.77
+    },
+    {
+      "name": "57651",
+      "symbol": "57651",
+      "token_address": "57651PAVutNCTppbhuS35BQJzBBM4LqG1PxB9XDDNzS7",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana perpetuals trading protocol",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 2.29,
+      "volume_24h_usd_at_discovery": 0.15,
+      "pair_age_days_at_discovery": 49.92
+    },
+    {
+      "name": "Bibi choose solana",
+      "symbol": "BIBICOIN",
+      "token_address": "4mHHQkDAoP77mzm6aqeWL1ChsUDLk9ik2vHzcnXWySsK",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana governance DAO protocol",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 0.98,
+      "volume_24h_usd_at_discovery": 0.48,
+      "pair_age_days_at_discovery": 1.01
+    },
+    {
+      "name": "Metal Solana",
+      "symbol": "MESOL",
+      "token_address": "FLWYZ2ECgLucrgKsn1GbCeXCg5axryRnNw8zD5qCi4xu",
+      "chain": "solana",
+      "approved_non_meme": true,
+      "discovery_source": "dexscreener_search",
+      "discovery_category": "Solana borrow money market",
+      "discovery_confidence": 0.8,
+      "has_project_website": false,
+      "has_project_social": false,
+      "liquidity_usd_at_discovery": 0.48,
+      "volume_24h_usd_at_discovery": 0.02,
+      "pair_age_days_at_discovery": 218.43
     },
     {
       "name": "Solana Network is up 65%",
@@ -2631,7 +2781,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 0.99,
-      "pair_age_days_at_discovery": 2.25
+      "pair_age_days_at_discovery": 2.29
     },
     {
       "name": "Shadow Coin",
@@ -2646,7 +2796,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 0.75,
-      "pair_age_days_at_discovery": 4.03
+      "pair_age_days_at_discovery": 4.07
     },
     {
       "name": "Solana Social Payments",
@@ -2661,7 +2811,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 0.69,
-      "pair_age_days_at_discovery": 21.09
+      "pair_age_days_at_discovery": 21.13
     },
     {
       "name": "SOLANA DEVS LAUNCHPAD @3K????",
@@ -2676,7 +2826,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 0.6,
-      "pair_age_days_at_discovery": 27.39
+      "pair_age_days_at_discovery": 27.43
     },
     {
       "name": "Real World Assets",
@@ -2691,7 +2841,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 0.06,
-      "pair_age_days_at_discovery": 34.86
+      "pair_age_days_at_discovery": 34.9
     },
     {
       "name": "Real World Asses",
@@ -2706,7 +2856,7 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.0,
       "volume_24h_usd_at_discovery": 0.0,
-      "pair_age_days_at_discovery": 48.64
+      "pair_age_days_at_discovery": 48.68
     },
     {
       "name": "DropYourSolanaWallet",
@@ -2721,20 +2871,20 @@
       "has_project_social": false,
       "liquidity_usd_at_discovery": 0.01,
       "volume_24h_usd_at_discovery": 0.01,
-      "pair_age_days_at_discovery": 7.74
+      "pair_age_days_at_discovery": 7.77
     }
   ],
   "discovery_diagnostics": {
     "queries": 72,
-    "pairs_seen": 2157,
-    "wrong_chain": 1101,
-    "meme_rejected": 45,
-    "invalid_candidates": 21,
-    "eligible": 181,
+    "pairs_seen": 2165,
+    "wrong_chain": 1118,
+    "meme_rejected": 44,
+    "invalid_candidates": 23,
+    "eligible": 191,
     "search_errors": 1,
     "profile_seed_addresses": 25,
-    "boost_seed_addresses": 21,
-    "unique_mints": 181,
+    "boost_seed_addresses": 24,
+    "unique_mints": 191,
     "query_sources": 73
   }
 }
