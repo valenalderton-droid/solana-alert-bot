@@ -122,49 +122,107 @@ def utc_now():
 # This is a heuristic filter, not a guarantee that every meme token is excluded.
 # Curated protocol-token universe. Exact-symbol matching reduces unrelated search results.
 # This is deliberately conservative; it will miss some legitimate projects.
+# Curated symbols are a seed, not the entire universe. Dynamic category searches
+# below expand discovery beyond this list; all discovered assets still face liquidity,
+# age, metadata, and explicit meme-risk checks before they can be analyzed.
 ECOSYSTEM_SYMBOLS = {
     "JUP", "RAY", "ORCA", "KMNO", "JTO", "PYTH", "DRIFT", "MNDE",
     "HNT", "MOBILE", "RENDER", "SHDW", "NOS", "TNSR", "PRCL", "ZEX",
-    "CLOUD", "INF", "JLP", "MPLX", "W", "STEP", "SLND",
-    "PORT", "UXD", "C98", "MNGO", "SRM", "FIDA",
-    "HONEY", "IO", "ZEUS", "MET", "BLZE",
-    "MSOL", "BSOL", "JITOSOL",
-    "BNSOL"
+    "CLOUD", "INF", "JLP", "MPLX", "W", "STEP", "SLND", "PORT", "UXD",
+    "C98", "MNGO", "SRM", "FIDA", "HONEY", "IO", "ZEUS", "MET", "BLZE",
+    "MSOL", "BSOL", "JITOSOL", "BNSOL", "JTO", "JST", "LIKE", "GUAC",
+    "DUST", "AUDIO", "ACS", "KIN", "ATLAS", "POLIS", "GENE", "GMT",
+    "GST", "PRISM", "MNDE", "LDO", "WOO", "WEN", "CROWN", "SHFL",
+    "MPL", "HADES", "CROWN", "SLND", "UXP", "SAMO", "STEP", "SBR",
+    "TULIP", "MNGO", "SON", "AURY", "DIO", "CHEX", "BORG", "GARI",
+    "MEDIA", "DVPN", "HONEY", "WHALES", "CATO", "BOKU", "NATIX",
+    "MATRIX", "PRCL", "ZBCN", "GIGA", "ISLAND", "PONCHO", "CASH",
+    "MELD", "HXD", "SHARK", "WIF", "JTO", "PYTH", "JUP", "RAY"
 }
 
 MEME_TERMS = {
     "meme", "memecoin", "inu", "doge", "pepe", "bonk", "wif", "shib",
     "floki", "wojak", "frog", "elon", "trump", "moon", "rocket", "kitty",
-    "dogwif", "baby dog", "babyshib", "pumpfun", "pump.fun"
+    "dogwif", "baby dog", "babyshib", "pumpfun", "pump.fun", "cat coin",
+    "dog coin", "frog coin", "memes"
 }
+
+DISCOVERY_QUERIES = (
+    "Solana DeFi protocol", "Solana lending borrowing", "Solana DEX exchange",
+    "Solana oracle data", "Solana liquid staking", "Solana restaking",
+    "Solana infrastructure developer tools", "Solana decentralized storage",
+    "Solana payments stablecoin", "Solana perpetual futures derivatives",
+    "Solana yield vaults", "Solana real world assets RWA",
+    "Solana privacy security", "Solana wallet infrastructure",
+    "Solana governance protocol", "Solana cross chain bridge",
+    "Solana NFT infrastructure utility", "Solana compute AI infrastructure",
+    "Solana DePIN network", "Solana gaming infrastructure",
+    "Solana identity authentication", "Solana tokenized treasury",
+    "Solana MEV trading infrastructure", "Solana analytics data protocol",
+)
+
+
+def _is_meme_like(name, symbol):
+    text = f"{name} {symbol}".lower().replace("-", " ").replace("_", " ")
+    words = set(text.split())
+    return bool(words & MEME_TERMS) or any(
+        term in text for term in (
+            "memecoin", "meme coin", "dogwif", "baby dog", "babyshib",
+            "pump.fun", "pumpfun", "dog token", "cat token"
+        )
+    )
+
+
+def _has_project_metadata(pair):
+    info = pair.get("info") or {}
+    websites = info.get("websites") or []
+    socials = info.get("socials") or []
+    has_website = any(
+        isinstance(item, dict) and str(item.get("url", "")).startswith(("https://", "http://"))
+        for item in websites
+    )
+    has_social = any(
+        isinstance(item, dict) and str(item.get("url", "")).startswith(("https://", "http://"))
+        for item in socials
+    )
+    return has_website, has_social
 
 
 def is_allowed_non_meme_project(project):
-    """Fail closed: only known Solana ecosystem utility/protocol tokens pass."""
+    """Allow curated protocol assets or evidence-backed category discoveries.
+
+    This is a risk-reduction heuristic, not proof that a token is legitimate.
+    """
     if not isinstance(project, dict) or not project.get("approved_non_meme", False):
         return False
     symbol = str(project.get("symbol") or "").strip().upper()
-    name = str(project.get("name") or "").strip().lower()
+    name = str(project.get("name") or "").strip()
     address = str(project.get("token_address") or "").strip()
-    if not symbol or symbol not in ECOSYSTEM_SYMBOLS or not address:
+    if not symbol or not address or _is_meme_like(name, symbol):
         return False
-    text = f"{name} {symbol.lower()}"
-    words = set(text.replace("-", " ").replace("_", " ").split())
-    if words & MEME_TERMS:
-        return False
-    if any(term in text for term in ("memecoin", "meme coin", "dogwif", "baby dog", "babyshib", "pump.fun", "pumpfun")):
-        return False
-    return True
+    curated = symbol in ECOSYSTEM_SYMBOLS
+    discovered = (
+        project.get("discovery_source") == "dexscreener_category_search"
+        and project.get("discovery_confidence", 0) >= 0.8
+        and project.get("has_project_website", False)
+    )
+    return curated or discovered
 
 
 DISCOVERY_CACHE_FILE = Path(__file__).resolve().parent / "data" / "discovery_cache.json"
 
 
 def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
-                             min_age_days=30, max_projects=20):
-    """Discover candidates with a disk cache to avoid repeated API bursts."""
+                             min_age_days=30, max_projects=500):
+    """Build a broad, cached Solana utility-token universe from many category searches.
+
+    The API cannot enumerate literally every Solana project. This gathers a much
+    broader candidate set, rotates through it in main.py, and fails closed when
+    metadata or market-quality evidence is missing.
+    """
     found = {}
     filters = {
+        "discovery_version": 2,
         "min_liquidity": float(min_liquidity),
         "min_volume_24h": float(min_volume_24h),
         "min_age_days": int(min_age_days),
@@ -176,51 +234,49 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
         cache = json.loads(DISCOVERY_CACHE_FILE.read_text(encoding="utf-8"))
         if cache.get("filters") == filters and isinstance(cache.get("projects"), list):
             cached_projects = cache["projects"]
-            cached_at = datetime.fromisoformat(
-                str(cache.get("saved_at", "")).replace("Z", "+00:00")
-            )
+            cached_at = datetime.fromisoformat(str(cache.get("saved_at", "")).replace("Z", "+00:00"))
             if cached_at.tzinfo is None:
                 cached_at = cached_at.replace(tzinfo=timezone.utc)
             age_seconds = (datetime.now(timezone.utc) - cached_at.astimezone(timezone.utc)).total_seconds()
             if cached_projects and cache_ttl_minutes > 0 and 0 <= age_seconds < cache_ttl_minutes * 60:
-                print(
-                    f"Discovery cache hit: {len(cached_projects)} projects; "
-                    f"age={age_seconds / 60:.1f} min."
-                )
+                print(f"Discovery cache hit: {len(cached_projects)} projects; age={age_seconds / 60:.1f} min.")
                 return cached_projects[:max_projects]
     except (OSError, ValueError, TypeError, AttributeError):
         cached_projects = []
-    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
-    counts = {"queries": 0, "pairs_seen": 0, "wrong_chain": 0,
-              "symbol_rejected": 0, "liquidity_volume_age_rejected": 0}
 
-    # Search one ticker at a time, then require exact symbol match.
-    for symbol_query in sorted(ECOSYSTEM_SYMBOLS):
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    counts = {
+        "queries": 0, "pairs_seen": 0, "wrong_chain": 0,
+        "meme_rejected": 0, "metadata_rejected": 0,
+        "liquidity_volume_age_rejected": 0, "eligible": 0,
+    }
+
+    # Search known protocol symbols plus broad categories. A bounded request count
+    # reduces API hammering while finding projects outside the old fixed allowlist.
+    queries = [("symbol", symbol) for symbol in sorted(ECOSYSTEM_SYMBOLS)]
+    queries.extend(("category", query) for query in DISCOVERY_QUERIES)
+    for query_type, query in queries:
         counts["queries"] += 1
         try:
             payload = get_json(
                 "https://api.dexscreener.com/latest/dex/search",
-                params={"q": symbol_query}
+                params={"q": query}
             )
             for pair in payload.get("pairs") or []:
                 counts["pairs_seen"] += 1
                 if pair.get("chainId") != "solana":
                     counts["wrong_chain"] += 1
                     continue
-
                 token = pair.get("baseToken") or {}
                 address = str(token.get("address") or "").strip()
                 name = str(token.get("name") or "").strip()
                 symbol = str(token.get("symbol") or "").strip().upper()
-                if not address or not name or symbol != symbol_query:
-                    counts["symbol_rejected"] += 1
+                if not address or not name or not symbol:
                     continue
-
-                text = (name + " " + symbol).lower()
-                words = set(text.replace("-", " ").replace("_", " ").split())
-                if words & MEME_TERMS or any(term in text for term in
-                    ("memecoin", "meme coin", "dogwif", "baby dog", "babyshib")):
-                    counts["symbol_rejected"] += 1
+                if query_type == "symbol" and symbol != query:
+                    continue
+                if _is_meme_like(name, symbol):
+                    counts["meme_rejected"] += 1
                     continue
 
                 liquidity = float((pair.get("liquidity") or {}).get("usd") or 0)
@@ -233,40 +289,57 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
                     counts["liquidity_volume_age_rejected"] += 1
                     continue
 
-                previous = found.get(address)
-                score = liquidity + volume
-                if previous and previous["_score"] >= score:
+                has_website, has_social = _has_project_metadata(pair)
+                curated = symbol in ECOSYSTEM_SYMBOLS
+                # New symbols are admitted only when category-discovered and an
+                # official website is present. Social-only tokens are too easy to fake.
+                if not curated and (query_type != "category" or not has_website):
+                    counts["metadata_rejected"] += 1
                     continue
-                found[address] = {
+
+                score = liquidity + volume
+                project = {
                     "name": name,
                     "symbol": symbol,
                     "token_address": address,
                     "approved_non_meme": True,
-                    "_score": score
+                    "discovery_source": (
+                        "curated_symbol_search" if curated
+                        else "dexscreener_category_search"
+                    ),
+                    "discovery_category": query if query_type == "category" else "known_ecosystem_symbol",
+                    "discovery_confidence": 1.0 if curated else 0.8,
+                    "has_project_website": bool(has_website),
+                    "has_project_social": bool(has_social),
+                    "liquidity_usd_at_discovery": liquidity,
+                    "volume_24h_usd_at_discovery": volume,
                 }
+                previous = found.get(address)
+                if previous and previous["_score"] >= score:
+                    continue
+                project["_score"] = score
+                found[address] = project
         except Exception as exc:
-            print(f"Discovery query failed ({symbol_query}): {exc}")
+            print(f"Discovery query failed ({query}): {exc}")
 
     projects = sorted(found.values(), key=lambda item: item["_score"], reverse=True)
     for project in projects:
         project.pop("_score", None)
+    counts["eligible"] = len(projects)
     print("Discovery diagnostics: " + str(counts))
-    print(f"Automatic discovery found {len(projects)} eligible Solana projects.")
+    print(f"Automatic discovery found {len(projects)} eligible Solana utility/protocol candidates.")
     if projects:
         try:
             DISCOVERY_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
-            DISCOVERY_CACHE_FILE.write_text(
-                json.dumps({
-                    "saved_at": datetime.now(timezone.utc).isoformat(),
-                    "filters": filters,
-                    "projects": projects[:max_projects],
-                }, ensure_ascii=False, indent=2),
-                encoding="utf-8"
-            )
+            DISCOVERY_CACHE_FILE.write_text(json.dumps({
+                "saved_at": datetime.now(timezone.utc).isoformat(),
+                "filters": filters,
+                "projects": projects[:max_projects],
+                "discovery_diagnostics": counts,
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
         except OSError as exc:
             print(f"Discovery cache write failed: {exc}")
     elif cached_projects:
-        # API outages/rate limits should not erase a previously known universe.
         print(f"Discovery returned no projects; using {len(cached_projects)} cached candidates as fallback.")
         return cached_projects[:max_projects]
     return projects[:max_projects]
