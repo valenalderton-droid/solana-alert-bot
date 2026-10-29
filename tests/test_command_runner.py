@@ -101,16 +101,16 @@ class CommandRunnerTests(unittest.TestCase):
 
     def test_detects_ranked_buy_watch_alert(self):
         message = (
-            "SOLANA TOP-RANKED BUY WATCH — NOT AN AUTOMATIC TRADE\\n\\n"
-            "Project: Example (EXM)\\n"
-            "Entry reference: $1.25\\n"
-            "Stop reference: $1.18 (5.00%)\\n"
-            "Target reference: $1.50 (20.00%)\\n"
-            "Combined model probability: 65.0%\\n"
-            'Probability by horizon: {"4h": 0.65, "24h": 0.61}\\n'
-            "Liquidity: $250,000\\n"
-            "24h volume: $500,000\\n"
-            "Mint: ExampleMintAddress\\n"
+            "SOLANA TOP-RANKED BUY WATCH — NOT AN AUTOMATIC TRADE\n\n"
+            "Project: Example (EXM)\n"
+            "Entry reference: $1.25\n"
+            "Stop reference: $1.18 (5.00%)\n"
+            "Target reference: $1.50 (20.00%)\n"
+            "Combined model probability: 65.0%\n"
+            'Probability by horizon: {"4h": 0.65, "24h": 0.61}\n'
+            "Liquidity: $250,000\n"
+            "24h volume: $500,000\n"
+            "Mint: ExampleMintAddress\n"
         )
         self.assertTrue(command_runner.is_buy_alert(message))
         reply = command_runner.concise_reply([message])
