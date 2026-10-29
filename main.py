@@ -251,9 +251,12 @@ def monitor_open_positions(state, market_info):
         exit_reason = None
         exit_price = None
         exit_ts = None
+        # Re-scan every post-entry candle on every run. Providers may update the
+        # current hourly candle during the hour; skipping last_checked_ts could
+        # permanently miss a stop/target touched later in that same candle.
         for candle in candles:
             ts = int(candle["timestamp"])
-            if ts <= entry_ts or ts <= int(position.get("last_checked_ts", entry_ts) or entry_ts):
+            if ts <= entry_ts:
                 continue
             low = float(candle["low"])
             high = float(candle["high"])
@@ -272,29 +275,31 @@ def monitor_open_positions(state, market_info):
         if not exit_reason and latest:
             latest_ts = int(latest["timestamp"])
             current_close = float(latest["close"])
-            # If structure breaks after entry, signal exit instead of waiting blindly.
-            try:
-                X, row = latest_features(candles)
-                if row is not None and latest_ts > entry_ts:
-                    if float(row.get("price_vs_ema21", 0)) < 0 and float(row.get("ema_gap", 0)) < 0:
-                        exit_reason, exit_price, exit_ts = "Trend breakdown below EMA21", current_close, latest_ts
-                    elif latest_ts - entry_ts >= 14 * 24 * 3600:
-                        exit_reason, exit_price, exit_ts = "14-day time limit reached", current_close, latest_ts
-            except Exception as exc:
-                print(f"Position trend check failed for {position.get('name')}: {exc}")
+            # Apply the time exit even if indicator history is too short or fails.
+            if latest_ts - entry_ts >= 14 * 24 * 3600:
+                exit_reason, exit_price, exit_ts = "14-day time limit reached", current_close, latest_ts
+            else:
+                # If structure breaks after entry, signal exit instead of waiting blindly.
+                try:
+                    X, row = latest_features(candles)
+                    if row is not None and latest_ts > entry_ts:
+                        if float(row.get("price_vs_ema21", 0)) < 0 and float(row.get("ema_gap", 0)) < 0:
+                            exit_reason, exit_price, exit_ts = "Trend breakdown below EMA21", current_close, latest_ts
+                except Exception as exc:
+                    print(f"Position trend check failed for {position.get('name')}: {exc}")
             position["last_checked_ts"] = latest_ts
 
         if exit_reason:
             pnl_pct = (float(exit_price) / entry - 1) * 100
             message = (
-                "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE\\n\\n"
-                f"Project: {position.get('name', 'Unknown')} ({position.get('symbol', '')})\\n"
-                f"Entry reference: ${entry:.8g}\\n"
-                f"Exit reference: ${float(exit_price):.8g}\\n"
-                f"Estimated return before fees/slippage: {pnl_pct:+.2f}%\\n"
-                f"Reason: {exit_reason}\\n"
-                f"Mint: {address}\\n"
-                f"Time (UTC): {utc_now()}\\n\\n"
+                "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE\n\n"
+                f"Project: {position.get('name', 'Unknown')} ({position.get('symbol', '')})\n"
+                f"Entry reference: ${entry:.8g}\n"
+                f"Exit reference: ${float(exit_price):.8g}\n"
+                f"Estimated return before fees/slippage: {pnl_pct:+.2f}%\n"
+                f"Reason: {exit_reason}\n"
+                f"Mint: {address}\n"
+                f"Time (UTC): {utc_now()}\n\n"
                 "This is an exit alert only; the bot does not place trades."
             )
             sent = send_telegram(message)
