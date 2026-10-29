@@ -145,21 +145,47 @@ def resolve_old_signals(state, store):
             store.get(address, {}).values(),
             key=lambda c: c["timestamp"]
         )
-        exit_time = int(signal["timestamp"]) + 4 * 3600
-
-        eligible = [
-            c for c in candles
-            if int(c["timestamp"]) >= exit_time
+        signal_time = int(signal["timestamp"])
+        future = [
+            candle for candle in candles
+            if signal_time < int(candle["timestamp"]) <= signal_time + 4 * 3600
         ]
-        if not eligible:
+        if len(future) < 4:
             still_pending.append(signal)
             continue
 
-        exit_candle = eligible[0]
-        exit_price = float(exit_candle["close"])
         entry_price = float(signal["entry"])
+        stop_price = float(signal.get("stop", entry_price * 0.98))
+        target_price = float(signal.get("target", entry_price * 1.04))
         if entry_price <= 0:
             continue
+
+        exit_price = None
+        exit_candle = None
+        exit_method = "close_after_4h"
+        for candle in future[:4]:
+            hit_stop = float(candle["low"]) <= stop_price
+            hit_target = float(candle["high"]) >= target_price
+            # Conservative assumption when OHLC data cannot reveal which level hit first.
+            if hit_stop and hit_target:
+                exit_price = stop_price
+                exit_candle = candle
+                exit_method = "both_hit_same_candle_assume_stop"
+                break
+            if hit_stop:
+                exit_price = stop_price
+                exit_candle = candle
+                exit_method = "stop_hit"
+                break
+            if hit_target:
+                exit_price = target_price
+                exit_candle = candle
+                exit_method = "target_hit"
+                break
+
+        if exit_price is None:
+            exit_candle = future[3]
+            exit_price = float(exit_candle["close"])
 
         ret = exit_price / entry_price - 1
         outcome = {
@@ -167,12 +193,14 @@ def resolve_old_signals(state, store):
             "token_address": address,
             "name": signal["name"],
             "entry": entry_price,
+            "stop": stop_price,
+            "target": target_price,
             "exit": exit_price,
             "return_pct": round(ret * 100, 4),
             "result": "win" if ret > 0 else "loss",
             "exit_timestamp": int(exit_candle["timestamp"]),
             "resolved_at": utc_now(),
-            "method": "close_after_4h_not_stop_target_simulation"
+            "method": exit_method
         }
         append_jsonl(OUTCOMES_FILE, outcome)
 
@@ -401,7 +429,9 @@ def main():
             "token_address": address,
             "name": prediction["name"],
             "timestamp": candle_ts,
-            "entry": entry
+            "entry": entry,
+            "stop": stop,
+            "target": target
         })
         state["last_alerts"][address] = candle_ts
         state["stats"]["signals"] += 1
