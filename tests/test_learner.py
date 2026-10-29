@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from learner import FEATURES, add_features, build_training_rows, price_action_ok
+from learner import FEATURES, add_features, build_training_rows, price_action_ok, recency_sample_weights
 
 
 def make_flat_candles(count=80):
@@ -71,6 +71,16 @@ class LearnerTests(unittest.TestCase):
         ok, reason = price_action_ok(candles, row)
         self.assertFalse(ok)
         self.assertIn("Weak candle", reason)
+
+    def test_recency_weights_favor_newer_rows_but_keep_old_rows(self):
+        timestamps = [1_700_000_000, 1_700_000_000 + 21 * 86400,
+                      1_700_000_000 + 42 * 86400]
+        weights = recency_sample_weights(timestamps)
+        self.assertEqual(len(weights), 3)
+        self.assertGreater(weights[2], weights[1])
+        self.assertGreater(weights[1], weights[0])
+        self.assertGreaterEqual(float(weights[0]), 0.20 / float(np.mean(weights)))
+        self.assertAlmostEqual(float(np.mean(weights)), 1.0, places=6)
 
     def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
         rows = build_training_rows([make_flat_candles()])
