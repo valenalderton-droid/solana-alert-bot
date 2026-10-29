@@ -143,6 +143,23 @@ class CommandRunnerTests(unittest.TestCase):
     def test_watchlist_status_is_not_misclassified_as_buy(self):
         message = "SOLANA TOP WATCHLIST — NO VALID BUY SETUP\\nThis is NOT a buy signal."
         self.assertFalse(command_runner.is_buy_alert(message))
+        self.assertFalse(command_runner.is_trade_alert(message))
+
+    def test_explicit_sell_exit_alert_is_allowed(self):
+        message = (
+            "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE\\n"
+            "Exit reason: stop reference reached."
+        )
+        self.assertTrue(command_runner.is_sell_alert(message))
+        self.assertTrue(command_runner.is_trade_alert(message))
+
+    def test_routine_status_is_not_a_trade_alert(self):
+        for message in (
+            "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED",
+            "فعلاً ستاپ خرید معتبر پیدا نشد.",
+            "SOLANA NEWS IMPACT — RESEARCH, NOT A TRADE SIGNAL",
+        ):
+            self.assertFalse(command_runner.is_trade_alert(message), message)
 
 
 if __name__ == "__main__":
