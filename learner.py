@@ -1,11 +1,17 @@
 
 import math
+import os
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, brier_score_loss
+
+# Keep historical labels aligned with the live bot's configured risk barriers.
+# The workflow uses TARGET_PCT=0.10 and MAX_STOP_PCT=0.05.
+LABEL_MAX_STOP_PCT = float(os.getenv("MAX_STOP_PCT", "0.05"))
+LABEL_TARGET_PCT = float(os.getenv("TARGET_PCT", "0.10"))
 
 FEATURES = [
     "ret1", "ret3", "ret6", "ret12", "ret24",
@@ -120,9 +126,11 @@ def build_training_rows(candle_sets, horizon=4):
             atr_pct = float(df.iloc[i]["atr_pct"])
             if not np.isfinite(atr_pct) or atr_pct <= 0:
                 continue
-            stop_pct = min(0.05, max(0.02, 1.5 * atr_pct))
-            # Keep training labels aligned with the live alert's minimum 2R target.
-            target_pct = max(0.04, 3 * atr_pct, 2.0 * stop_pct)
+            # These barriers must match main.py's live BUY-watch construction.
+            # A 4% training target paired with a 10% live target makes model
+            # probabilities optimistic for the trades the bot actually proposes.
+            stop_pct = min(LABEL_MAX_STOP_PCT, max(0.02, 1.5 * atr_pct))
+            target_pct = max(LABEL_TARGET_PCT, 3 * atr_pct, 2.0 * stop_pct)
             target = entry * (1 + target_pct)
             stop = entry * (1 - stop_pct)
             label = None
