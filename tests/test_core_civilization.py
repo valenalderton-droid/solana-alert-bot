@@ -4,7 +4,18 @@ from core_civilization import (
     run_civilization_cycle, is_core_eligible, record_civilization_outcome,
 )
 from nine_core_engine import CORE_SPECS, evaluate_nine_cores
-from tests.test_nine_core_engine import candidate
+def candidate(address, name):
+    strategies = {"trend_following": 90, "breakout": 90, "momentum": 90, "volume_flow": 90,
+                  "market_structure": 90, "risk_control": 90, "mean_reversion": 60, "candle_rejection": 70}
+    pred = {"signal_id": address + ":100:BUY", "token_address": address, "name": name,
+            "symbol": name[:4].upper(), "timestamp": 100, "entry": 100, "stop": 95, "target": 115,
+            "stop_pct": 5, "target_pct": 15, "probability": 0.9, "rank_score": 90,
+            "liquidity_usd": 500000, "volume_24h_usd": 1000000, "entry_deviation_pct": 0.5,
+            "strategy_ensemble": {"strategies": strategies, "risk_flags": [], "market_regime": "uptrend"},
+            "signal_quality": {"score": 90, "passed": True}, "recent_news_context": []}
+    return {"prediction": pred, "info": {"price": 100, "liquidity": 500000, "volume24h": 1000000},
+            "ensemble": pred["strategy_ensemble"], "quality": pred["signal_quality"],
+            "entry": 100, "stop": 95, "target": 115, "stop_pct": 0.05, "target_pct": 0.15}
 
 
 class CoreCivilizationTests(unittest.TestCase):
@@ -46,7 +57,7 @@ class CoreCivilizationTests(unittest.TestCase):
 
     def test_governance_is_integrated_into_nine_core_scan(self):
         state = {}
-        result = evaluate_nine_cores([candidate("mintA", "Alpha")], state, {}, now="test-time")
+        result = evaluate_nine_cores([candidate("mintA", "Alpha")], state, {}, now="2026-10-29T12:00:00+00:00")
         self.assertIn("civilization", result)
         self.assertEqual(result["civilization"]["election_number"], 1)
         self.assertIsNotNone(result["winner"])
