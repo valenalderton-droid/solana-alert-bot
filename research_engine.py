@@ -179,6 +179,60 @@ def fetch_solana_tvl_snapshot(now=None):
     }
 
 
+def fetch_solana_activity_metrics(now=None):
+    """Fetch protocol-level DEX, fees, and derivatives snapshots from DeFiLlama."""
+    now = now or datetime.now(timezone.utc)
+    endpoints = [
+        ("Solana DEX volume", "https://api.llama.fi/overview/dexs/Solana"),
+        ("Solana fees", "https://api.llama.fi/overview/fees/Solana"),
+        ("Solana perpetuals volume", "https://api.llama.fi/overview/derivatives/Solana"),
+    ]
+    snapshots = []
+    failures = []
+    for label, url in endpoints:
+        try:
+            response = SESSION.get(url, timeout=(4, 10))
+            response.raise_for_status()
+            payload = response.json()
+            if not isinstance(payload, dict):
+                raise ValueError("unexpected response shape")
+            total24h = payload.get("total24h")
+            if total24h is None:
+                total24h = payload.get("total24hUSD")
+            try:
+                value = float(total24h) if total24h is not None else None
+            except (TypeError, ValueError, OverflowError):
+                value = None
+            change = None
+            for key in ("change_1d", "change1d", "change_24h", "change24h"):
+                if payload.get(key) is not None:
+                    try:
+                        change = float(payload[key])
+                        break
+                    except (TypeError, ValueError, OverflowError):
+                        pass
+            if change is not None and not (-100 <= change <= 10000):
+                change = None
+            if value is not None and (value < 0 or value == float("inf") or value != value):
+                value = None
+            snapshots.append({
+                "id": f"defillama-{label.lower().replace(' ', '-')}-{int(now.timestamp() // 3600)}",
+                "kind": "metric",
+                "metric": label,
+                "value_usd": round(value, 2) if value is not None else None,
+                "change_24h_pct": round(change, 3) if change is not None else None,
+                "observed_at": now.isoformat(),
+                "source": "DeFiLlama",
+                "url": url,
+                "data_quality": "valid" if value is not None or change is not None else "partial",
+                "note": "Ecosystem activity context; not a standalone price prediction."
+            })
+        except (requests.RequestException, ValueError, TypeError) as exc:
+            failures.append({"metric": label, "error": str(exc)[:160]})
+            print(f"DeFiLlama metric failed ({label}): {exc}")
+    return snapshots, failures
+
+
 def run_research_cycle(state, outcomes=None, configured_projects=None, now=None):
     """Run a rate-limited research cycle; save evidence and report health counters."""
     now = now or datetime.now(timezone.utc)
@@ -227,16 +281,21 @@ def run_research_cycle(state, outcomes=None, configured_projects=None, now=None)
         except (ValueError, TypeError, OverflowError):
             metric_due = True
     metric = None
+    activity_metrics = []
     if metric_due:
         try:
             metric = fetch_solana_tvl_snapshot(now=now)
-            if metric["id"] not in seen:
-                evidence.append(metric)
-                seen.add(metric["id"])
+            activity_metrics, metric_failures = fetch_solana_activity_metrics(now=now)
+            failures += len(metric_failures)
+            for row in [metric] + activity_metrics:
+                if row["id"] not in seen:
+                    evidence.append(row)
+                    seen.add(row["id"])
             status["last_tvl_refresh_utc"] = now.isoformat()
+            status["last_activity_metrics_refresh_utc"] = now.isoformat()
         except (requests.RequestException, ValueError, TypeError, KeyError) as exc:
             failures += 1
-            print(f"Solana TVL research failed: {exc}")
+            print(f"Solana ecosystem metrics failed: {exc}")
 
     state["research_observations"] = evidence[-500:]
     state["seen_research_ids"] = list(seen)[-1000:]
@@ -249,6 +308,8 @@ def run_research_cycle(state, outcomes=None, configured_projects=None, now=None)
         "query_results": query_results[-4:],
         "total_evidence": len(evidence),
         "latest_tvl_change_24h_pct": metric.get("change_24h_pct") if metric else status.get("latest_tvl_change_24h_pct"),
+        "activity_metrics_refreshed": bool(activity_metrics),
+        "activity_metrics_count": len(activity_metrics),
     })
     print("Autonomous research cycle:", json.dumps(status, ensure_ascii=False))
-    return {"skipped": False, "new_articles": len(new_articles), "failures": failures, "metric": metric}
+    return {"skipped": False, "new_articles": len(new_articles), "failures": failures, "metric": metric, "activity_metrics": len(activity_metrics)}
