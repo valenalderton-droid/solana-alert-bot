@@ -1,5 +1,5 @@
 {
-  "saved_at": "2026-10-29T13:09:22.875311+00:00",
+  "saved_at": "2026-10-29T14:11:39.358689+00:00",
   "filters": {
     "min_liquidity": 100000.0,
     "min_volume_24h": 50000.0,
@@ -98,9 +98,9 @@
       "approved_non_meme": true
     },
     {
-      "name": "Nosana",
-      "symbol": "NOS",
-      "token_address": "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7",
+      "name": "Pyth Network",
+      "symbol": "PYTH",
+      "token_address": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
       "approved_non_meme": true
     },
     {
@@ -110,9 +110,9 @@
       "approved_non_meme": true
     },
     {
-      "name": "Pyth Network",
-      "symbol": "PYTH",
-      "token_address": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+      "name": "Nosana",
+      "symbol": "NOS",
+      "token_address": "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7",
       "approved_non_meme": true
     },
     {

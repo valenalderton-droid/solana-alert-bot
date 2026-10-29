@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T13:25:20.892836+00:00",
+  "last_run_utc": "2026-10-29T14:13:10.723604+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -49,7 +49,8 @@
     "f8eac83543fe939d91d05d5f",
     "4e3500f937ca847efa3b4032",
     "5d3a48e1dd64273a795ddbb2",
-    "bde8d79a7a48a9d1160c0f5d"
+    "bde8d79a7a48a9d1160c0f5d",
+    "7b30382e5f6ad2c9b2941c05"
   ],
   "news_observations": [
     {
@@ -497,13 +498,25 @@
       "title": "How to Buy PayPal USD (PYUSD): A Step-by-Step Guide - OneBullEx",
       "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOVUprc0I1ZDlVVmp1ZzhRbnpYQ01sWkQ3dW9Ra1JQem96VGwySzIyQ0R0SVRyc0VSeFp4WGNmdHlWV1E2ZjBkc3o3ZE54eklia3l3NjNmX1ZldkY3Ql9QQkN3ZkhRd0NMNFB5YmgwY2VMLVJXT1kwcWk5OXhNbl9USkx6eEFjWGs?oc=5",
       "research_topic": "adoption"
+    },
+    {
+      "observed_at": "2026-10-29T14:11:41.307533+00:00",
+      "published_at": "2026-10-29T13:36:06+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana Price Prediction: SOL Eyes $111 as Its Network Stays Busy, Analysts Tip Pepeto for 100x - openPR.com",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNUUt1MlFMSm9reGp3dWw0azlKa29RWnltd0d2ZlFDSjd4eG1fWUNUVDZ0N2trTXlWOXdjVGtmVDhzNU9zUFJwaFYyQnA2TDZITW9uVk00SFFDVzBJYXZmUndyaVdkQ2Nlbms2bXpSNDVYeV9Oay1lZVBkVnZiSnZPeFJQSWpCZ2dBRGpYRGdXLVZDT2tIbHdQZmhmUTlDOEk?oc=5"
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952333,
-  "last_news_refresh_utc": "2026-10-29T14:06:23.758796+00:00",
+  "telegram_update_offset": 806952334,
+  "last_news_refresh_utc": "2026-10-29T14:11:41.307584+00:00",
   "last_watchlist_ping_utc": "2026-10-29T11:19:40.239690+00:00",
-  "project_scan_cursor": 13,
+  "project_scan_cursor": 18,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
