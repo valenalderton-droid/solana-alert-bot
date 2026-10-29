@@ -61,7 +61,7 @@ class ComprehensiveAnalysisTests(unittest.TestCase):
         )
         self.assertIn("قیمت مرجع: نامعتبر", report)
         self.assertIn("کندل معتبر کافی نیست", report)
-        self.assertIn("تاریخچه", report)
+        self.assertIn("داده", report)
         self.assertIn("به معنی نبود خبر منفی نیست", report)
 
 
