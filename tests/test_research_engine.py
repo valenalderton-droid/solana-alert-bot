@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime, timezone
-from research_engine import build_research_plan, _performance_topics, fetch_solana_tvl_snapshot
+from research_engine import build_research_plan, _performance_topics, fetch_solana_tvl_snapshot, fetch_solana_activity_metrics
 from unittest.mock import patch
 
 
@@ -27,6 +27,26 @@ class ResearchEngineTests(unittest.TestCase):
             state, [], [{"name": "Random token", "symbol": "RND", "approved_non_meme": False}]
         )
         self.assertNotIn("Random token", " ".join(row[1] for row in plan))
+
+    def test_activity_metrics_parse_valid_numeric_changes(self):
+        class Response:
+            def __init__(self, payload):
+                self.payload = payload
+            def raise_for_status(self):
+                pass
+            def json(self):
+                return self.payload
+        responses = [
+            Response({"total24h": 1000000, "change_1d": -27.5}),
+            Response({"total24h": 20000, "change_1d": -5.0}),
+            Response({"total24h": 500000, "change_1d": -31.0}),
+        ]
+        with patch("research_engine.SESSION.get", side_effect=responses):
+            rows, failures = fetch_solana_activity_metrics(datetime(2026, 10, 29, tzinfo=timezone.utc))
+        self.assertEqual(failures, [])
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(rows[0]["change_24h_pct"], -27.5)
+        self.assertEqual(rows[2]["metric"], "Solana perpetuals volume")
 
     def test_tvl_requires_valid_history(self):
         class Response:
