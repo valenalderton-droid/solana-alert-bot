@@ -150,9 +150,31 @@ def resolve_old_signals(state, store):
             candle for candle in candles
             if signal_time < int(candle["timestamp"]) <= signal_time + 4 * 3600
         ]
-        if len(future) < 4:
-            still_pending.append(signal)
+        # Require four consecutive hourly candles. A missing candle must not
+        # make the evaluator silently treat a shorter/irregular window as 4h.
+        expected_times = [signal_time + hour * 3600 for hour in range(1, 5)]
+        future_by_time = {int(candle["timestamp"]): candle for candle in future}
+        complete_horizon = all(ts in future_by_time for ts in expected_times)
+        if not complete_horizon:
+            latest_ts = int(candles[-1]["timestamp"]) if candles else signal_time
+            # Keep waiting while data may still arrive; after 8h, close the
+            # paper observation as a data gap rather than leave it pending forever.
+            if latest_ts < signal_time + 8 * 3600:
+                still_pending.append(signal)
+                continue
+            append_jsonl(OUTCOMES_FILE, {
+                "signal_id": signal_id,
+                "token_address": address,
+                "name": signal.get("name", "Unknown"),
+                "entry": float(signal.get("entry", 0) or 0),
+                "result": "data_gap",
+                "return_pct": None,
+                "resolved_at": utc_now(),
+                "method": "missing_hourly_candles"
+            })
+            state["stats"]["resolved"] += 1
             continue
+        future = [future_by_time[ts] for ts in expected_times]
 
         entry_price = float(signal["entry"])
         stop_price = float(signal.get("stop", entry_price * 0.98))
@@ -478,7 +500,9 @@ def main():
         candle_ts = int(row["timestamp"])
         signal_id = f"{address}:{candle_ts}:BUY_WATCH"
 
-        if state["last_alerts"].get(address) == candle_ts:
+        last_alert_ts = int(state["last_alerts"].get(address, 0) or 0)
+        cooldown_hours = max(1, int(os.getenv("ALERT_COOLDOWN_HOURS", "6")))
+        if last_alert_ts and candle_ts - last_alert_ts < cooldown_hours * 3600:
             continue
 
         pa_ok, pa_reason = price_action_ok(candles, row)
