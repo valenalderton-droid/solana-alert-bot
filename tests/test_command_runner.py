@@ -162,7 +162,7 @@ class CommandRunnerTests(unittest.TestCase):
         ):
             self.assertFalse(command_runner.is_trade_alert(message), message)
 
-    def test_ordinary_text_does_not_trigger_a_reply(self):
+    def test_ordinary_text_gets_intelligent_reply_without_triggering_scan(self):
         response = Mock()
         response.raise_for_status.return_value = None
         response.json.return_value = {
@@ -171,13 +171,41 @@ class CommandRunnerTests(unittest.TestCase):
                 {"update_id": 40, "message": {"chat": {"id": 123}, "text": "hello"}},
             ],
         }
+        sent = Mock()
+        sent.raise_for_status.return_value = None
+        sent.json.return_value = {"ok": True}
         with patch.dict("os.environ", {
             "TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "123"
         }), patch.object(command_runner.requests, "get", return_value=response), \
-             patch.object(command_runner.requests, "post") as post, \
+             patch.object(command_runner.requests, "post", return_value=sent) as post, \
              patch.object(command_runner, "save_state"):
             self.assertFalse(command_runner.poll_pay({}))
-            post.assert_not_called()
+            post.assert_called_once()
+            self.assertIn("سلام", post.call_args.kwargs["json"]["text"])
+
+    def test_intelligent_reply_help_status_and_unknown(self):
+        help_text = command_runner.intelligent_reply("راهنما", {})
+        self.assertIn("//Pay", help_text)
+        status_text = command_runner.intelligent_reply(
+            "وضعیت", {"stats": {"signals": 3}, "open_positions": [{}], "last_run_utc": "now"}
+        )
+        self.assertIn("سیگنال‌های ثبت‌شده: 3", status_text)
+        self.assertIn("موقعیت‌های باز", status_text)
+        unknown = command_runner.intelligent_reply("سوال ناشناخته", {})
+        self.assertIn("پاسخ مطمئنی", unknown)
+
+    def test_intelligent_reply_news_uses_saved_sources(self):
+        reply = command_runner.intelligent_reply("اخبار", {
+            "news_observations": [{
+                "title": "Solana network update",
+                "sentiment": "POSITIVE",
+                "impact_score": 4,
+                "confidence": "MEDIUM",
+                "url": "https://example.com/news"
+            }]
+        })
+        self.assertIn("Solana network update", reply)
+        self.assertIn("https://example.com/news", reply)
 
     def test_recent_cached_candles_are_exit_only_fallback(self):
         now = datetime(2026, 10, 29, 12, 30, tzinfo=timezone.utc)
