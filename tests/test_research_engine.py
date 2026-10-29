@@ -1,10 +1,29 @@
 import unittest
 from datetime import datetime, timezone
-from research_engine import build_research_plan, _performance_topics, fetch_solana_tvl_snapshot, fetch_solana_activity_metrics, assess_research_evidence
+from research_engine import build_research_plan, _performance_topics, fetch_solana_tvl_snapshot, fetch_solana_activity_metrics, assess_research_evidence, corroborate_evidence
 from unittest.mock import patch
 
 
 class ResearchEngineTests(unittest.TestCase):
+    def test_corroboration_requires_similar_titles_on_distinct_domains(self):
+        rows = [
+            {"title": "Solana protocol announces major network upgrade today",
+             "url": "https://publisher-one.example/solana-upgrade",
+             "evidence_quality_score": 70},
+            {"title": "Solana protocol announces major network upgrade today",
+             "url": "https://publisher-two.example/network-upgrade",
+             "evidence_quality_score": 65},
+            {"title": "Local weather forecast changes this weekend",
+             "url": "https://weather.example/forecast",
+             "evidence_quality_score": 60},
+        ]
+        result = corroborate_evidence(rows)
+        self.assertTrue(result[0]["corroborated"])
+        self.assertTrue(result[1]["corroborated"])
+        self.assertEqual(result[0]["corroborating_publisher_count"], 2)
+        self.assertGreater(result[0]["evidence_quality_score"], 70)
+        self.assertFalse(result[2]["corroborated"])
+
     def test_research_evidence_marks_mixed_keywords_without_claiming_verified_impact(self):
         now = datetime(2026, 10, 29, tzinfo=timezone.utc)
         result = assess_research_evidence(
