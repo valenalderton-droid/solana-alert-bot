@@ -2,6 +2,8 @@
 import requests
 import json
 import os
+import math
+import statistics
 from pathlib import Path
 from datetime import datetime, timezone
 from requests.adapters import HTTPAdapter
@@ -32,6 +34,12 @@ def get_json(url, params=None):
 
 
 def get_best_solana_pair(token_address, min_liquidity=100000):
+    """Choose a liquid, recently active pool with a price consistent with peers.
+
+    DexScreener does not expose a quote timestamp on each pair. Recent hourly
+    trades and cross-pool price agreement are therefore used as conservative
+    sanity checks; this does not guarantee an executable fill price.
+    """
     url = f"https://api.dexscreener.com/latest/dex/tokens/{token_address}"
     data = get_json(url)
     pairs = data.get("pairs") or []
@@ -42,22 +50,54 @@ def get_best_solana_pair(token_address, min_liquidity=100000):
             continue
 
         base = pair.get("baseToken") or {}
-        if base.get("address", "").lower() != token_address.lower():
+        if str(base.get("address") or "").lower() != token_address.lower():
             continue
 
-        liquidity = float((pair.get("liquidity") or {}).get("usd") or 0)
-        price = float(pair.get("priceUsd") or 0)
-
-        if liquidity < min_liquidity or price <= 0:
+        try:
+            liquidity = float((pair.get("liquidity") or {}).get("usd") or 0)
+            price = float(pair.get("priceUsd") or 0)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not (math.isfinite(liquidity) and math.isfinite(price)):
+            continue
+        if liquidity < float(min_liquidity) or price <= 0:
             continue
 
+        txns = pair.get("txns") or {}
+        h1 = txns.get("h1") or {}
+        try:
+            recent_trades = int(h1.get("buys") or 0) + int(h1.get("sells") or 0)
+        except (TypeError, ValueError, OverflowError):
+            recent_trades = 0
         pair["_liquidity_usd"] = liquidity
+        pair["_reference_price_usd"] = price
+        pair["_recent_trades_1h"] = recent_trades
         eligible.append(pair)
 
     if not eligible:
         return None
 
-    return max(eligible, key=lambda p: p["_liquidity_usd"])
+    # When transaction counts are provided, don't treat a dormant pool's old
+    # displayed quote as current if no eligible pool traded in the last hour.
+    has_h1_data = any(isinstance((p.get("txns") or {}).get("h1"), dict) for p in eligible)
+    if has_h1_data:
+        active = [p for p in eligible if p["_recent_trades_1h"] > 0]
+        if not active:
+            return None
+        eligible = active
+
+    # A high-liquidity pool can still carry a stale/outlier quote. Compare only
+    # eligible, active pools and fail closed if no pool is within 3% of their
+    # median price; this also keeps the selected pool's candles aligned to price.
+    median_price = statistics.median(p["_reference_price_usd"] for p in eligible)
+    consistent = [
+        p for p in eligible
+        if abs(p["_reference_price_usd"] / median_price - 1.0) <= 0.03
+    ]
+    if not consistent:
+        return None
+
+    return max(consistent, key=lambda p: p["_liquidity_usd"])
 
 
 def get_hourly_candles(pool_address, limit=1000):
