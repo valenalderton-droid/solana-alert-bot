@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T17:52:25.013070+00:00",
+  "last_run_utc": "2026-10-29T17:54:23.286614+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -670,9 +670,9 @@
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T17:49:56.751053+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T17:52:24.412215+00:00",
-  "project_scan_cursor": 102,
+  "last_news_refresh_utc": "2026-10-29T17:52:58.195738+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T17:54:22.823747+00:00",
+  "project_scan_cursor": 132,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
