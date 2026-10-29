@@ -95,6 +95,19 @@ class AdaptivePolicyTests(unittest.TestCase):
                                   research_observations=positive)
         self.assertEqual(unchanged["min_probability"], 0.60)
 
+    def test_dex_and_perpetuals_contraction_tightens_risk_policy(self):
+        now = datetime.now(timezone.utc)
+        research = [
+            {"kind": "metric", "metric": "Solana DEX volume",
+             "change_24h_pct": -27.0, "observed_at": now.isoformat()},
+            {"kind": "metric", "metric": "Solana perpetuals volume",
+             "change_24h_pct": -31.0, "observed_at": now.isoformat()},
+        ]
+        result = derive_policy([], [], base_probability=0.60, now=now,
+                               research_observations=research)
+        self.assertEqual(result["min_probability"], 0.65)
+        self.assertEqual(result["cooldown_hours"], 8)
+
     def test_non_target_outcomes_do_not_count(self):
         outcomes = [{"result": "timeout"} for _ in range(20)]
         result = derive_policy(outcomes, [], base_probability=0.60)
