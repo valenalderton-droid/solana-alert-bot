@@ -580,7 +580,8 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
         score, project, info, ensemble, candles = ranked[0]
         address = str(project.get("token_address", "")).strip()
         if info and candles:
-            price = float(info.get("price") or candles[-1].get("close") or 0)
+            price_is_valid = bool(info.get("price_reference_valid", False))
+            price = float(info.get("price") or 0) if price_is_valid else 0.0
             recent_lows = [
                 float(c.get("low") or 0) for c in candles[-20:]
                 if float(c.get("low") or 0) > 0
@@ -595,12 +596,22 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
                     f"هدف مرجع با نسبت سود به ریسک ۲:۱: ${target:.8g}\n"
                 )
                 exit_warning = (
-                    "این سطوح از کف ۲۰ کندل اخیر محاسبه شده‌اند؛ اگر فاصله حد خروج بیش از حد بزرگ است، "
-                    "ورود نکن. این سطح تضمین نمی‌کند خروج دقیقاً در همان قیمت انجام شود.\n"
+                    "قیمت لحظه‌ای با آخرین کندل بسته‌شده حداکثر ۳٪ اختلاف دارد. "
+                    "این سطوح تضمین اجرای معامله در همان قیمت نیستند.\n"
                 )
             else:
-                exit_lines = "حد خروج/هدف: به‌دلیل نامعتبر بودن قیمت یا نبود کف معتبر، محاسبه نشد.\n"
-                exit_warning = "تا دریافت داده معتبر، ورود نکن.\n"
+                deviation = info.get("price_deviation_pct")
+                deviation_note = (
+                    f" اختلاف قیمت لحظه‌ای و آخرین کندل: {deviation:.2f}٪."
+                    if isinstance(deviation, (int, float)) and math.isfinite(deviation)
+                    else ""
+                )
+                exit_lines = (
+                    "قیمت مرجع فعلی و حد خروج/هدف اعلام نمی‌شوند، چون قیمت لحظه‌ای "
+                    "با آخرین کندل بسته‌شده سازگار نیست یا داده کافی نیست.\n"
+                    + deviation_note + "\n"
+                )
+                exit_warning = "تا دریافت قیمت معتبر و سازگار، ورود نکن.\n"
             message = (
                 "SOLANA TOP-RANKED PROJECT — NOT A BUY SIGNAL\n\n"
                 "بهترین پروژه قابل رتبه‌بندی این نوبت (نه الزاماً برنده آینده): "
@@ -1000,10 +1011,29 @@ def main():
 
             active_projects.append(project)
             scan_diagnostics["usable_projects"] += 1
+            spot_price = float(pair.get("priceUsd") or 0)
+            signal_close = float(candles[-1].get("close") or 0)
+            price_deviation_pct = (
+                abs(spot_price / signal_close - 1.0) * 100
+                if spot_price > 0 and signal_close > 0 else float("inf")
+            )
+            # A current quote that disagrees materially with the latest closed
+            # hourly candle is not safe to print as a verified reference price.
+            price_reference_valid = (
+                math.isfinite(price_deviation_pct) and price_deviation_pct <= 3.0
+            )
+            if not price_reference_valid:
+                print(
+                    f"Price reference rejected for {project.get('name')}: "
+                    f"spot/hourly-close deviation={price_deviation_pct:.2f}%"
+                )
             market_info[address] = {
                 "pair": pair,
                 "candles": merged,
-                "price": float(pair.get("priceUsd") or candles[-1]["close"]),
+                "price": spot_price if price_reference_valid else None,
+                "raw_spot_price": spot_price,
+                "price_reference_valid": price_reference_valid,
+                "price_deviation_pct": round(price_deviation_pct, 3) if math.isfinite(price_deviation_pct) else None,
                 "liquidity": float(
                     (pair.get("liquidity") or {}).get("usd") or 0
                 ),
@@ -1037,10 +1067,22 @@ def main():
                 pair is not None and len(cached) >= 65
                 and 0 <= cached_age_hours <= 3
             ):
+                spot_price = float(pair.get("priceUsd") or 0)
+                cached_close = float(cached[-1].get("close") or 0)
+                price_deviation_pct = (
+                    abs(spot_price / cached_close - 1.0) * 100
+                    if spot_price > 0 and cached_close > 0 else float("inf")
+                )
+                price_reference_valid = (
+                    math.isfinite(price_deviation_pct) and price_deviation_pct <= 3.0
+                )
                 market_info[address] = {
                     "pair": pair,
                     "candles": cached,
-                    "price": float(pair.get("priceUsd") or cached[-1]["close"]),
+                    "price": spot_price if price_reference_valid else None,
+                    "raw_spot_price": spot_price,
+                    "price_reference_valid": price_reference_valid,
+                    "price_deviation_pct": round(price_deviation_pct, 3) if math.isfinite(price_deviation_pct) else None,
                     "liquidity": float((pair.get("liquidity") or {}).get("usd") or 0),
                     "volume24h": float((pair.get("volume") or {}).get("h24") or 0)
                 }
@@ -1239,9 +1281,13 @@ def main():
               scan_diagnostics["invalid_atr"] += 1
               continue
 
-          # Use the latest spot quote for the entry reference, but reject chasing
-          # if price has moved too far since the completed signal candle.
-          entry = float(info.get("price") or signal_close)
+          # Never substitute a candle close for a missing/discordant current quote.
+          # A missing or rejected spot reference means no new BUY alert.
+          if not info.get("price_reference_valid", False) or not info.get("price"):
+              scan_diagnostics["invalid_price_reference"] += 1
+              print(f"Entry skipped for {project.get('name')}: current price reference failed validation")
+              continue
+          entry = float(info["price"])
           entry_deviation_pct = abs(entry / signal_close - 1.0) * 100
           max_entry_deviation_pct = max(1.5, min(3.0, 1.5 * atr_pct * 100))
           if entry <= 0 or entry_deviation_pct > max_entry_deviation_pct:
