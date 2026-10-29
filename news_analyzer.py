@@ -69,7 +69,7 @@ def _parse_date(value):
 
 
 def _clean(value):
-    return re.sub(r"\\s+", " ", re.sub(r"<[^>]+>", " ", value or "")).strip()
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", value or "")).strip()
 
 
 def _item_id(item):
