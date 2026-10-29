@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T10:12:41.992885+00:00",
+  "last_run_utc": "2026-10-29T10:17:45.894713+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -31,7 +31,12 @@
     "bce4e8201ac92858f17b85fc",
     "5d5e180c08d71c301ec69854",
     "7d0a4f1de338d355a5bbca4b",
-    "32489316876ca071d62343f4"
+    "32489316876ca071d62343f4",
+    "e0937a20130de0c5f30f34d9",
+    "48f6e6f8ea0db8caeff0b08f",
+    "7cf5cffe6333ef8a77530e3d",
+    "0bca9475989b43c0cd73db2f",
+    "e73a638e0b5dc2275a0f373f"
   ],
   "news_observations": [
     {
@@ -204,6 +209,61 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Solana (SOL) Climbs 3% Amid Fed Decision Anticipation - NameCoinNews",
       "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1OVkxzZzlDQ0d3UEdzTTRLYWZXTmF2WjdDUHlLemN4c053MUI0bXpKa2pfaXZzQ29xVUd0MWN6aE5tTEI1ZXRqaUlCVFNEc05kdFFDQWRHcV9KNzFreDQ5Z1dFS3hWSHdlZ01aanZkMm1hcE1Nc0xKUUFuRjRGQQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:17:20.081723+00:00",
+      "published_at": "2026-10-29T09:04:25+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Bitcoin price dips below $80K after Fed holds i... - Pluang",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQS1BfNjFPLVNzZW53QURkbDZYTGluMUZNbWFzTHBCVElUQ2NoalgxWl9LejdNQXZwSEZwN0R5cVR0UlBKTjU1NXNnOTRjUVZXdVFoRXIzR1huYUI5cERpSVVNU0FOUVZ4a2ZkdkE2UWJDNFRQTmdjVHR3Q0gzUWZBMmdwYnUxdzhvdzl6dTBMN1BYMUdTd3ZMdk8zRVVJQQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:17:20.081794+00:00",
+      "published_at": "2026-10-29T05:51:04+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Crypto News Today: BTC, ETH, XRP Slide After Fed Decision Keeps Rates Unchanged - Brave New Coin",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPb3EwZmIyZkx2czJWNmZIYVJmNjJMNHFQNXZCbmVBTmF2X0lnZGJTbUg2dVFZSDJqYlFtaUtCUkpvVUhGZEstOENRa3BiYVB1TWxPVUQyOVUtNmF4NURPVUZmM0hTRlJQaG15WjE5eHNEa0NoS0FCUE9KMi1sYkh6eEtDa0lyRHpoTHp5Njk3SmF3UkdzVjNaQWJhc1hrOElDR1FqUkJtZ2U3RFQ5d3hV?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:17:20.081832+00:00",
+      "published_at": "2026-10-29T04:40:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Why Is BTC Falling as Crypto Derivatives Face Fresh Pressure? - Kalkine Media",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNMVl0RlRRM0RJSmxvQTZpZ2JHbzVEeWJvSE1kVm5XckNjQk53bzA4VF9YLXJOeVBOMjJJSFVFc2xuM1V1bDRoNWtMOGJfZGJKREtMS1hUVVFyeFZCMUJpS3J5U0hUbDBDRXlKNi1pM1FKM256azB1U0ZldVNBQjZreGxKMEc4bmtWT1laSmMxTVRoWDRfY0xJQTBHYWJxV3ZiWmpaeDR6ZWk?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:17:20.081874+00:00",
+      "published_at": "2026-10-29T03:03:56+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Stock Market LIVE Updates, Sensex Today: Markets Likely To Open In Green Amid Mixed Global Cues - شبكة تواصل الإخبارية",
+      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE5hZ2VrSE5QSTVzdjRDXzRkQm1RQzY5WmxrdmNoaDRmeXREUkZ0RWFQajNOWjh1OVBDRmNad3RZYXo1LUVKMUxPT2ZrajNsdUd2b2x3?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:17:20.081904+00:00",
+      "published_at": "2026-10-29T01:50:14+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Bitcoin (BTCUSD) Volatility Intensified on Oct 29: What You Should Know - TradingKey",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQbm5idUJtdjVEVUdFVUJTZC1JWkZHVWJlV0RScWtBcVZkNUdUTUJ1el8ybC0wRE5PMElhMk02SHRVdFNuRlVObkpnX0hSYXRPRl9Kd01Idk5lbHRNNGtCYk9aRWU1Y2FNdnBLYS1tYWREdmlnWnNyQkphYmF6dHBaX0RiNEVMc3lPV1Jzb3B3?oc=5"
     }
   ],
   "open_positions": []
