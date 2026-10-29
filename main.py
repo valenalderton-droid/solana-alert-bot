@@ -563,6 +563,7 @@ def main():
             "impact_score": int(analyzed.get("impact_score", 0)),
             "relevance": analyzed.get("relevance", "UNCERTAIN"),
             "feed_category": analyzed.get("feed_category", "Uncategorized"),
+            "analysis": analyzed.get("analysis", "")[:900],
             "title": analyzed.get("title", "")[:250],
             "url": analyzed.get("url", "")
         })
@@ -603,7 +604,41 @@ def main():
     global_context["global_bearish_news_24h"] = global_bearish
     global_context["global_bullish_news_24h"] = global_bullish
     global_context["direct_bearish_news_24h"] = direct_bearish
-    print("Global market context:", json.dumps(global_context, ensure_ascii=False))
+    # Attach a short, recent headline rationale to BUY alerts, without sending
+    # standalone news notifications to Telegram.
+    recent_news_context = []
+    news_now = datetime.now(timezone.utc)
+    for item in reversed(state.get("news_observations", [])):
+        published = item.get("published_at")
+        try:
+            published_dt = datetime.fromisoformat(str(published).replace("Z", "+00:00"))
+            if published_dt.tzinfo is None:
+                published_dt = published_dt.replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError):
+            continue
+        age_hours = (news_now - published_dt.astimezone(timezone.utc)).total_seconds() / 3600
+        category = str(item.get("feed_category", ""))
+        relevance = str(item.get("relevance", ""))
+        sentiment = str(item.get("sentiment", ""))
+        is_market_news = (
+            category in ("Macro / global markets", "Geopolitics / global risk")
+            or relevance.startswith("DIRECT")
+        )
+        if 0 <= age_hours <= 24 and is_market_news and sentiment in ("BULLISH", "BEARISH"):
+            analysis_lines = str(item.get("analysis", "")).splitlines()
+            impact_summary = ""
+            if len(analysis_lines) > 1:
+                impact_summary = analysis_lines[1].replace("Possible SOL impact:", "").strip()
+            recent_news_context.append({
+                "sentiment": sentiment,
+                "impact_score": int(item.get("impact_score", 0)),
+                "title": str(item.get("title", ""))[:130],
+                "possible_sol_impact": impact_summary[:200],
+                "url": str(item.get("url", ""))[:300]
+            })
+            if len(recent_news_context) >= 2:
+                break
+    recent_news_context.reverse()
 
     store = load_candle_store()
     active_projects = []
@@ -888,6 +923,7 @@ def main():
               "target_pct": round(target_pct * 100, 3),
               "probability": round(probability, 4),
               "horizon_probabilities": horizon_probabilities,
+              "recent_news_context": recent_news_context,
               "entry_deviation_pct": round(entry_deviation_pct, 3),
               "liquidity_usd": info["liquidity"],
               "volume_24h_usd": info["volume24h"],
@@ -909,6 +945,7 @@ def main():
               f"Liquidity: ${info['liquidity']:,.0f}\n"
               f"24h volume: ${info['volume24h']:,.0f}\n"
               f"BTC 24h change: {global_context['btc_24h_pct']}%; SOL 24h change: {global_context['sol_24h_pct']}%\n"
+              f"Recent news and possible SOL impact: {json.dumps(recent_news_context, ensure_ascii=False)}\n"
               f"Evaluation: {json.dumps(compact_metrics)}\n"
               f"Mint: {address}\n"
               f"Time (UTC): {utc_now()}\n\n"
