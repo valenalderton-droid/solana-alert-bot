@@ -869,6 +869,18 @@ def main():
                   "stop": stop,
                   "target": target
               })
+              if not any(p.get("token_address") == address for p in state["open_positions"]):
+                  state["open_positions"].append({
+                      "signal_id": signal_id,
+                      "token_address": address,
+                      "name": prediction["name"],
+                      "symbol": prediction["symbol"],
+                      "timestamp": candle_ts,
+                      "last_checked_ts": candle_ts,
+                      "entry": entry,
+                      "stop": stop,
+                      "target": target
+                  })
               state["last_alerts"][address] = candle_ts
               state["stats"]["signals"] += 1
           else:
