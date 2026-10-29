@@ -70,20 +70,42 @@ def concise_reply(messages):
         target = re.search(r"^Target reference: \$([0-9.eE+-]+)", message, re.MULTILINE)
         probability = re.search(r"^Combined model probability: ([0-9.]+)%?$", message, re.MULTILINE)
         mint = re.search(r"^Mint: (.+)$", message, re.MULTILINE)
+        horizons = re.search(r"^Probability by horizon: (.+)$", message, re.MULTILINE)
+        liquidity = re.search(r"^Liquidity: \$([0-9,]+)", message, re.MULTILINE)
+        volume = re.search(r"^24h volume: \$([0-9,]+)", message, re.MULTILINE)
         if not all((project, entry, stop, target, probability, mint)):
             continue
         try:
+            model_score = float(probability.group(1).rstrip("%"))
+            horizon_values = {}
+            if horizons:
+                parsed = json.loads(horizons.group(1))
+                if isinstance(parsed, dict):
+                    horizon_values = {
+                        str(key): float(value) for key, value in parsed.items()
+                        if isinstance(value, (int, float)) and 0 <= float(value) <= 1
+                    }
+            # Prefer agreement across time horizons and better liquidity/volume,
+            # rather than choosing by the model's raw score alone.
+            consensus = (
+                sum(value >= 0.50 for value in horizon_values.values()) / len(horizon_values)
+                if horizon_values else 0.5
+            )
+            liq = float(liquidity.group(1).replace(",", "")) if liquidity else 100000.0
+            vol = float(volume.group(1).replace(",", "")) if volume else 50000.0
+            liquidity_bonus = min(4.0, max(0.0, 2.0 * __import__("math").log10(max(liq, 1) / 100000.0 + 1)))
+            volume_bonus = min(3.0, max(0.0, 1.5 * __import__("math").log10(max(vol, 1) / 50000.0 + 1)))
+            rank_score = model_score + 8.0 * consensus + liquidity_bonus + volume_bonus
             candidates.append((
-                float(probability.group(1).rstrip("%")),
-                project.group(1).strip(), entry.group(1), target.group(1),
-                stop.group(1), mint.group(1).strip()
+                rank_score, model_score, project.group(1).strip(), entry.group(1),
+                target.group(1), stop.group(1), mint.group(1).strip()
             ))
-        except ValueError:
+        except (ValueError, TypeError, json.JSONDecodeError):
             continue
 
     if not candidates:
         return "NO_SETUP"
-    _, project, entry, target, stop, mint = max(candidates, key=lambda row: row[0])
+    _, _, project, entry, target, stop, mint = max(candidates, key=lambda row: row[0])
     return f"{project} | خرید: ${entry} | فروش: ${target} | حدضرر: ${stop} | {mint}"
 
 
