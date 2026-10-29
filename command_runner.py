@@ -225,6 +225,21 @@ def run_self_improvement_if_due(state):
         print(f"Scheduled self-improvement review failed safely: {exc}")
 
 
+def split_telegram_message(message, max_length=3500):
+    """Split long research alerts into Telegram-safe chunks."""
+    remaining = str(message or "")
+    chunks = []
+    while len(remaining) > max_length:
+        split_at = remaining.rfind("\n", 0, max_length)
+        if split_at < max_length // 2:
+            split_at = max_length
+        chunks.append(remaining[:split_at])
+        remaining = remaining[split_at:].lstrip("\n")
+    if remaining:
+        chunks.append(remaining)
+    return chunks
+
+
 def concise_reply(messages):
     candidates = []
     for message in messages:
@@ -328,8 +343,13 @@ def main():
             if compact == "NO_SETUP":
                 print("BUY alert rejected: required fields could not be parsed; no Telegram message sent.")
                 return False
-            # Record the signal only after Telegram confirms delivery.
-            sent = original_send_telegram(message)
+            # Deliver the complete report in chunks below Telegram's message limit.
+            parts = split_telegram_message(message)
+            sent = bool(parts)
+            for part in parts:
+                if not original_send_telegram(part):
+                    sent = False
+                    break
             if sent:
                 messages.append(message)
                 delivered_buys.append(message)
