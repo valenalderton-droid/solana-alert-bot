@@ -112,6 +112,34 @@ def refresh_news_if_due(state, interval_minutes=15):
         print(f"News-only refresh failed: {exc}")
 
 
+def run_self_improvement_if_due(state):
+    """Run the bounded learning review on scheduled cycles, even without open positions."""
+    def read_jsonl(path):
+        rows = []
+        try:
+            with open(path, "r", encoding="utf-8") as handle:
+                for line in handle:
+                    try:
+                        rows.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+        except OSError:
+            pass
+        return rows
+
+    try:
+        from self_improver import update_self_improvement
+        result = update_self_improvement(
+            predictions=read_jsonl("data/predictions.jsonl"),
+            outcomes=read_jsonl("data/outcomes.jsonl"),
+            news_observations=state.get("news_observations", []),
+            current_threshold=float(os.getenv("MIN_PROBABILITY", "0.60"))
+        )
+        print("Scheduled self-improvement review:", json.dumps(result, ensure_ascii=False))
+    except Exception as exc:
+        print(f"Scheduled self-improvement review failed safely: {exc}")
+
+
 def concise_reply(messages):
     candidates = []
     for message in messages:
@@ -168,6 +196,7 @@ def main():
     open_positions = state.get("open_positions", [])
     if not requested and not open_positions:
         refresh_news_if_due(state)
+        run_self_improvement_if_due(state)
         print("No //Pay request and no open positions; market scan skipped.")
         return
 
