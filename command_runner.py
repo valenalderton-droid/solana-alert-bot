@@ -72,6 +72,10 @@ def poll_pay(state):
             command = str(message.get("text", "")).strip()
             if not command:
                 continue
+            # Ignore ordinary chat text so the bot does not answer every message.
+            # Only acknowledge the supported command or help with slash commands.
+            if not command.startswith("/"):
+                continue
             matched_chat_message = True
             if command == "//Pay":
                 requested = True
@@ -87,7 +91,7 @@ def poll_pay(state):
                 try:
                     telegram_send(
                         token, chat_id,
-                        "پیامت به ربات رسید، اما دستور را نشناختم. برای بررسی بازار دقیقاً این متن را بفرست: //Pay"
+                        "دستور پشتیبانی نمی‌شود. برای بررسی بازار دقیقاً این متن را بفرست: //Pay"
                     )
                 except Exception as send_exc:
                     print(f"Telegram help reply failed: {send_exc}")
@@ -361,7 +365,12 @@ def main():
         return False
 
     scanner.send_telegram = capture_buy
-    scanner.main()
+    try:
+        scanner.main()
+    finally:
+        # Restore the module function even if the scan raises; otherwise a second
+        # invocation in the same process can recursively wrap the Telegram sender.
+        scanner.send_telegram = original_send_telegram
 
     if not requested:
         print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
