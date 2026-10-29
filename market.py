@@ -1,15 +1,31 @@
 
 import requests
 from datetime import datetime, timezone
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 SESSION = requests.Session()
-SESSION.headers.update({"User-Agent": "SolanaProjectTrader/1.0"})
+SESSION.headers.update({"User-Agent": "SolanaProjectTrader/1.1"})
+RETRY_POLICY = Retry(
+    total=2,
+    connect=2,
+    read=1,
+    status=2,
+    backoff_factor=0.6,
+    status_forcelist=(429, 500, 502, 503, 504),
+    allowed_methods=frozenset(["GET"]),
+    respect_retry_after_header=True
+)
+SESSION.mount("https://", HTTPAdapter(max_retries=RETRY_POLICY, pool_connections=10, pool_maxsize=10))
 
 
 def get_json(url, params=None):
-    response = SESSION.get(url, params=params, timeout=20)
+    response = SESSION.get(url, params=params, timeout=(5, 12))
     response.raise_for_status()
-    return response.json()
+    payload = response.json()
+    if not isinstance(payload, dict):
+        raise ValueError(f"Unexpected API response format from {url}")
+    return payload
 
 
 def get_best_solana_pair(token_address, min_liquidity=100000):
@@ -64,14 +80,29 @@ def get_hourly_candles(pool_address, limit=1000):
     for item in items:
         if len(item) < 6:
             continue
-        candles.append({
-            "timestamp": int(item[0]),
-            "open": float(item[1]),
-            "high": float(item[2]),
-            "low": float(item[3]),
-            "close": float(item[4]),
-            "volume": float(item[5])
-        })
+        try:
+            candle = {
+                "timestamp": int(item[0]),
+                "open": float(item[1]),
+                "high": float(item[2]),
+                "low": float(item[3]),
+                "close": float(item[4]),
+                "volume": float(item[5])
+            }
+        except (TypeError, ValueError, OverflowError):
+            continue
+
+        # Reject malformed or non-positive OHLC candles before indicators use them.
+        prices = (candle["open"], candle["high"], candle["low"], candle["close"])
+        if any(not (value > 0 and value < float("inf")) for value in prices):
+            continue
+        if candle["high"] < max(candle["open"], candle["close"], candle["low"]):
+            continue
+        if candle["low"] > min(candle["open"], candle["close"], candle["high"]):
+            continue
+        if not (candle["volume"] >= 0 and candle["volume"] < float("inf")):
+            continue
+        candles.append(candle)
 
     candles.sort(key=lambda c: c["timestamp"])
 
