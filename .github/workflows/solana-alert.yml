@@ -3,6 +3,8 @@ name: Solana Project Trader
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "data/**"
   workflow_dispatch:
   schedule:
     - cron: "7,37 * * * *"
