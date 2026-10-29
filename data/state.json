@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T10:00:32.973983+00:00",
+  "last_run_utc": "2026-10-29T10:05:44.222608+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -28,7 +28,9 @@
     "507d90a8f3f9a96a578b7d6e",
     "6ec30d52b9822edbd372b38c",
     "14a94b80222a89472c572bce",
-    "bce4e8201ac92858f17b85fc"
+    "bce4e8201ac92858f17b85fc",
+    "5d5e180c08d71c301ec69854",
+    "7d0a4f1de338d355a5bbca4b"
   ],
   "news_observations": [
     {
@@ -170,6 +172,26 @@
       "feed_category": "Macro / global markets",
       "title": "Fed Holds Interest Rates at 3.75% - 4.00%: What it Means for Bitcoin and Crypto Markets - Altcoin Buzz",
       "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNR29xMUxnMUtQSnZVNk5LVjYzYlBWamdidWhFRndqbkhIRjNDLTZfT1l0QVJScUljMW9hREVBMFgtbTVuYXN0WXlSM1JLQnJKWDhaVTA0R2dET1ZMM05KbzhmS0JNVjBqMmdsdzRhb1RLbGdZZjRfdmpjN1RPU0ZMYXVueUpqUnVjbldndA?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:05:17.430260+00:00",
+      "published_at": "2026-10-29T00:40:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Geopolitics / global risk",
+      "title": "Oil's War Premium Could Vanish Fast Once a Hormuz Deal Lands, Analysts Warn - BeInCrypto",
+      "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBFZ2VRak1zdjhnYjY4MmJ0Z0ZKSGRtMzM4NXJScU9sRjJRdk5uVFkxUEdiVTY5WDdwQzdSVXBvdkpGcUphQW94LXI4cUlTTkFxaHhldnF5Mmh6andmS1lsOC1GX21Gc2FvTngyaA?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:05:17.430337+00:00",
+      "published_at": "2026-10-28T14:45:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "title": "Bitcoin Price Tops USD 80K as ETF Flows Rise Before Fed Vote - Analytics Insight",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQTVpXVDdqODc5LTd4RWpPWTQ5LVV5QTlsR1p2eEJ6akFuelNaeXlNLW9tb1V6YmtOUG1NOEZ0ekFDeGk4aEJjTGtGWVlWMmFzeXFHS0ZvUkR3SWdiLVJjeG9qSXFSbkNvLXhXcUk4Y1hrWlNlN0JsYkpJVzltZGRGX1dSaUU1M0ZLaGZXWFN3dUxHa3ZLU255dDhsMTFXVmPSAawBQVVfeXFMTnB5eVVkSGtTbnpmSkFRd2FmZXZrcVpZcjVISmhWa1E3cjJLbkQwXzhVblpueFZSV3N1bXpWUE5JT0tSZ2hRZG1udFY4NUp4YVBLNmVrcEFkQWRUZ1FXVFd6cFlGYWtpZVlHSnlhbHFzejVvNWtidTJ6a0RuZ1QtZm5nazJ6aHVDRGdBMExLNUVSMlpJclJEQ2xxOGpZNE1wVy1pb2xUQ1c0MUNWeQ?oc=5"
     }
   ],
   "open_positions": []
