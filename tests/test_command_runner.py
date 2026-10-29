@@ -34,11 +34,7 @@ class CommandRunnerTests(unittest.TestCase):
                     {"update_id": 30, "message": {"chat": {"id": 123}, "text": command}},
                 ],
             }
-            with patch.dict("os.environ", {
-                "TELEGRAM_BOT_TOKEN": "test-token",
-                "TELEGRAM_CHAT_ID": "123",
-            }), patch.object(command_runner.requests, "get", return_value=response), \\
-                 patch.object(command_runner, "save_state"):
+            with patch.dict("os.environ", {"TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "123"}), patch.object(command_runner.requests, "get", return_value=response), patch.object(command_runner, "save_state"):
                 self.assertFalse(command_runner.poll_pay({}), command)
 
     def test_other_chat_cannot_trigger_scan(self):
