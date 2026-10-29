@@ -652,6 +652,11 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
                 paper_ts, paper_entry, paper_stop = 0, 0.0, 0.0
             paper_signal_id = f"{paper_address}:{paper_ts}:PAPER_TOP"
             existing_ids = {str(item.get("signal_id")) for item in state.get("paper_open_signals", [])}
+            # Keep completed or data-gap observations from being re-added on every 15m scan.
+            existing_ids.update(
+                str(item.get("signal_id")) for item in read_jsonl(PAPER_PREDICTIONS_FILE)
+                if item.get("signal_id")
+            )
             if paper_ts > 0 and paper_entry > 0 and 0 < paper_stop < paper_entry and paper_signal_id not in existing_ids:
                 # One sample per token per completed hourly candle; repeated 15m scans do not duplicate it.
                 paper_target = paper_entry + 2 * (paper_entry - paper_stop)
