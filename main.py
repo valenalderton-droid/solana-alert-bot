@@ -197,7 +197,14 @@ def resolve_old_signals(state, store):
             "target": target_price,
             "exit": exit_price,
             "return_pct": round(ret * 100, 4),
-            "result": "win" if ret > 0 else "loss",
+            # A win means the defined target was hit before the stop. If neither
+            # level was hit within four candles, keep it as a timeout rather
+            # than relabelling a small positive close as a target-hit win.
+            "result": (
+                "win" if exit_method == "target_hit"
+                else "loss" if exit_method in ("stop_hit", "both_hit_same_candle_assume_stop")
+                else "timeout"
+            ),
             "exit_timestamp": int(exit_candle["timestamp"]),
             "resolved_at": utc_now(),
             "method": exit_method
@@ -205,9 +212,9 @@ def resolve_old_signals(state, store):
         append_jsonl(OUTCOMES_FILE, outcome)
 
         state["stats"]["resolved"] += 1
-        if ret > 0:
+        if outcome["result"] == "win":
             state["stats"]["wins"] += 1
-        else:
+        elif outcome["result"] == "loss":
             state["stats"]["losses"] += 1
 
     state["open_signals"] = still_pending
@@ -388,6 +395,7 @@ def main():
         ]
         wins = sum(1 for item in recent_outcomes if item.get("result") == "win")
         losses = sum(1 for item in recent_outcomes if item.get("result") == "loss")
+        timeouts = sum(1 for item in recent_outcomes if item.get("result") == "timeout")
         resolved = wins + losses
         win_rate = (wins / resolved * 100) if resolved else 0.0
         returns = [
@@ -398,8 +406,8 @@ def main():
         digest = (
             "SOLANA BOT — LAST 24H PERFORMANCE\n\n"
             f"BUY-watch alerts recorded in last 24h: {len(recent_predictions)}\n"
-            f"Alerts resolved in last 24h: {resolved} (wins: {wins}, losses: {losses})\n"
-            f"Win rate of alerts resolved in last 24h: {win_rate:.1f}%\n"
+            f"Target/stop outcomes in last 24h: {resolved} (wins: {wins}, losses: {losses}); timeouts: {timeouts}\n"
+            f"Target-hit rate among target/stop outcomes: {win_rate:.1f}%\n"
             f"Average return of alerts resolved in last 24h: {avg_return:.2f}%\n"
             f"Projects with usable market data this run: {len(active_projects)}\n"
             f"Time (UTC): {utc_now()}\n\n"
