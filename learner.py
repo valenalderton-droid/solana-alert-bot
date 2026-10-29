@@ -125,7 +125,7 @@ def build_training_rows(candle_sets, horizon=4):
             future = df.iloc[i + 1:i + horizon + 1]
             expected_times = [signal_ts + hour * 3600 for hour in range(1, horizon + 1)]
             future_times = [int(value) for value in future["timestamp"].tolist()]
-            if len(future) != 4 or future_times != expected_times:
+            if len(future) != horizon or future_times != expected_times:
                 continue
 
             for j in range(i + 1, i + horizon + 1):
