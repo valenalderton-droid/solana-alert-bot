@@ -57,5 +57,9 @@ jobs:
             echo "No history changes to commit."
           else
             git commit -m "Update bot history"
+            # A manual code commit can land while this scheduled run is active.
+            # Rebase the generated data commit onto the newest branch before pushing.
+            git fetch origin "${{ github.ref_name }}"
+            git pull --rebase origin "${{ github.ref_name }}"
             git push origin HEAD:${{ github.ref_name }}
           fi
