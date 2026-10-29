@@ -422,7 +422,8 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
     registry["learning_diagnostics"] = diagnose_failure_modes(predictions, outcomes)
     # Rebuild strategy rules from resolved outcomes each run. A rule that no
     # longer meets the evidence criteria is automatically retired.
-    registry["experience_rules"] = build_experience_rules(registry["learning_diagnostics"])\n    file_actions = sync_experience_rule_files(registry["experience_rules"], now=now)
+    registry["experience_rules"] = build_experience_rules(registry["learning_diagnostics"])
+    file_actions = sync_experience_rule_files(registry["experience_rules"], now=now)
     rules = registry.setdefault("rules", [])
     active = next((rule for rule in rules
                    if rule.get("id") == "validated_probability_floor"), None)
