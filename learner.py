@@ -385,15 +385,55 @@ def _train_single_horizon(candle_sets, horizon=4):
 
 
 class MultiHorizonModel:
-    """Weighted probability ensemble across available, independently validated horizons."""
-    def __init__(self, models):
+    """Blend independently validated horizons, favoring stronger out-of-sample evidence."""
+    def __init__(self, models, horizon_metrics=None):
         self.models = models
         self.base_weights = {4: 0.30, 12: 0.22, 24: 0.18, 72: 0.15, 168: 0.10, 336: 0.05}
-        total = sum(self.base_weights.get(h, 0.05) for h, _ in models)
-        self.weights = {
-            h: self.base_weights.get(h, 0.05) / total
+        metrics = horizon_metrics or {}
+        reliability = {}
+        for horizon, _ in models:
+            report = metrics.get(f"{horizon}h", {})
+            walk = report.get("walk_forward", {}) if isinstance(report, dict) else {}
+            # Prefer walk-forward metrics; blend with the untouched chronological holdout.
+            wf_balanced = walk.get("mean_balanced_accuracy")
+            holdout_balanced = report.get("balanced_accuracy") if isinstance(report, dict) else None
+            wf_brier = walk.get("mean_brier_score")
+            holdout_brier = report.get("brier_score") if isinstance(report, dict) else None
+            try:
+                balanced_values = [float(v) for v in (wf_balanced, holdout_balanced)
+                                   if v is not None and math.isfinite(float(v))]
+                brier_values = [float(v) for v in (wf_brier, holdout_brier)
+                                if v is not None and math.isfinite(float(v))]
+            except (TypeError, ValueError, OverflowError):
+                balanced_values, brier_values = [], []
+            if balanced_values and brier_values:
+                balanced = sum(balanced_values) / len(balanced_values)
+                brier = sum(brier_values) / len(brier_values)
+                # Reward evidence above chance and better probability calibration.
+                # A floor avoids zeroing a horizon from a small/noisy validation sample.
+                directional = max(0.05, min(1.0, (balanced - 0.45) / 0.15))
+                calibration = max(0.05, min(1.0, 1.0 - brier / 0.35))
+                reliability[horizon] = directional * calibration
+            else:
+                reliability[horizon] = self.base_weights.get(horizon, 0.05)
+        raw = {
+            h: self.base_weights.get(h, 0.05) * reliability[h]
             for h, _ in models
         }
+        total = sum(raw.values())
+        if total <= 0 or not math.isfinite(total):
+            raw = {h: self.base_weights.get(h, 0.05) for h, _ in models}
+            total = sum(raw.values())
+        self.weights = {h: value / total for h, value in raw.items()}
+        self.weighting_method = (
+            "validation-weighted using chronological holdout and walk-forward balanced accuracy/Brier score"
+            if any(
+                isinstance(metrics.get(f"{h}h"), dict)
+                and isinstance(metrics[f"{h}h"].get("walk_forward"), dict)
+                and metrics[f"{h}h"].get("balanced_accuracy") is not None
+                for h, _ in models
+            ) else "base horizon weights; validation metrics unavailable"
+        )
 
     def predict_horizon_proba(self, X):
         return {
@@ -434,7 +474,7 @@ def train_model(candle_sets):
         }
 
     active = [horizon for horizon, _ in trained]
-    return MultiHorizonModel(trained), {
+    return MultiHorizonModel(trained, horizon_metrics), {
         "ready": True,
         "active_horizons": [f"{h}h" for h in active],
         "horizons": horizon_metrics,
