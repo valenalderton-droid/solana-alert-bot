@@ -27,12 +27,14 @@ class LearnerTests(unittest.TestCase):
         self.assertTrue(np.isfinite(numeric.to_numpy()[~np.isnan(numeric.to_numpy())]).all())
 
     def test_new_price_action_features_are_available(self):
-        features = add_features(make_flat_candles(120))
+        features = add_features(make_flat_candles(240))
         for name in ("ret24", "ema_gap34", "volatility_ratio",
                      "volume_trend", "close_location", "breakout_distance",
                      "price_vs_ema21", "rsi_short", "upper_wick_pct",
                      "lower_wick_pct", "high_distance24", "low_distance24",
-                     "trend_persistence"):
+                     "trend_persistence", "ret48", "ema_gap50", "price_vs_ema50",
+                     "trend_persistence24", "volatility_regime", "volume_zscore",
+                     "momentum_consistency", "drawdown24", "close_location_avg3"):
             self.assertIn(name, features.columns)
         latest = features.dropna(subset=FEATURES)
         self.assertFalse(latest.empty)
@@ -48,6 +50,7 @@ class LearnerTests(unittest.TestCase):
         row = {
             "close": 100.0, "ema_gap": 0.02, "ret6": 0.01,
             "price_vs_ema21": -0.01, "trend_persistence": 0.8,
+            "price_vs_ema50": 0.01, "trend_persistence24": 0.8,
             "rsi": 0.5, "close_location": 0.8,
             "upper_wick_pct": 0.1, "volume_ratio": 2.0
         }
@@ -65,6 +68,7 @@ class LearnerTests(unittest.TestCase):
         row = {
             "close": 100.0, "ema_gap": 0.02, "ret6": 0.01,
             "price_vs_ema21": 0.01, "trend_persistence": 0.8,
+            "price_vs_ema50": 0.01, "trend_persistence24": 0.8,
             "rsi": 0.5, "close_location": 0.3,
             "upper_wick_pct": 0.7, "volume_ratio": 2.0
         }
