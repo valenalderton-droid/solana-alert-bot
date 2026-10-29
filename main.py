@@ -824,6 +824,7 @@ def main():
             scan_diagnostics["not_approved_or_missing_address"] += 1
             continue
 
+        pair = None
         try:
             # Existing positions use a lower monitoring threshold so a
             # liquidity drop does not silently disable their exit checks.
