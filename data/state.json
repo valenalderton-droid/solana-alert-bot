@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T10:32:10.329946+00:00",
+  "last_run_utc": "2026-10-29T10:52:41.530854+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -38,7 +38,8 @@
     "0bca9475989b43c0cd73db2f",
     "e73a638e0b5dc2275a0f373f",
     "d2e67b2d7ad8c6a701f85b56",
-    "ef6966d6f4eec3a520903730"
+    "ef6966d6f4eec3a520903730",
+    "4083e47ec658f0dff5cf98dd"
   ],
   "news_observations": [
     {
@@ -289,9 +290,21 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Polymarket Makes a Remarkable Move for Bitcoin (BTC), Ethereum (ETH), Solana (SOL), and XRP! Time Limit Reduced to 5 Minutes! - Bitcoin Sistemi",
       "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQRXlyZ09WcG5LZTNMbUs0ZTB5eFM1SHEwZVItVHdkd1lFRThNSmtyUXZZSlhEVXdnQkNMcnFxbS1QOUVBb2RTZW52S1hhbVpUai15MnBFM19MWTdyT1hsVFJ6NENjLW00VFZsUkFmVkoxdmwyamdiZXJzR0tTXzdNWjVTNjd4TnRIdndsSERkYlZsTkRNSUpCMllyYi1qS1NqYTlBcFpmZkFSNXpWNkw5bFlWQ2V6RFJZSVQ3Y0xUY1ZYa3VyWlN1RHJNTQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:52:12.694994+00:00",
+      "published_at": "2026-10-29T10:44:48+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — Solana network / protocol",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Potentially relevant to SOL itself; verify official status and actual network impact.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — Solana network / protocol\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana wallet Solflare pledges to pay missed rewards on staked $160 million after validator goes offline - CoinDesk",
+      "url": "https://news.google.com/rss/articles/CBMi5AFBVV95cUxQRGNQZXJtS1JLZGRwLUFlYVVyNFpScjFkRzN0X25Bc210SFZnMFRRSDNBdk03ajF3TWc1dVNPeXFNSlhqU0tLYUZoWXRMYnZ3bWpMclpMMFZpd1lhdW9XZUhYbmdkOGhLTF9tUDNOQ1NzaDNOU214cEp4MmYxZk1sdkE2VGlrN0RKNmJJblpHNk5HWGhJWlNUblJEc0hUc0NjT0xaaWlQeXBOOVJmNEozSkU3WnZWc1lFX054eG4tWlJUOUduZGVXYlhxTmY0cXpZa1dTSmR0X0YwbEFHY3RvSDVrRnY?oc=5"
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952304,
-  "last_news_refresh_utc": "2026-10-29T10:35:35.183131+00:00"
+  "telegram_update_offset": 806952307,
+  "last_news_refresh_utc": "2026-10-29T10:52:12.695044+00:00"
 }
