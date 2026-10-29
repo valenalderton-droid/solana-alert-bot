@@ -65,8 +65,16 @@ def build_training_rows(candle_sets):
             if entry <= 0:
                 continue
 
-            target = entry * 1.03
-            stop = entry * 0.98
+            # Keep training labels aligned with the live signal's ATR-based
+            # risk rules. Otherwise the model learns a different trade setup
+            # from the one the bot actually sends.
+            atr_pct = float(df.iloc[i]["atr_pct"])
+            if not np.isfinite(atr_pct) or atr_pct <= 0:
+                continue
+            stop_pct = min(0.05, max(0.02, 1.5 * atr_pct))
+            target_pct = max(0.04, 3 * atr_pct)
+            target = entry * (1 + target_pct)
+            stop = entry * (1 - stop_pct)
             label = 0
 
             for j in range(i + 1, i + 5):
