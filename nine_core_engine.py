@@ -8,6 +8,10 @@ from datetime import datetime, timezone
 import math
 
 from paper_portfolio import get_portfolio, open_paper_trade, update_paper_portfolio
+from core_civilization import (
+    run_civilization_cycle, is_core_eligible,
+    record_civilization_outcome, format_civilization_report,
+)
 
 CORE_SPECS = [
     {"id": "trend", "name": "Trend follower", "threshold": 58},
@@ -344,6 +348,7 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
         update_paper_portfolio(substate, market_info or {}, now=now)
         core["portfolio"] = substate["paper_portfolio"]
 
+    civilization = run_civilization_cycle(system, CORE_SPECS, timestamp)
     evolution = evolve_core_population(system)
 
     candidate_scores = []
@@ -354,6 +359,9 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
         votes = []
         scores = {}
         for spec in CORE_SPECS:
+            if not is_core_eligible(system, spec["id"]):
+                scores[spec["id"]] = 0.0
+                continue
             genome = _core_state(system, spec["id"]).get("genome") or {}
             score = score_for_core(spec["id"], candidate, genome)
             scores[spec["id"]] = score
@@ -369,7 +377,8 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
     core_choices = {}
     for spec in CORE_SPECS:
         eligible = [row for row in candidate_scores
-                    if not row["discussion"]["risk_veto"]
+                    if is_core_eligible(system, spec["id"])
+                    and not row["discussion"]["risk_veto"]
                     and row["adjusted_scores"].get(spec["id"], 0) >= _num(
                         (_core_state(system, spec["id"]).get("genome") or {}).get("threshold"), spec["threshold"])]
         eligible.sort(key=lambda row: row["adjusted_scores"][spec["id"]], reverse=True)
@@ -396,8 +405,12 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
             core["last_vote"] = "PASS"
             core["last_candidate"] = None
             core["votes"] = 0
-            decision = {"at": timestamp, "vote": "PASS", "reason": "no candidate passed this core's threshold"}
-            core_choices[spec["id"]] = {"token_address": None, "score": None, "trade": {"opened": False, "reason": "no_candidate"}}
+            suspended = not is_core_eligible(system, spec["id"])
+            decision = {"at": timestamp, "vote": "SUSPENDED" if suspended else "PASS",
+                        "reason": "temporary police suspension" if suspended else "no candidate passed this core's threshold"}
+            core_choices[spec["id"]] = {"token_address": None, "score": None,
+                                        "status": "suspended" if suspended else "active",
+                                        "trade": {"opened": False, "reason": "suspended" if suspended else "no_candidate"}}
         core["decisions"].append(decision)
         core["decisions"] = core["decisions"][-200:]
         core["updated_at"] = timestamp
@@ -413,6 +426,10 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
     ranked = sorted(candidate_scores, key=lambda row: (row["vote_count"],
                       sum(row["scores"].values()) / max(1, len(row["scores"]))), reverse=True)
     winner = ranked[0] if ranked and ranked[0]["vote_count"] >= MAJORITY_VOTES else None
+    record_civilization_outcome(system, winner, timestamp)
+    civilization["ecology"] = dict(system["civilization"].get("ecology") or {})
+    civilization["bulletin"] = list(system["civilization"].get("bulletin") or [])[-5:]
+    civilization["virtual_treasury_usd"] = (system["civilization"].get("economy") or {}).get("virtual_treasury_usd", 0.0)
     result = {
         "timestamp": timestamp,
         "majority_required": MAJORITY_VOTES,
@@ -428,6 +445,7 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
                         "discussion": row["discussion"]} for row in ranked[:10]],
         "core_choices": core_choices,
         "evolution": evolution,
+        "civilization": civilization,
         "core_lineage": {spec["id"]: {
             "profile_id": (system["cores"][spec["id"]].get("genome") or {}).get("profile_id", spec["id"]),
             "generation": (system["cores"][spec["id"]].get("genome") or {}).get("generation", 0),
@@ -484,4 +502,6 @@ def format_core_result(result):
         discussion = candidate.get("discussion") or {}
         if discussion.get("risk_veto"):
             lines.append("  وتوی ریسک: " + ", ".join(discussion.get("risk_veto_reasons", [])))
+    if result.get("civilization"):
+        lines.append(format_civilization_report(result["civilization"]))
     return "\n".join(lines)
