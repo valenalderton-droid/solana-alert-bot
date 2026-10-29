@@ -89,21 +89,33 @@ def concise_reply(messages):
 
 def main():
     state = read_state()
-    if not poll_pay(state):
-        print("No /Pay request; scan skipped and no Telegram message sent.")
+    requested = poll_pay(state)
+    # Keep checking exit conditions on scheduled runs while a paper position is
+    # open. BUY messages are still suppressed unless the user explicitly sends //Pay.
+    open_positions = state.get("open_positions", [])
+    if not requested and not open_positions:
+        print("No //Pay request and no open positions; scan skipped.")
         return
 
     import main as scanner
 
     messages = []
+    original_send_telegram = scanner.send_telegram
+
     def capture_buy(message):
         if "SOLANA BUY WATCH" in message:
             messages.append(message)
-        # Return False so verbose alerts are never considered delivered.
-        return False
+            # BUY alerts are summarized into one compact reply only on //Pay.
+            return False
+        # SELL/EXIT alerts must reach Telegram even on scheduled monitoring runs.
+        return original_send_telegram(message)
 
     scanner.send_telegram = capture_buy
     scanner.main()
+
+    if not requested:
+        print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
+        return
 
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
