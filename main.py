@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from market import get_best_solana_pair, get_hourly_candles, utc_now
+from market import get_best_solana_pair, get_hourly_candles, discover_solana_candidates, utc_now
 from learner import train_model, latest_features, price_action_ok
 
 ROOT = Path(__file__).resolve().parent
@@ -129,66 +129,97 @@ def get_closed_candles(raw_candles):
 
 
 def resolve_old_signals(state, store):
+    """Monitor open BUY alerts and send a SELL alert at stop, target, or 14-day expiry."""
     pending = state.get("open_signals", [])
     still_pending = []
-    known_outcomes = {
-        row.get("signal_id") for row in read_jsonl(OUTCOMES_FILE)
-    }
+    known_outcomes = {row.get("signal_id") for row in read_jsonl(OUTCOMES_FILE)}
 
     for signal in pending:
-        signal_id = signal["signal_id"]
-        if signal_id in known_outcomes:
+        signal_id = signal.get("signal_id")
+        if not signal_id or signal_id in known_outcomes:
             continue
+        address = signal.get("token_address")
+        candles = sorted(store.get(address, {}).values(), key=lambda c: c["timestamp"])
+        entry = float(signal.get("entry") or 0)
+        if entry <= 0:
+            continue
+        entry_ts = int(signal.get("timestamp") or 0)
+        stop = float(signal.get("stop") or entry * 0.95)
+        target = float(signal.get("target") or entry * 1.04)
+        after_entry = [c for c in candles if int(c["timestamp"]) > entry_ts]
+        exit_candle = None
+        exit_reason = None
 
-        address = signal["token_address"]
-        candles = sorted(
-            store.get(address, {}).values(),
-            key=lambda c: c["timestamp"]
-        )
-        exit_time = int(signal["timestamp"]) + 4 * 3600
+        for candle in after_entry:
+            hit_stop = float(candle["low"]) <= stop
+            hit_target = float(candle["high"]) >= target
+            # Conservative handling if both levels occur within one hourly candle.
+            if hit_stop and hit_target:
+                exit_candle, exit_reason = candle, "STOP (both levels touched; conservative)"
+                break
+            if hit_stop:
+                exit_candle, exit_reason = candle, "STOP"
+                break
+            if hit_target:
+                exit_candle, exit_reason = candle, "TARGET"
+                break
 
-        eligible = [
-            c for c in candles
-            if int(c["timestamp"]) >= exit_time
-        ]
-        if not eligible:
+        if exit_candle is None:
+            expiry = entry_ts + 14 * 24 * 3600
+            eligible = [c for c in after_entry if int(c["timestamp"]) >= expiry]
+            if eligible:
+                exit_candle, exit_reason = eligible[0], "TIME EXIT (14 days)"
+
+        if exit_candle is None:
             still_pending.append(signal)
             continue
 
-        exit_candle = eligible[0]
-        exit_price = float(exit_candle["close"])
-        entry_price = float(signal["entry"])
-        if entry_price <= 0:
-            continue
-
-        ret = exit_price / entry_price - 1
+        exit_price = stop if "STOP" in exit_reason else (target if exit_reason == "TARGET" else float(exit_candle["close"]))
+        ret = exit_price / entry - 1
         outcome = {
             "signal_id": signal_id,
             "token_address": address,
-            "name": signal["name"],
-            "entry": entry_price,
+            "name": signal.get("name", "Unknown"),
+            "entry": entry,
             "exit": exit_price,
             "return_pct": round(ret * 100, 4),
             "result": "win" if ret > 0 else "loss",
             "exit_timestamp": int(exit_candle["timestamp"]),
             "resolved_at": utc_now(),
-            "method": "close_after_4h_not_stop_target_simulation"
+            "method": exit_reason
         }
         append_jsonl(OUTCOMES_FILE, outcome)
-
+        state.setdefault("stats", {}).setdefault("resolved", 0)
         state["stats"]["resolved"] += 1
-        if ret > 0:
-            state["stats"]["wins"] += 1
-        else:
-            state["stats"]["losses"] += 1
+        state["stats"]["wins" if ret > 0 else "losses"] = state["stats"].get("wins" if ret > 0 else "losses", 0) + 1
+
+        message = (
+            "SOLANA SELL / EXIT ALERT\n\n"
+            f"Project: {outcome['name']}\n"
+            f"Exit reason: {exit_reason}\n"
+            f"Entry reference: ${entry:.8g}\n"
+            f"Exit reference: ${exit_price:.8g}\n"
+            f"Observed return: {ret * 100:+.2f}% (before fees/slippage)\n"
+            f"Mint: {address}\n"
+            f"Time (UTC): {utc_now()}\n\n"
+            "Research alert only; not an executed trade."
+        )
+        send_telegram(message)
 
     state["open_signals"] = still_pending
-
 
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
 
     config = read_json(PROJECTS_FILE, {"projects": []})
+    # Auto-discover candidate tokens; configured projects are also considered.
+    candidates = list(config.get("projects", []))
+    seen_addresses = {str(p.get("token_address", "")).strip() for p in candidates}
+    for candidate in discover_solana_candidates(limit=int(os.getenv("MAX_DISCOVERY_CANDIDATES", "25"))):
+        if candidate["token_address"] not in seen_addresses:
+            candidates.append(candidate)
+            seen_addresses.add(candidate["token_address"])
+    print(f"Candidate tokens: {len(candidates)} (manual + discovered)")
     state = read_json(STATE_FILE, {
         "last_alerts": {},
         "open_signals": [],
@@ -207,12 +238,26 @@ def main():
         "signals": 0, "resolved": 0, "wins": 0, "losses": 0
     })
 
+    # Keep tracking every open alert even if it disappears from discovery feeds.
+    for signal in state.get("open_signals", []):
+        address = str(signal.get("token_address", "")).strip()
+        if address and address not in seen_addresses:
+            candidates.append({
+                "token_address": address,
+                "name": signal.get("name", "Open signal"),
+                "symbol": "",
+                "approved_non_meme": True,
+                "discovered_from": "open_signal_tracking"
+            })
+            seen_addresses.add(address)
+
     store = load_candle_store()
     active_projects = []
     market_info = {}
 
-    for project in config.get("projects", []):
-        if not project.get("approved_non_meme", False):
+    for project in candidates:
+        # Manually configured entries must explicitly opt in; discovery entries are filtered in market.py.
+        if project.get("discovered_from") is None and not project.get("approved_non_meme", False):
             continue
 
         address = str(project.get("token_address", "")).strip()
@@ -225,6 +270,9 @@ def main():
                 print(f"No eligible liquid Solana pair: {project.get('name')}")
                 continue
 
+            base_token = pair.get("baseToken") or {}
+            project["name"] = project.get("name") or base_token.get("name") or "Unknown"
+            project["symbol"] = project.get("symbol") or base_token.get("symbol") or ""
             pool_address = pair.get("pairAddress")
             raw = get_hourly_candles(pool_address)
             candles = get_closed_candles(raw)
@@ -277,6 +325,20 @@ def main():
 
     if model is None:
         print("Model is not ready; no BUY alerts will be generated.")
+        # A throttled heartbeat distinguishes a healthy scan from a silent failure.
+        now = datetime.now(timezone.utc).timestamp()
+        last_heartbeat = float(state.get("last_heartbeat_epoch", 0) or 0)
+        if now - last_heartbeat >= 6 * 3600:
+            message = (
+                "SOLANA BOT STATUS\n"
+                f"Scan completed: {utc_now()}\n"
+                f"Candidates discovered: {len(candidates)}\n"
+                f"Eligible projects: {len(active_projects)}\n"
+                f"Model not ready: {metrics.get('reason', 'unknown reason')}\n"
+                "No trade signal was generated. This is a status message, not a BUY alert."
+            )
+            if send_telegram(message):
+                state["last_heartbeat_epoch"] = now
         state["last_run_utc"] = utc_now()
         write_json_atomic(STATE_FILE, state)
         return
@@ -347,7 +409,9 @@ def main():
             "token_address": address,
             "name": prediction["name"],
             "timestamp": candle_ts,
-            "entry": entry
+            "entry": entry,
+            "stop": stop,
+            "target": target
         })
         state["last_alerts"][address] = candle_ts
         state["stats"]["signals"] += 1
