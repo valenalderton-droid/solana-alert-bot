@@ -34,7 +34,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Validate configuration
         run: |
-          python -m py_compile command_runner.py main.py market.py learner.py news_analyzer.py research_engine.py adaptive_policy.py self_improver.py signal_quality.py strategy_ensemble.py paper_portfolio.py nine_core_engine.py core_civilization.py market_university.py
+          python -m py_compile command_runner.py main.py market.py learner.py news_analyzer.py research_engine.py adaptive_policy.py self_improver.py signal_quality.py strategy_ensemble.py paper_portfolio.py nine_core_engine.py core_civilization.py market_university.py metropolis_simulation.py
           python -c "import json; json.load(open('data/projects.json', encoding='utf-8'))"
       - name: Run regression tests
         run: python -m unittest discover -s tests -v
