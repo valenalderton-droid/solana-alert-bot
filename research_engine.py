@@ -66,47 +66,69 @@ def _article_id(url, title):
 
 
 def _performance_topics(outcomes):
-    usable = []
-    for row in (outcomes or [])[-20:]:
-        if not isinstance(row, dict) or row.get("result") == "data_gap":
+    """Use numeric returns when available, otherwise validated win/loss labels."""
+    recent = [row for row in (outcomes or [])[-20:] if isinstance(row, dict)]
+    numeric = []
+    labels = []
+    for row in recent:
+        if row.get("result") == "data_gap":
             continue
         try:
             value = float(row.get("return_pct"))
+            if value == value and abs(value) != float("inf"):
+                numeric.append(value)
+                continue
         except (TypeError, ValueError, OverflowError):
-            continue
-        if value == value and abs(value) != float("inf"):
-            usable.append(value)
-    if len(usable) >= 5 and sum(v < 0 for v in usable) / len(usable) >= 0.60:
+            pass
+        label = str(row.get("result", "")).strip().lower()
+        if label in {"loss", "stop", "stop_loss", "stopped", "negative"}:
+            labels.append(False)
+        elif label in {"win", "target", "take_profit", "positive"}:
+            labels.append(True)
+
+    if len(numeric) >= 5:
+        loss_ratio = sum(value < 0 for value in numeric) / len(numeric)
+    elif len(labels) >= 5:
+        loss_ratio = sum(not value for value in labels) / len(labels)
+    else:
+        return set()
+
+    if loss_ratio >= 0.60:
         return {"security", "liquidity", "tokenomics", "strategy"}
+    if loss_ratio <= 0.35:
+        return {"adoption", "developers", "protocol", "governance"}
     return set()
 
 
 def build_research_plan(state, outcomes=None, configured_projects=None):
-    """Rotate broad queries; prioritize risk topics after a poor recent outcome sample."""
+    """Rotate broad queries, always retain one project query when eligible."""
     priority = _performance_topics(outcomes)
     plan = list(QUERY_PLAN)
     if priority:
         plan.sort(key=lambda row: (row[2] not in priority, row[2]))
+
     projects = [
         p for p in (configured_projects or [])
         if isinstance(p, dict) and p.get("approved_non_meme")
         and p.get("name") and p.get("symbol")
     ]
+    project_query = None
     if projects:
         cursor = int(state.get("project_research_cursor", 0) or 0) % len(projects)
         project = projects[cursor]
         name = str(project["name"]).strip()[:60]
         symbol = str(project["symbol"]).strip()[:16]
-        plan.insert(0, (
+        project_query = (
             "Solana ecosystem",
             f'"{name}" "{symbol}" Solana protocol news security audit governance token unlock',
             "project_specific"
-        ))
+        )
         state["project_research_cursor"] = (cursor + 1) % len(projects)
+
     cursor = int(state.get("research_query_cursor", 0) or 0) % len(plan)
-    selected = [plan[(cursor + i) % len(plan)] for i in range(min(2, len(plan)))]
-    state["research_query_cursor"] = (cursor + len(selected)) % len(plan)
-    return selected
+    general = [plan[(cursor + i) % len(plan)] for i in range(min(2 if project_query is None else 1, len(plan)))]
+    state["research_query_cursor"] = (cursor + len(general)) % len(plan)
+    return ([project_query] if project_query else []) + general
 
 
 def search_public_rss(query, category, topic, now=None):
