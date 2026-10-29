@@ -48,11 +48,18 @@ def add_features(candles):
     gain = delta.clip(lower=0).rolling(14).mean()
     loss = (-delta.clip(upper=0)).rolling(14).mean()
     rs = gain / loss.replace(0, np.nan)
-    df["rsi"] = (100 - 100 / (1 + rs)) / 100
+    rsi = (100 - 100 / (1 + rs)) / 100
+    # A zero-loss uptrend has RSI=1, not NaN. Flat candles have neutral RSI.
+    rsi = rsi.mask((loss == 0) & (gain > 0), 1.0)
+    rsi = rsi.mask((loss == 0) & (gain == 0), 0.5)
+    df["rsi"] = rsi
     short_gain = delta.clip(lower=0).rolling(6).mean()
     short_loss = (-delta.clip(upper=0)).rolling(6).mean()
     short_rs = short_gain / short_loss.replace(0, np.nan)
-    df["rsi_short"] = (100 - 100 / (1 + short_rs)) / 100
+    rsi_short = (100 - 100 / (1 + short_rs)) / 100
+    rsi_short = rsi_short.mask((short_loss == 0) & (short_gain > 0), 1.0)
+    rsi_short = rsi_short.mask((short_loss == 0) & (short_gain == 0), 0.5)
+    df["rsi_short"] = rsi_short
 
     previous_close = close.shift(1)
     tr = pd.concat([
@@ -493,14 +500,16 @@ def train_model(candle_sets):
         }
 
     active = [horizon for horizon, _ in trained]
-    return MultiHorizonModel(trained, horizon_metrics), {
+    ensemble_model = MultiHorizonModel(trained, horizon_metrics)
+    return ensemble_model, {
         "ready": True,
         "active_horizons": [f"{h}h" for h in active],
         "horizons": horizon_metrics,
         "ensemble": "weighted average of independently validated horizon probabilities",
+        # Report the exact weights used by the returned model.
         "weights": {
             f"{h}h": round(weight, 4)
-            for h, weight in MultiHorizonModel(trained).weights.items()
+            for h, weight in ensemble_model.weights.items()
         }
     }
 
