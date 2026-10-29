@@ -390,7 +390,7 @@ def price_action_ok(candles, row):
     if not uptrend:
         return False, "Trend is not bullish"
     if not above_trend or not trend_persistence or not above_medium_trend or not medium_persistence:
-        return False, "Price is not holding above persistent short- and medium-term trends"
+        return False, "Price is not holding above persistent EMA21 and EMA50 trends"
     if not (0.35 <= rsi <= 0.78):
         return False, "RSI outside the selected range"
     if not breakout and (close_location < 0.50 or upper_wick > 0.65):
