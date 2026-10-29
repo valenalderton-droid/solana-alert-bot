@@ -19,7 +19,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
           MAX_STOP_PCT: "0.05"
           TARGET_PCT: "0.10"
           MAX_DISCOVERED_PROJECTS: "500"
-          MAX_PROJECTS_PER_SCAN: "12"
+          MAX_PROJECTS_PER_SCAN: "30"
           ALERT_COOLDOWN_HOURS: "6"
         run: python command_runner.py
       - name: Save persistent history
