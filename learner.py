@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, brier_score_loss
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, brier_score_loss
 
 FEATURES = [
     "ret1", "ret3", "ret6", "ret12",
@@ -75,14 +75,23 @@ def build_training_rows(candle_sets):
             target_pct = max(0.04, 3 * atr_pct)
             target = entry * (1 + target_pct)
             stop = entry * (1 - stop_pct)
-            label = 0
+            label = None
+            label_end = int(df.iloc[i + 4]["timestamp"])
+
+            # Match the live evaluator: only use the next four hours. Missing
+            # hourly bars or a timeout must not be silently labelled as a loss.
+            signal_ts = int(df.iloc[i]["timestamp"])
+            future = df.iloc[i + 1:i + 5]
+            if len(future) != 4 or label_end - signal_ts > 4 * 3600:
+                continue
 
             for j in range(i + 1, i + 5):
                 candle = df.iloc[j]
                 hit_target = float(candle["high"]) >= target
                 hit_stop = float(candle["low"]) <= stop
 
-                # Ambiguous same-candle hits count as unsuccessful.
+                # If both levels are touched in one candle, assume the stop
+                # came first, matching the conservative live paper evaluator.
                 if hit_target and hit_stop:
                     label = 0
                     break
@@ -93,14 +102,19 @@ def build_training_rows(candle_sets):
                     label = 1
                     break
 
+            # If neither level was reached within the horizon, it is a timeout,
+            # not a negative example. Exclude it from this binary target-hit model.
+            if label is None:
+                continue
+
             values = df.iloc[i][FEATURES]
             if values.isna().any():
                 continue
 
             rows.append({
                 **{name: float(values[name]) for name in FEATURES},
-                "timestamp": int(df.iloc[i]["timestamp"]),
-                "label_end": int(df.iloc[i + 4]["timestamp"]),
+                "timestamp": signal_ts,
+                "label_end": label_end,
                 "y": label
             })
 
@@ -174,6 +188,7 @@ def train_model(candle_sets):
         "train_rows": int(len(train)),
         "test_rows": int(len(test)),
         "accuracy": round(float(accuracy_score(test["y"], predictions)), 4),
+        "balanced_accuracy": round(float(balanced_accuracy_score(test["y"], predictions)), 4),
         "precision": round(float(
             precision_score(test["y"], predictions, zero_division=0)
         ), 4),
