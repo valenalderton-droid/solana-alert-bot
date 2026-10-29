@@ -86,64 +86,74 @@ def utc_now():
 
 # Discover established Solana ecosystem tokens from protocol/category searches.
 # This is a heuristic filter, not a guarantee that every meme token is excluded.
-DISCOVERY_QUERIES = [
-    "Jupiter Solana", "Raydium Solana", "Orca Solana", "Kamino Solana",
-    "Jito Solana", "Marinade Solana", "Drift Solana", "Pyth Solana",
-    "Meteora Solana", "Sanctum Solana", "Solana lending", "Solana DeFi",
-    "Solana oracle", "Solana infrastructure", "Solana perpetuals",
-    "Solana liquid staking", "Solana RWA", "Solana payments",
-    "Solana bridge", "Solana governance"
-]
+# Curated protocol-token universe. Exact-symbol matching reduces unrelated search results.
+# This is deliberately conservative; it will miss some legitimate projects.
+ECOSYSTEM_SYMBOLS = {
+    "JUP", "RAY", "ORCA", "KMNO", "JTO", "PYTH", "DRIFT", "MNDE",
+    "HNT", "MOBILE", "RENDER", "SHDW", "NOS", "TNSR", "PRCL", "ZEX",
+    "CLOUD", "INF", "JLP", "MPLX", "W", "WEN", "STEP", "SLND",
+    "PORT", "UXD", "C98", "DUST", "MNGO", "SRM", "FIDA", "SAMO",
+    "HONEY", "IO", "ZEUS", "MET", "CROWN", "BLZE", "LST", "STARS",
+    "CASH", "EURO", "USDY", "USDC", "USDT", "MSOL", "BSOL", "JITOSOL",
+    "BNSOL", "INF", "SOL"
+}
 
 MEME_TERMS = {
     "meme", "memecoin", "inu", "doge", "pepe", "bonk", "wif", "shib",
-    "floki", "wojak", "frog", "dog", "cat", "elon", "trump", "moon",
-    "rocket", "pump", "kitty", "inu"
+    "floki", "wojak", "frog", "elon", "trump", "moon", "rocket", "kitty"
 }
 
 
 def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
-                             min_age_days=30, max_projects=80):
-    """Return a deduplicated list of candidate non-meme Solana projects."""
+                             min_age_days=30, max_projects=20):
+    """Find liquid, mature Solana pairs for a conservative curated token universe."""
     found = {}
     now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    counts = {"queries": 0, "pairs_seen": 0, "wrong_chain": 0,
+              "symbol_rejected": 0, "liquidity_volume_age_rejected": 0}
 
-    for query in DISCOVERY_QUERIES:
+    # Search one ticker at a time, then require exact symbol match.
+    for symbol_query in sorted(ECOSYSTEM_SYMBOLS):
+        counts["queries"] += 1
         try:
             payload = get_json(
                 "https://api.dexscreener.com/latest/dex/search",
-                params={"q": query}
+                params={"q": symbol_query}
             )
             for pair in payload.get("pairs") or []:
+                counts["pairs_seen"] += 1
                 if pair.get("chainId") != "solana":
+                    counts["wrong_chain"] += 1
                     continue
 
                 token = pair.get("baseToken") or {}
                 address = str(token.get("address") or "").strip()
                 name = str(token.get("name") or "").strip()
-                symbol = str(token.get("symbol") or "").strip()
-                if not address or not name or not symbol:
+                symbol = str(token.get("symbol") or "").strip().upper()
+                if not address or not name or symbol != symbol_query:
+                    counts["symbol_rejected"] += 1
                     continue
 
                 text = (name + " " + symbol).lower()
                 words = set(text.replace("-", " ").replace("_", " ").split())
                 if words & MEME_TERMS or any(term in text for term in
                     ("memecoin", "meme coin", "dogwif", "baby dog", "babyshib")):
+                    counts["symbol_rejected"] += 1
                     continue
 
                 liquidity = float((pair.get("liquidity") or {}).get("usd") or 0)
                 volume = float((pair.get("volume") or {}).get("h24") or 0)
                 price = float(pair.get("priceUsd") or 0)
                 created = pair.get("pairCreatedAt")
-                if liquidity < min_liquidity or volume < min_volume_24h or price <= 0:
-                    continue
-                # Require a known, mature pool to reduce brand-new speculative tokens.
-                if not created or now_ms - int(created) < min_age_days * 86400000:
+                if (liquidity < min_liquidity or volume < min_volume_24h or
+                        price <= 0 or not created or
+                        now_ms - int(created) < min_age_days * 86400000):
+                    counts["liquidity_volume_age_rejected"] += 1
                     continue
 
-                existing = found.get(address)
+                previous = found.get(address)
                 score = liquidity + volume
-                if existing and existing["_score"] >= score:
+                if previous and previous["_score"] >= score:
                     continue
                 found[address] = {
                     "name": name,
@@ -153,10 +163,11 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
                     "_score": score
                 }
         except Exception as exc:
-            print(f"Discovery query failed ({query}): {exc}")
+            print(f"Discovery query failed ({symbol_query}): {exc}")
 
     projects = sorted(found.values(), key=lambda item: item["_score"], reverse=True)
     for project in projects:
         project.pop("_score", None)
+    print("Discovery diagnostics: " + str(counts))
     print(f"Automatic discovery found {len(projects)} eligible Solana projects.")
     return projects[:max_projects]
