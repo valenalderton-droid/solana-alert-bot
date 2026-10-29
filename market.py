@@ -65,26 +65,33 @@ def get_best_solana_pair(token_address, min_liquidity=100000):
 
         txns = pair.get("txns") or {}
         h1 = txns.get("h1") or {}
+        h24 = txns.get("h24") or {}
         try:
-            recent_trades = int(h1.get("buys") or 0) + int(h1.get("sells") or 0)
+            recent_trades_1h = int(h1.get("buys") or 0) + int(h1.get("sells") or 0)
+            recent_trades_24h = int(h24.get("buys") or 0) + int(h24.get("sells") or 0)
         except (TypeError, ValueError, OverflowError):
-            recent_trades = 0
+            recent_trades_1h = 0
+            recent_trades_24h = 0
         pair["_liquidity_usd"] = liquidity
         pair["_reference_price_usd"] = price
-        pair["_recent_trades_1h"] = recent_trades
+        pair["_recent_trades_1h"] = recent_trades_1h
+        pair["_recent_trades_24h"] = recent_trades_24h
         eligible.append(pair)
 
     if not eligible:
         return None
 
-    # When transaction counts are provided, don't treat a dormant pool's old
-    # displayed quote as current if no eligible pool traded in the last hour.
-    has_h1_data = any(isinstance((p.get("txns") or {}).get("h1"), dict) for p in eligible)
-    if has_h1_data:
-        active = [p for p in eligible if p["_recent_trades_1h"] > 0]
-        if not active:
+    # Prefer pools with trades in the last hour. If none traded during that
+    # hour, accept pools with 24h activity instead of discarding every quote.
+    # DexScreener's priceUsd is a current API snapshot, not an executable quote.
+    active_1h = [p for p in eligible if p["_recent_trades_1h"] > 0]
+    if active_1h:
+        eligible = active_1h
+    else:
+        active_24h = [p for p in eligible if p["_recent_trades_24h"] > 0]
+        if not active_24h:
             return None
-        eligible = active
+        eligible = active_24h
 
     # A high-liquidity pool can still carry a stale/outlier quote. Compare only
     # eligible, active pools and fail closed if no pool is within 3% of their
