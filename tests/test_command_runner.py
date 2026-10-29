@@ -99,6 +99,22 @@ class CommandRunnerTests(unittest.TestCase):
         self.assertTrue(command_runner.is_sell_alert(message))
         self.assertTrue(command_runner.is_trade_alert(message))
 
+    def test_watchlist_and_data_status_reports_are_forwarded(self):
+        for header in (
+            "SOLANA TOP WATCHLIST — NO VALID BUY SETUP",
+            "SOLANA WATCHLIST STATUS — MARKET DATA UNAVAILABLE",
+            "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED",
+        ):
+            with patch.object(command_runner, "read_state", return_value={"open_positions": []}), \
+                 patch.object(command_runner, "refresh_news_if_due"), \
+                 patch.object(command_runner, "run_self_improvement_if_due"), \
+                 patch.object(scanner, "main", side_effect=lambda: scanner.send_telegram(header)), \
+                 patch.object(scanner, "send_telegram", return_value=True) as sender, \
+                 patch.object(command_runner, "telegram_send") as final_sender:
+                command_runner.main()
+            sender.assert_called_once_with(header)
+            final_sender.assert_not_called()
+
     def test_routine_status_is_not_a_trade_alert(self):
         for message in (
             "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED",
