@@ -329,7 +329,7 @@ def main():
                 print("BUY alert rejected: required fields could not be parsed; no Telegram message sent.")
                 return False
             # Record the signal only after Telegram confirms delivery.
-            sent = original_send_telegram(compact)
+            sent = original_send_telegram(message)
             if sent:
                 messages.append(message)
                 delivered_buys.append(message)
