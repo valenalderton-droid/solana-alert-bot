@@ -162,5 +162,21 @@ class SelfImproverTests(unittest.TestCase):
                 self.assertFalse((Path(temp) / "main.py.json").exists())
 
 
+    def test_unchanged_rule_is_not_rewritten(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(self_improver, "RULE_FILES_DIR", Path(temp)):
+                rule = {
+                    "id": "avoid_entry_chase", "enabled": True,
+                    "field": "entry_deviation_pct", "operator": "gte",
+                    "value": 2.0, "reason": "Repeated losses",
+                    "evidence": {"samples": 12}
+                }
+                self_improver.sync_experience_rule_files([rule])
+                result = self_improver.sync_experience_rule_files([rule])
+                self.assertEqual(result["created"], [])
+                self.assertEqual(result["edited"], [])
+                self.assertEqual(result["active"], ["avoid_entry_chase.json"])
+
+
 if __name__ == "__main__":
     unittest.main()
