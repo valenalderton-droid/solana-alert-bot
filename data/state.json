@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T11:19:40.679144+00:00",
+  "last_run_utc": "2026-10-29T11:33:38.405298+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -344,7 +344,7 @@
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952311,
-  "last_news_refresh_utc": "2026-10-29T11:18:53.670003+00:00",
+  "telegram_update_offset": 806952312,
+  "last_news_refresh_utc": "2026-10-29T11:33:06.507512+00:00",
   "last_watchlist_ping_utc": "2026-10-29T11:19:40.239690+00:00"
 }
