@@ -1,0 +1,39 @@
+name: Regression Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.py"
+      - "tests/**"
+      - "requirements.txt"
+      - ".github/workflows/regression-tests.yml"
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: regression-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Compile all bot modules
+        run: python -m py_compile command_runner.py main.py market.py learner.py news_analyzer.py research_engine.py adaptive_policy.py self_improver.py signal_quality.py strategy_ensemble.py paper_portfolio.py nine_core_engine.py core_civilization.py
+      - name: Run regression tests
+        run: python -m unittest discover -s tests -v
