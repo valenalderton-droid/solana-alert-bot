@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T15:25:14.961541+00:00",
+  "last_run_utc": "2026-10-29T15:31:06.251820+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -553,9 +553,9 @@
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T15:23:50.143452+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T15:25:14.447266+00:00",
-  "project_scan_cursor": 14,
+  "last_news_refresh_utc": "2026-10-29T15:30:03.341779+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T15:31:05.770478+00:00",
+  "project_scan_cursor": 9,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T15:17:01.292287+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T15:17:01.292287+00:00",
@@ -796,6 +796,16 @@
       "entry": 0.009814293984394849,
       "stop": 0.0097664329279028,
       "target": 0.009910016097378946
+    },
+    {
+      "signal_id": "7wcT8pY4Anv31b6QyPWFcXTmLVUcBkr2S7hNDqk4Qf9r:1793282400:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "7wcT8pY4Anv31b6QyPWFcXTmLVUcBkr2S7hNDqk4Qf9r",
+      "name": "Render",
+      "timestamp": 1793282400,
+      "entry": 1.7107435046399526,
+      "stop": 1.7013631500477886,
+      "target": 1.7295042138242807
     }
   ]
 }
