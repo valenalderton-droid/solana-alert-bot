@@ -760,6 +760,10 @@ def main():
           info = market_info.get(address)
           if not info:
               continue
+          # Do not stack duplicate BUY recommendations while an exit-monitored
+          # position for this mint is still open.
+          if any(p.get("token_address") == address for p in state["open_positions"]):
+              continue
 
           candles = info["candles"]
           X, row = latest_features(candles)
@@ -791,10 +795,23 @@ def main():
               )
               continue
 
-          entry = float(row["close"])
+          signal_close = float(row["close"])
           atr_pct = float(row["atr_pct"])
           if not math.isfinite(atr_pct) or atr_pct <= 0:
               scan_diagnostics["invalid_atr"] += 1
+              continue
+
+          # Use the latest spot quote for the entry reference, but reject chasing
+          # if price has moved too far since the completed signal candle.
+          entry = float(info.get("price") or signal_close)
+          entry_deviation_pct = abs(entry / signal_close - 1.0) * 100
+          max_entry_deviation_pct = max(1.5, min(3.0, 1.5 * atr_pct * 100))
+          if entry <= 0 or entry_deviation_pct > max_entry_deviation_pct:
+              print(
+                  f"Entry skipped for {project.get('name')}: spot moved "
+                  f"{entry_deviation_pct:.2f}% from signal close "
+                  f"(limit {max_entry_deviation_pct:.2f}%)"
+              )
               continue
 
           stop_pct = min(MAX_STOP_PCT, max(0.02, 1.5 * atr_pct))
@@ -820,6 +837,7 @@ def main():
               "stop_pct": round(stop_pct * 100, 3),
               "target_pct": round(target_pct * 100, 3),
               "probability": round(probability, 4),
+              "entry_deviation_pct": round(entry_deviation_pct, 3),
               "liquidity_usd": info["liquidity"],
               "volume_24h_usd": info["volume24h"],
               "price_action": pa_reason,
@@ -833,6 +851,8 @@ def main():
               f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\n"
               f"Target reference: ${target:.8g} ({target_pct * 100:.2f}%)\n"
               f"Model probability: {probability:.1%}\n"
+              f"Price-action check: {pa_reason}\n"
+              f"Spot vs signal-candle deviation: {entry_deviation_pct:.2f}%\n"
               f"Liquidity: ${info['liquidity']:,.0f}\n"
               f"24h volume: ${info['volume24h']:,.0f}\n"
               f"BTC 24h change: {global_context['btc_24h_pct']}%; SOL 24h change: {global_context['sol_24h_pct']}%\n"
