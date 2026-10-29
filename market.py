@@ -144,6 +144,13 @@ MEME_TERMS = {
     "dog coin", "frog coin", "memes"
 }
 
+# A small seed of high-signal symbols; broad category searches discover the rest.
+DISCOVERY_SYMBOL_QUERIES = (
+    "JUP", "RAY", "ORCA", "KMNO", "JTO", "PYTH", "DRIFT", "MNDE",
+    "HNT", "RENDER", "SHDW", "TNSR", "PRCL", "CLOUD", "JLP", "MPLX",
+    "MSOL", "BSOL", "ZBCN", "MOBILE", "W", "FIDA"
+)
+
 DISCOVERY_QUERIES = (
     "Solana DeFi protocol", "Solana lending borrowing", "Solana DEX exchange",
     "Solana oracle data", "Solana liquid staking", "Solana restaking",
@@ -152,10 +159,8 @@ DISCOVERY_QUERIES = (
     "Solana yield vaults", "Solana real world assets RWA",
     "Solana privacy security", "Solana wallet infrastructure",
     "Solana governance protocol", "Solana cross chain bridge",
-    "Solana NFT infrastructure utility", "Solana compute AI infrastructure",
-    "Solana DePIN network", "Solana gaming infrastructure",
-    "Solana identity authentication", "Solana tokenized treasury",
-    "Solana MEV trading infrastructure", "Solana analytics data protocol",
+    "Solana compute AI infrastructure", "Solana DePIN network",
+    "Solana gaming infrastructure", "Solana tokenized treasury",
 )
 
 
@@ -250,7 +255,7 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
 
     # Search known protocol symbols plus broad categories. A bounded request count
     # reduces API hammering while finding projects outside the old fixed allowlist.
-    queries = [("symbol", symbol) for symbol in sorted(ECOSYSTEM_SYMBOLS)]
+    queries = [("symbol", symbol) for symbol in DISCOVERY_SYMBOL_QUERIES]
     queries.extend(("category", query) for query in DISCOVERY_QUERIES)
     for query_type, query in queries:
         counts["queries"] += 1
