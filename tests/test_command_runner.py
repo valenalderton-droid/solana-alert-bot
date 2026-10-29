@@ -99,5 +99,29 @@ class CommandRunnerTests(unittest.TestCase):
         self.assertIn("mint-beta", reply)
 
 
+    def test_detects_ranked_buy_watch_alert(self):
+        message = (
+            "SOLANA TOP-RANKED BUY WATCH — NOT AN AUTOMATIC TRADE\\n\\n"
+            "Project: Example (EXM)\\n"
+            "Entry reference: $1.25\\n"
+            "Stop reference: $1.18 (5.00%)\\n"
+            "Target reference: $1.50 (20.00%)\\n"
+            "Combined model probability: 65.0%\\n"
+            'Probability by horizon: {"4h": 0.65, "24h": 0.61}\\n'
+            "Liquidity: $250,000\\n"
+            "24h volume: $500,000\\n"
+            "Mint: ExampleMintAddress\\n"
+        )
+        self.assertTrue(command_runner.is_buy_alert(message))
+        reply = command_runner.concise_reply([message])
+        self.assertIn("Example (EXM)", reply)
+        self.assertIn("خرید: $1.25", reply)
+        self.assertNotEqual(reply, "NO_SETUP")
+
+    def test_watchlist_status_is_not_misclassified_as_buy(self):
+        message = "SOLANA TOP WATCHLIST — NO VALID BUY SETUP\\nThis is NOT a buy signal."
+        self.assertFalse(command_runner.is_buy_alert(message))
+
+
 if __name__ == "__main__":
     unittest.main()
