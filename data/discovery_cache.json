@@ -1,0 +1,131 @@
+{
+  "saved_at": "2026-10-29T10:12:12.199085+00:00",
+  "filters": {
+    "min_liquidity": 100000.0,
+    "min_volume_24h": 50000.0,
+    "min_age_days": 30,
+    "max_projects": 20
+  },
+  "projects": [
+    {
+      "name": "Raydium",
+      "symbol": "RAY",
+      "token_address": "FJkTpy5rTZYCAUn3FXDzz9hgJYHYwBsxGm5ee75rAZNC",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Render",
+      "symbol": "RENDER",
+      "token_address": "7wcT8pY4Anv31b6QyPWFcXTmLVUcBkr2S7hNDqk4Qf9r",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Helium",
+      "symbol": "HNT",
+      "token_address": "9F4UatNR9XnvQVffUu6MojWEywTqwAwD1CtNL7Lht3pT",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Render",
+      "symbol": "RENDER",
+      "token_address": "AEByTaDwTqn1eVNS3AuET1owY7xLYdNLW7Q8BugwnyaC",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Meteora",
+      "symbol": "MET",
+      "token_address": "METvsvVRapdj9cFLzq4Tr43xK4tAjQfwX76z3n6mWQL",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Metaplex Token",
+      "symbol": "MPLX",
+      "token_address": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Parcl",
+      "symbol": "PRCL",
+      "token_address": "DogpWmFd1BUULq1UML1CZvV4xWgPmKFCfiE22R6j8qxL",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Raydium",
+      "symbol": "RAY",
+      "token_address": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Jito Staked SOL",
+      "symbol": "JITOSOL",
+      "token_address": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Kamino",
+      "symbol": "KMNO",
+      "token_address": "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Jupiter Perps LP",
+      "symbol": "JLP",
+      "token_address": "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Jupiter",
+      "symbol": "JUP",
+      "token_address": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Marinade staked SOL (mSOL)",
+      "symbol": "MSOL",
+      "token_address": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+      "approved_non_meme": true
+    },
+    {
+      "name": "JITO",
+      "symbol": "JTO",
+      "token_address": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Orca",
+      "symbol": "ORCA",
+      "token_address": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Nosana",
+      "symbol": "NOS",
+      "token_address": "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7",
+      "approved_non_meme": true
+    },
+    {
+      "name": "BlazeStake Staked SOL (bSOL)",
+      "symbol": "BSOL",
+      "token_address": "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Pyth Network",
+      "symbol": "PYTH",
+      "token_address": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+      "approved_non_meme": true
+    },
+    {
+      "name": "ZEUS",
+      "symbol": "ZEUS",
+      "token_address": "ZEUS1aR7aX8DFFJf5QjWj2ftDDdNTroMNGo8YoQm3Gq",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Render Token",
+      "symbol": "RENDER",
+      "token_address": "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof",
+      "approved_non_meme": true
+    }
+  ]
+}
