@@ -7,12 +7,44 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T09:29:03.091747+00:00",
+  "last_run_utc": "2026-10-29T09:40:32.062044+00:00",
   "last_status_message_utc": "2026-10-29T03:39:02.533088+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
     "80dc80f108e24c577158c3d4",
     "1720a1e665b3b30cf33bf5ac",
-    "edfd910460c9a3bda039d1c8"
+    "edfd910460c9a3bda039d1c8",
+    "cd94a19df52c4be557de94c7",
+    "440e7118ef1d11a3831a9d97",
+    "fbbe9ed1c230c6c1ded02e2a"
+  ],
+  "news_observations": [
+    {
+      "observed_at": "2026-10-29T09:40:08.013351+00:00",
+      "published_at": "2026-10-29T01:41:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Hyperliquid Is Up 218% This Year While Solana Is Down 18%. Which Is the Better Buy? - 24/7 Wall St.",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPb0V4WWtxTU1FcWRESFNkclZmSkxQdjFoMldrWno2MWdGRTVFUVduUUdfR25CZ0NMZlpmSmR4d2NteGZmajRuNWh1VFZEVWM5QUxVd1E4TlhRUnFDaG1OYjBoWG51MUdmQXlqU0JmdzdNUGxkSERjaTlIMHNKeVowVXNNYmY3VW9LWXRaV05WeG9aM1A2RnI1WEZfdy1TSzljYTNKZDRqdHZ5R0lsZ2gxcVU3bmowVFFxc1hiSlFMWDlfWENwNUpmVzR4WjN1ek5WZlNlRg?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:40:08.719684+00:00",
+      "published_at": "2026-10-29T01:18:38+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana Introduces BP Badges for Breakpoint Event Attendance - Cryptonews.net",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBvSkJQeEkwZ2VzcjlCZ0xYeTVCdm1IT1NuSUQ4cXJZNDJuZGNlLW8wR0p3WTM5NXdRcTRZQVUtWlBtU2loNklpWEJyTjJzWGNFNFFVRmxXVWJSdw?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:40:09.122546+00:00",
+      "published_at": "2026-10-28T22:29:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana Handles 38% of Spot DEX Trading. So Why Does SOL Keep Falling? - 24/7 Wall St.",
+      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQdlRtczBucWZFSzdIU25QOC01LWYyRTdMV3ByZWM3TVVwQ1FBcWJaMkVKRFJLZ3RyTVc5ZEoyTUtSVklLNHhtTGJiTUl4ZFJqSzVGbEtnS2REaFBXVEEta1cyVWZaRG1sQzN2eXdHVGhhaC00MVZ1T21JQzY5SDRNYl9DX2NXbG1kdEl2eEprZzFwczJmWnAtQnVtM1BjOFhMWkgtMzdvOTlrVDFweWVjN0VSeVNmcEh3cGxPMjE0VWIzbDg?oc=5"
+    }
   ]
 }
