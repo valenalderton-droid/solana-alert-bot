@@ -121,6 +121,8 @@ def translate_telegram(message):
         "Probability by horizon:": "احتمال بر اساس افق زمانی:",
         "Model horizons available:": "افق‌های زمانی مدل:",
         "Price-action check:": "تأیید پرایس اکشن:",
+        "Signal quality:": "کیفیت سیگنال:",
+        "Quality checks:": "بررسی‌های کیفیت:",
         "Spot vs signal-candle deviation:": "فاصله قیمت لحظه‌ای از کندل سیگنال:",
         "Entry skipped for": "ورود رد شد برای", "Liquidity:": "نقدینگی:",
         "24h volume:": "حجم معاملات ۲۴ ساعته:", "Evaluation:": "ارزیابی مدل:",
