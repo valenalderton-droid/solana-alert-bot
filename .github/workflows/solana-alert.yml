@@ -1,13 +1,9 @@
 name: Solana Project Trader
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - "data/**"
   workflow_dispatch:
   schedule:
-    - cron: "7,22,37,52 * * * *"
+    - cron: "*/5 * * * *"
 
 permissions:
   contents: write
@@ -47,7 +43,7 @@ jobs:
           MAX_STOP_PCT: "0.05"
           TARGET_PCT: "0.04"
           ALERT_COOLDOWN_HOURS: "6"
-        run: python main.py
+        run: python command_runner.py
       - name: Save persistent history
         run: |
           git config user.name "github-actions[bot]"
