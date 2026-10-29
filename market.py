@@ -129,15 +129,12 @@ ECOSYSTEM_SYMBOLS = {
     "JUP", "RAY", "ORCA", "KMNO", "JTO", "PYTH", "DRIFT", "MNDE",
     "HNT", "MOBILE", "RENDER", "SHDW", "NOS", "TNSR", "PRCL", "ZEX",
     "CLOUD", "INF", "JLP", "MPLX", "W", "STEP", "SLND", "PORT", "UXD",
-    "C98", "MNGO", "SRM", "FIDA", "HONEY", "IO", "ZEUS", "MET", "BLZE",
-    "MSOL", "BSOL", "JITOSOL", "BNSOL", "JTO", "JST", "LIKE", "GUAC",
-    "DUST", "AUDIO", "ACS", "KIN", "ATLAS", "POLIS", "GENE", "GMT",
-    "GST", "PRISM", "MNDE", "LDO", "WOO", "WEN", "CROWN", "SHFL",
-    "MPL", "HADES", "CROWN", "SLND", "UXP", "SAMO", "STEP", "SBR",
-    "TULIP", "MNGO", "SON", "AURY", "DIO", "CHEX", "BORG", "GARI",
-    "MEDIA", "DVPN", "HONEY", "WHALES", "CATO", "BOKU", "NATIX",
-    "MATRIX", "PRCL", "ZBCN", "GIGA", "ISLAND", "PONCHO", "CASH",
-    "MELD", "HXD", "SHARK", "WIF", "JTO", "PYTH", "JUP", "RAY"
+    "C98", "FIDA", "IO", "ZEUS", "MET", "BLZE", "MSOL", "BSOL",
+    "JITOSOL", "BNSOL", "AUDIO", "ACS", "ATLAS", "POLIS", "GENE", "GMT",
+    "GST", "PRISM", "WOO", "CHEX", "MEDIA", "DVPN", "NATIX", "MATRIX",
+    "ZBCN", "MELD", "HXD", "SHARK", "TULIP", "SBR", "AURY", "DIO",
+    "MPL", "SLND", "HONEY", "PORT", "UXP", "STEP", "JST", "LDO",
+    "CROWN", "SHFL", "BORG", "GARI", "KIN"
 }
 
 MEME_TERMS = {
