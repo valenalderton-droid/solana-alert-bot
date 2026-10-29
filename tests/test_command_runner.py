@@ -79,8 +79,8 @@ class CommandRunnerTests(unittest.TestCase):
         ]
         reply = command_runner.concise_reply(messages)
         self.assertIn("Beta (BET)", reply)
-        self.assertIn("خرید: $2.2", reply)
-        self.assertIn("فروش: $2.6", reply)
+        self.assertIn("نقطه ورود: $2.2", reply)
+        self.assertIn("نقطه فروش هدف (Take Profit): $2.6", reply)
         self.assertIn("mint-beta", reply)
         self.assertNotIn("Combined model probability", reply)
 
@@ -123,7 +123,7 @@ class CommandRunnerTests(unittest.TestCase):
         self.assertTrue(command_runner.is_buy_alert(message))
         reply = command_runner.concise_reply([message])
         self.assertIn("Example (EXM)", reply)
-        self.assertIn("خرید: $1.25", reply)
+        self.assertIn("نقطه ورود: $1.25", reply)
         self.assertNotEqual(reply, "NO_SETUP")
 
     def test_scan_rotation_covers_universe_without_duplicates(self):
@@ -167,6 +167,17 @@ class CommandRunnerTests(unittest.TestCase):
             "SOLANA NEWS IMPACT — RESEARCH, NOT A TRADE SIGNAL",
         ):
             self.assertFalse(command_runner.is_trade_alert(message), message)
+
+    def test_automatic_mode_does_not_poll_for_pay_commands(self):
+        original_sender = scanner.send_telegram
+        with patch.object(command_runner, "read_state", return_value={"open_positions": []}), \\
+             patch.object(command_runner, "poll_pay", side_effect=AssertionError("Pay polling must be disabled")), \\
+             patch.object(command_runner, "refresh_news_if_due"), \\
+             patch.object(command_runner, "run_self_improvement_if_due"), \\
+             patch.object(scanner, "main"), \\
+             patch.object(scanner, "send_telegram", original_sender):
+            # A scheduled run should execute without checking for a Telegram trigger.
+            command_runner.main()
 
     def test_only_pay_command_is_accepted_and_other_text_is_ignored(self):
         for ignored_text in ("hello", "سلام", "راهنما", "/status", "اخبار"):
