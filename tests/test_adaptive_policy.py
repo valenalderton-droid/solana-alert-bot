@@ -79,6 +79,22 @@ class AdaptivePolicyTests(unittest.TestCase):
         self.assertEqual(result["global_bearish_news_24h"], 0)
         self.assertEqual(result["min_probability"], 0.60)
 
+    def test_large_tvl_drop_tightens_entries_but_tvl_rise_does_not_loosen(self):
+        now = datetime.now(timezone.utc)
+        research = [{
+            "metric": "Solana DeFi TVL",
+            "change_24h_pct": -16.0,
+            "observed_at": now.isoformat()
+        }]
+        result = derive_policy([], [], base_probability=0.60, now=now,
+                               research_observations=research)
+        self.assertEqual(result["min_probability"], 0.65)
+        self.assertEqual(result["cooldown_hours"], 8)
+        positive = [{**research[0], "change_24h_pct": 18.0}]
+        unchanged = derive_policy([], [], base_probability=0.60, now=now,
+                                  research_observations=positive)
+        self.assertEqual(unchanged["min_probability"], 0.60)
+
     def test_non_target_outcomes_do_not_count(self):
         outcomes = [{"result": "timeout"} for _ in range(20)]
         result = derive_policy(outcomes, [], base_probability=0.60)
