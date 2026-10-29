@@ -332,24 +332,47 @@ def main():
 
     if report_due:
         outcomes = read_jsonl(OUTCOMES_FILE)
-        returns = [
-            float(item["return_pct"]) for item in outcomes
-            if isinstance(item.get("return_pct"), (int, float))
+        predictions = read_jsonl(PREDICTIONS_FILE)
+        window_start = now.timestamp() - 24 * 3600
+
+        def timestamp_in_window(value):
+            if not value:
+                return False
+            try:
+                parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+                if parsed.tzinfo is None:
+                    parsed = parsed.replace(tzinfo=timezone.utc)
+                return parsed.timestamp() >= window_start
+            except (ValueError, TypeError, OverflowError):
+                return False
+
+        recent_predictions = [
+            item for item in predictions
+            if timestamp_in_window(item.get("created_at"))
         ]
-        wins = sum(1 for item in outcomes if item.get("result") == "win")
-        losses = sum(1 for item in outcomes if item.get("result") == "loss")
+        recent_outcomes = [
+            item for item in outcomes
+            if timestamp_in_window(item.get("resolved_at"))
+        ]
+        wins = sum(1 for item in recent_outcomes if item.get("result") == "win")
+        losses = sum(1 for item in recent_outcomes if item.get("result") == "loss")
         resolved = wins + losses
         win_rate = (wins / resolved * 100) if resolved else 0.0
+        returns = [
+            float(item["return_pct"]) for item in recent_outcomes
+            if isinstance(item.get("return_pct"), (int, float))
+        ]
         avg_return = (sum(returns) / len(returns)) if returns else 0.0
         digest = (
-            "SOLANA BOT — 24H PERFORMANCE LOG\n\n"
-            f"BUY-watch alerts recorded: {state['stats'].get('signals', 0)}\n"
-            f"Resolved alerts: {resolved} (wins: {wins}, losses: {losses})\n"
-            f"Historical win rate: {win_rate:.1f}%\n"
-            f"Average recorded return: {avg_return:.2f}%\n"
+            "SOLANA BOT — LAST 24H PERFORMANCE\n\n"
+            f"BUY-watch alerts recorded in last 24h: {len(recent_predictions)}\n"
+            f"Alerts resolved in last 24h: {resolved} (wins: {wins}, losses: {losses})\n"
+            f"Win rate of alerts resolved in last 24h: {win_rate:.1f}%\n"
+            f"Average return of alerts resolved in last 24h: {avg_return:.2f}%\n"
             f"Projects with usable market data this run: {len(active_projects)}\n"
             f"Time (UTC): {utc_now()}\n\n"
-            "Paper-tracking statistics only; not a guarantee of future performance."
+            "Only resolved paper-tracked alerts are included in win rate and average return. "
+            "This is not a guarantee of future performance."
         )
         if send_telegram(digest):
             state["last_stats_report_utc"] = utc_now()
