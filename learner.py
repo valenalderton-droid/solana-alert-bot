@@ -441,7 +441,9 @@ class MultiHorizonModel:
                 calibration = max(0.05, min(1.0, 1.0 - brier / 0.35))
                 reliability[horizon] = directional * calibration
             else:
-                reliability[horizon] = self.base_weights.get(horizon, 0.05)
+                # Missing validation metrics mean "no evidence-based adjustment".
+                # A neutral multiplier preserves the configured base horizon weights.
+                reliability[horizon] = 1.0
         raw = {
             h: self.base_weights.get(h, 0.05) * reliability[h]
             for h, _ in models
@@ -452,7 +454,7 @@ class MultiHorizonModel:
             total = sum(raw.values())
         self.weights = {h: value / total for h, value in raw.items()}
         self.weighting_method = (
-            "validation-weighted using chronological holdout and walk-forward balanced accuracy/Brier score"
+            "validation-weighted using out-of-sample chronological holdout and walk-forward balanced accuracy/Brier score"
             if any(
                 isinstance(metrics.get(f"{h}h"), dict)
                 and isinstance(metrics[f"{h}h"].get("walk_forward"), dict)
