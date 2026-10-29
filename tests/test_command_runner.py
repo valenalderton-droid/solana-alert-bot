@@ -74,18 +74,18 @@ class CommandRunnerTests(unittest.TestCase):
 
     def test_candidate_ranking_uses_horizon_consensus_and_liquidity(self):
         weak_high_score = (
-            "SOLANA BUY WATCH\\nProject: Alpha (ALP)\\nEntry reference: $1.2\\n"
-            "Stop reference: $1.1 (5%)\\nTarget reference: $1.4 (4%)\\n"
-            "Combined model probability: 75.0%\\n"
-            'Probability by horizon: {"4h": 0.35, "12h": 0.45, "24h": 0.8}\\n'
-            "Liquidity: $100,000\\n24h volume: $50,000\\nMint: mint-alpha"
+            "SOLANA BUY WATCH\nProject: Alpha (ALP)\nEntry reference: $1.2\n"
+            "Stop reference: $1.1 (5%)\nTarget reference: $1.4 (4%)\n"
+            "Combined model probability: 75.0%\n"
+            'Probability by horizon: {"4h": 0.35, "12h": 0.45, "24h": 0.8}\n'
+            "Liquidity: $100,000\n24h volume: $50,000\nMint: mint-alpha"
         )
         consistent = (
-            "SOLANA BUY WATCH\\nProject: Beta (BET)\\nEntry reference: $2.2\\n"
-            "Stop reference: $2.0 (5%)\\nTarget reference: $2.6 (4%)\\n"
-            "Combined model probability: 72.0%\\n"
-            'Probability by horizon: {"4h": 0.72, "12h": 0.70, "24h": 0.68}\\n'
-            "Liquidity: $500,000\\n24h volume: $300,000\\nMint: mint-beta"
+            "SOLANA BUY WATCH\nProject: Beta (BET)\nEntry reference: $2.2\n"
+            "Stop reference: $2.0 (5%)\nTarget reference: $2.6 (4%)\n"
+            "Combined model probability: 72.0%\n"
+            'Probability by horizon: {"4h": 0.72, "12h": 0.70, "24h": 0.68}\n'
+            "Liquidity: $500,000\n24h volume: $300,000\nMint: mint-beta"
         )
         reply = command_runner.concise_reply([weak_high_score, consistent])
         self.assertIn("Beta (BET)", reply)
