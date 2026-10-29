@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from learner import FEATURES, add_features, build_training_rows, price_action_ok, recency_sample_weights, walk_forward_validation
+from learner import FEATURES, MultiHorizonModel, add_features, build_training_rows, price_action_ok, recency_sample_weights, walk_forward_validation
 
 
 def make_flat_candles(count=80):
@@ -110,6 +110,30 @@ class LearnerTests(unittest.TestCase):
         # The synthetic price range is far too small to hit either the 2%+
         # stop or 4%+ target within four hours. These are timeouts, not losses.
         self.assertTrue(rows.empty)
+
+    def test_training_rows_support_longer_horizons(self):
+        candles = make_flat_candles(360)
+        for i in range(200, len(candles), 8):
+            base = candles[i]["close"]
+            for j in range(i + 1, min(i + 5, len(candles))):
+                candles[j]["high"] = max(candles[j]["high"], base * 1.06)
+        rows = build_training_rows([candles], horizon=12)
+        self.assertFalse(rows.empty)
+        self.assertTrue(((rows["label_end"] - rows["timestamp"]) == 12 * 3600).all())
+
+    def test_multi_horizon_model_returns_weighted_and_separate_probabilities(self):
+        class FakeModel:
+            def __init__(self, probability):
+                self.probability = probability
+
+            def predict_proba(self, X):
+                return np.array([[1 - self.probability, self.probability]])
+
+        model = MultiHorizonModel([(4, FakeModel(0.8)), (24, FakeModel(0.4))])
+        combined = model.predict_proba(np.array([[1.0]]))
+        horizon = model.predict_horizon_proba(np.array([[1.0]]))
+        self.assertAlmostEqual(float(combined[0][1]), 0.64)
+        self.assertEqual(horizon, {"4h": 0.8, "24h": 0.4})
 
     def test_training_rows_include_binary_labels_only(self):
         candles = make_flat_candles(320)
