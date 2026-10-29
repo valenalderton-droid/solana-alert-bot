@@ -66,5 +66,27 @@ class ResearchEngineTests(unittest.TestCase):
                 fetch_solana_tvl_snapshot(datetime(2026, 10, 29, tzinfo=timezone.utc))
 
 
+    def test_learning_diagnostics_prioritize_next_research_cycle(self):
+        import io
+        import json
+        from unittest.mock import patch
+        import research_engine
+
+        original_open = open
+        def fake_open(path, *args, **kwargs):
+            if str(path).endswith("data/self_improvement.json"):
+                return io.StringIO(json.dumps({
+                    "learning_diagnostics": {"research_focus": ["liquidity"]}
+                }))
+            return original_open(path, *args, **kwargs)
+
+        state = {}
+        with patch("builtins.open", side_effect=fake_open):
+            plan = build_research_plan(state, outcomes=[], configured_projects=[])
+        self.assertEqual(plan[0][2], "liquidity")
+        self.assertEqual(state["research_query_cursor"], 2)
+        self.assertEqual(state["research_priority_signature"], "liquidity")
+
+
 if __name__ == "__main__":
     unittest.main()
