@@ -103,9 +103,28 @@ def _performance_topics(outcomes):
 def build_research_plan(state, outcomes=None, configured_projects=None):
     """Rotate broad queries, always retain one project query when eligible."""
     priority = _performance_topics(outcomes)
+    # Feed validated outcome diagnostics back into the next research cycle.
+    # This changes search priority only; it never changes trading rules directly.
+    diagnostics = {}
+    diagnostics_path = os.path.join(os.path.dirname(__file__), "data", "self_improvement.json")
+    try:
+        with open(diagnostics_path, "r", encoding="utf-8") as handle:
+            registry = json.load(handle)
+        diagnostics = registry.get("learning_diagnostics", {})
+        learned_topics = diagnostics.get("research_focus", [])
+        if isinstance(learned_topics, list):
+            valid_topics = {row[2] for row in QUERY_PLAN}
+            priority.update(str(topic) for topic in learned_topics if str(topic) in valid_topics)
+    except (OSError, json.JSONDecodeError, TypeError, AttributeError):
+        diagnostics = {}
+
     plan = list(QUERY_PLAN)
     if priority:
         plan.sort(key=lambda row: (row[2] not in priority, row[2]))
+    priority_signature = "|".join(sorted(priority))
+    if state.get("research_priority_signature") != priority_signature:
+        state["research_priority_signature"] = priority_signature
+        state["research_query_cursor"] = 0
 
     projects = [
         p for p in (configured_projects or [])
