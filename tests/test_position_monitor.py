@@ -99,19 +99,19 @@ class PositionMonitorTests(unittest.TestCase):
         }
         state = {"paper_open_signals": []}
 
-        with tempfile.TemporaryDirectory() as temp, \\
-             patch.object(main, "PAPER_PREDICTIONS_FILE", Path(temp) / "paper_predictions.jsonl"), \\
-             patch.object(main, "evaluate_strategies", return_value={"score": 72, "risk_flags": []}), \\
-             patch.object(main, "send_telegram", return_value=False), \\
-             patch.object(main, "append_jsonl", wraps=main.append_jsonl) as append:
-            main.send_watchlist_fallback(
-                [project], {"mint-paper-test": info}, state,
-                reason="model not ready", configured_projects=[project]
-            )
-            main.send_watchlist_fallback(
-                [project], {"mint-paper-test": info}, state,
-                reason="model not ready", configured_projects=[project]
-            )
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(main, "PAPER_PREDICTIONS_FILE", Path(temp) / "paper_predictions.jsonl"):
+                with patch.object(main, "evaluate_strategies", return_value={"score": 72, "risk_flags": []}):
+                    with patch.object(main, "send_telegram", return_value=False):
+                        with patch.object(main, "append_jsonl", wraps=main.append_jsonl) as append:
+                            main.send_watchlist_fallback(
+                                [project], {"mint-paper-test": info}, state,
+                                reason="model not ready", configured_projects=[project]
+                            )
+                            main.send_watchlist_fallback(
+                                [project], {"mint-paper-test": info}, state,
+                                reason="model not ready", configured_projects=[project]
+                            )
 
         self.assertEqual(len(state["paper_open_signals"]), 1)
         self.assertEqual(state["paper_open_signals"][0]["source"], "paper_watchlist")
