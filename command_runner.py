@@ -2,6 +2,7 @@ import json
 import math
 import os
 import re
+from datetime import datetime, timezone
 import requests
 
 STATE_FILE = "data/state.json"
@@ -62,6 +63,55 @@ def poll_pay(state):
         return False
 
 
+def refresh_news_if_due(state, interval_minutes=15):
+    """Refresh source-linked news between trade scans without hammering market APIs."""
+    last_value = state.get("last_news_refresh_utc")
+    if last_value:
+        try:
+            last = datetime.fromisoformat(str(last_value).replace("Z", "+00:00"))
+            if last.tzinfo is None:
+                last = last.replace(tzinfo=timezone.utc)
+            age_seconds = (datetime.now(timezone.utc) - last.astimezone(timezone.utc)).total_seconds()
+            if 0 <= age_seconds < interval_minutes * 60:
+                return
+        except (ValueError, TypeError, OverflowError):
+            pass
+
+    try:
+        from news_analyzer import fetch_recent_news, analyze_news
+        seen = state.setdefault("seen_news_ids", [])
+        seen_set = set(seen)
+        observations = state.setdefault("news_observations", [])
+        added = 0
+        for item in fetch_recent_news()[:12]:
+            if item.get("id") in seen_set:
+                continue
+            analyzed = analyze_news(item)
+            observations.append({
+                "observed_at": datetime.now(timezone.utc).isoformat(),
+                "published_at": analyzed.get("published_at"),
+                "sentiment": analyzed.get("sentiment", "NEUTRAL / UNCLEAR"),
+                "impact_score": int(analyzed.get("impact_score", 0)),
+                "relevance": analyzed.get("relevance", "UNCERTAIN"),
+                "confidence": analyzed.get("confidence", "UNKNOWN"),
+                "feed_category": analyzed.get("feed_category", "Uncategorized"),
+                "analysis": analyzed.get("analysis", "")[:900],
+                "title": analyzed.get("title", "")[:250],
+                "url": analyzed.get("url", "")
+            })
+            seen.append(item["id"])
+            seen_set.add(item["id"])
+            added += 1
+        state["news_observations"] = observations[-500:]
+        state["seen_news_ids"] = seen[-500:]
+        state["last_news_refresh_utc"] = datetime.now(timezone.utc).isoformat()
+        save_state(state)
+        print(f"News-only refresh completed; new headlines analyzed: {added}")
+    except Exception as exc:
+        # News is supplemental; a temporary feed failure must not stop command polling.
+        print(f"News-only refresh failed: {exc}")
+
+
 def concise_reply(messages):
     candidates = []
     for message in messages:
@@ -117,7 +167,8 @@ def main():
     # open. BUY messages are still suppressed unless the user explicitly sends //Pay.
     open_positions = state.get("open_positions", [])
     if not requested and not open_positions:
-        print("No //Pay request and no open positions; scan skipped.")
+        refresh_news_if_due(state)
+        print("No //Pay request and no open positions; market scan skipped.")
         return
 
     import main as scanner
