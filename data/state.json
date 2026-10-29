@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T18:41:11.549226+00:00",
+  "last_run_utc": "2026-10-29T18:43:35.826759+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -683,9 +683,9 @@
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T18:38:05.894022+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T18:41:11.096267+00:00",
-  "project_scan_cursor": 20,
+  "last_news_refresh_utc": "2026-10-29T18:41:45.759568+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T18:43:35.287127+00:00",
+  "project_scan_cursor": 50,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T18:16:08.925514+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T18:16:08.925514+00:00",
@@ -1228,6 +1228,16 @@
       "entry": 0.9988692863703912,
       "stop": 0.9895134368086559,
       "target": 1.0175809854938618
+    },
+    {
+      "signal_id": "DogpWmFd1BUULq1UML1CZvV4xWgPmKFCfiE22R6j8qxL:1793293200:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "DogpWmFd1BUULq1UML1CZvV4xWgPmKFCfiE22R6j8qxL",
+      "name": "Parcl",
+      "timestamp": 1793293200,
+      "entry": 0.009822704247087774,
+      "stop": 0.0097664329279028,
+      "target": 0.009935246885457721
     }
   ],
   "paper_portfolio": {
