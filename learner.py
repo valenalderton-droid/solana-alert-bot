@@ -339,6 +339,32 @@ def _train_single_horizon(candle_sets, horizon=4):
         "walk_forward": walk_forward_validation(data)
     }
 
+    # Refuse to deploy a horizon when both the chronological holdout and
+    # walk-forward evidence look no better than chance. This avoids treating
+    # a technically trainable model as a useful trading model.
+    wf = metrics.get("walk_forward", {})
+    wf_folds = int(wf.get("folds", 0) or 0)
+    wf_balanced_accuracy = wf.get("mean_balanced_accuracy")
+    wf_brier = wf.get("mean_brier_score")
+    holdout_direction_poor = metrics["balanced_accuracy"] < 0.50
+    holdout_brier_poor = metrics["brier_score"] >= 0.25
+    walk_forward_direction_poor = (
+        wf_folds == 0 or wf_balanced_accuracy is None or wf_balanced_accuracy < 0.50
+    )
+    walk_forward_brier_poor = (
+        wf_folds == 0 or wf_brier is None or wf_brier >= 0.25
+    )
+    if (
+        holdout_direction_poor and walk_forward_direction_poor and
+        holdout_brier_poor and walk_forward_brier_poor
+    ):
+        metrics["ready"] = False
+        metrics["reason"] = (
+            "Validation gate rejected this horizon: chronological holdout and "
+            "walk-forward results did not demonstrate a reliable edge"
+        )
+        return None, metrics
+
     # Refit on all labelled rows for the current prediction.
     final_model = Pipeline([
         ("scale", StandardScaler()),
