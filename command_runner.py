@@ -376,6 +376,19 @@ def main():
         print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
         return
 
+    # Always provide a final response to an explicit //Pay request.
+    # A missing setup is a valid result, not a silent failure.
+    if not delivered_buys:
+        try:
+            telegram_send(
+                os.getenv("TELEGRAM_BOT_TOKEN"),
+                str(os.getenv("TELEGRAM_CHAT_ID", "")).strip(),
+                "اسکن بازار سولانا تمام شد، اما هیچ ستاپ خرید معتبری از فیلترهای فعلی عبور نکرد. این به معنی خرابی ربات نیست؛ فعلاً خریدی پیشنهاد نمی‌شود. برای بررسی دوباره، دقیقاً //Pay را بفرست."
+            )
+            print("Final no-setup response sent for //Pay request.")
+        except Exception as reply_exc:
+            print(f"Final scan response failed: {reply_exc}")
+
 
 
 if __name__ == "__main__":
