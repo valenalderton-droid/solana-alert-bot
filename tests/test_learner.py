@@ -20,6 +20,19 @@ def make_flat_candles(count=80):
 
 
 class LearnerTests(unittest.TestCase):
+    def test_add_features_sorts_deduplicates_and_rejects_invalid_candles(self):
+        candles = make_flat_candles(90)
+        shuffled = candles[40:] + candles[:40]
+        shuffled.append(dict(candles[20]))
+        bad = dict(candles[30])
+        bad["high"] = bad["low"] - 1.0
+        shuffled.append(bad)
+        features = add_features(shuffled)
+        self.assertFalse(features.empty)
+        self.assertTrue(features["timestamp"].is_monotonic_increasing)
+        self.assertEqual(int(features["timestamp"].duplicated().sum()), 0)
+        self.assertTrue((features["high"] >= features[["open", "close", "low"]].max(axis=1)).all())
+
     def test_features_are_finite_when_present(self):
         features = add_features(make_flat_candles())
         self.assertFalse(features.empty)
