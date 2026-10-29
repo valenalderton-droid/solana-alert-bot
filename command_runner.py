@@ -383,7 +383,7 @@ def main():
 
     # Always provide a final response to an explicit trigger, including when
     # the scanner crashes. Do not report a normal no-setup result after an error.
-    if not delivered_buys:
+    if not delivered_messages:
         if scan_error is not None:
             final_reply = (
                 "در اجرای اسکن بازار خطا رخ داد و نتیجه قابل اتکا نیست. "
