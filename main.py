@@ -264,18 +264,35 @@ def main():
     store = load_candle_store()
     active_projects = []
     market_info = {}
+    scan_diagnostics = {
+        "projects_seen": 0,
+        "not_approved_or_missing_address": 0,
+        "no_eligible_pair": 0,
+        "insufficient_candles": 0,
+        "market_errors": 0,
+        "usable_projects": 0,
+        "price_action_rejected": 0,
+        "invalid_features": 0,
+        "below_probability_threshold": 0,
+        "invalid_atr": 0,
+        "alerts_created": 0
+    }
 
     for project in config.get("projects", []):
+        scan_diagnostics["projects_seen"] += 1
         if not project.get("approved_non_meme", False):
+            scan_diagnostics["not_approved_or_missing_address"] += 1
             continue
 
         address = str(project.get("token_address", "")).strip()
         if not address or address.startswith("REPLACE_"):
+            scan_diagnostics["not_approved_or_missing_address"] += 1
             continue
 
         try:
             pair = get_best_solana_pair(address, MIN_LIQUIDITY)
             if not pair:
+                scan_diagnostics["no_eligible_pair"] += 1
                 print(f"No eligible liquid Solana pair: {project.get('name')}")
                 continue
 
@@ -283,6 +300,7 @@ def main():
             raw = get_hourly_candles(pool_address)
             candles = get_closed_candles(raw)
             if len(candles) < 35:
+                scan_diagnostics["insufficient_candles"] += 1
                 print(f"Not enough candles: {project.get('name')}")
                 continue
 
@@ -299,6 +317,7 @@ def main():
             }
 
             active_projects.append(project)
+            scan_diagnostics["usable_projects"] += 1
             market_info[address] = {
                 "pair": pair,
                 "candles": merged,
@@ -312,6 +331,7 @@ def main():
             }
 
         except Exception as exc:
+            scan_diagnostics["market_errors"] += 1
             print(f"Market data error for {project.get('name')}: {exc}")
 
     save_candle_store(store)
@@ -386,6 +406,7 @@ def main():
 
     model, metrics = train_model(candle_sets)
     print("Model evaluation:", json.dumps(metrics))
+    print("Scan diagnostics before signals:", json.dumps(scan_diagnostics))
 
     if model is None:
         print("Model is not ready; no BUY alerts will be generated.")
@@ -430,6 +451,7 @@ def main():
         candles = info["candles"]
         X, row = latest_features(candles)
         if X is None or row is None:
+            scan_diagnostics["invalid_features"] += 1
             continue
 
         # Use the last completed candle as the signal timestamp.
@@ -441,15 +463,23 @@ def main():
 
         pa_ok, pa_reason = price_action_ok(candles, row)
         if not pa_ok:
+            scan_diagnostics["price_action_rejected"] += 1
+            print(f"Price-action rejection {project.get('name')}: {pa_reason}")
             continue
 
         probability = float(model.predict_proba(X)[0][1])
         if probability < MIN_PROBABILITY:
+            scan_diagnostics["below_probability_threshold"] += 1
+            print(
+                f"Probability rejection {project.get('name')}: "
+                f"{probability:.3f} < {MIN_PROBABILITY:.3f}"
+            )
             continue
 
         entry = float(row["close"])
         atr_pct = float(row["atr_pct"])
         if not math.isfinite(atr_pct) or atr_pct <= 0:
+            scan_diagnostics["invalid_atr"] += 1
             continue
 
         stop_pct = min(MAX_STOP_PCT, max(0.02, 1.5 * atr_pct))
@@ -481,6 +511,7 @@ def main():
             "model_metrics": metrics
         }
 
+        scan_diagnostics["alerts_created"] += 1
         append_jsonl(PREDICTIONS_FILE, prediction)
         state["open_signals"].append({
             "signal_id": signal_id,
@@ -512,6 +543,13 @@ def main():
 
         sent = send_telegram(message)
         print(f"Signal {signal_id}; telegram_sent={sent}")
+
+    print("Final scan diagnostics:", json.dumps(scan_diagnostics))
+    if scan_diagnostics["alerts_created"] == 0:
+        print(
+            "No BUY-watch alert this run. This can be normal; inspect the "
+            "diagnostic counters above to identify the strictest filter."
+        )
 
     state["last_run_utc"] = utc_now()
     write_json_atomic(STATE_FILE, state)
