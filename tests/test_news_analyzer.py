@@ -36,6 +36,11 @@ class NewsAnalyzerTests(unittest.TestCase):
         self.assertIn("Source:", message)
         self.assertIn("Do not trade on a headline alone", message)
 
+    def test_negated_outage_headline_is_not_classified_as_bearish(self):
+        result = analyze_news(self.item("Solana confirms no network outage"))
+        self.assertEqual(result["sentiment"], "NEUTRAL / UNCLEAR")
+        self.assertEqual(result["impact_score"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
