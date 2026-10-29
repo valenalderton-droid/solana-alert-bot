@@ -41,8 +41,8 @@ class LearnerTests(unittest.TestCase):
             for j in range(i + 1, min(i + 5, len(candles))):
                 candles[j]["high"] = max(candles[j]["high"], base * 1.06)
         rows = build_training_rows([candles])
-        if not rows.empty:
-            self.assertTrue(set(rows["y"].unique()).issubset({0, 1}))
+        self.assertFalse(rows.empty)
+        self.assertTrue(set(rows["y"].unique()).issubset({0, 1}))
 
 
 if __name__ == "__main__":
