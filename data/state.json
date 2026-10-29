@@ -7,7 +7,12 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T03:54:06.451019+00:00",
+  "last_run_utc": "2026-10-29T09:29:03.091747+00:00",
   "last_status_message_utc": "2026-10-29T03:39:02.533088+00:00",
-  "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00"
+  "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
+  "seen_news_ids": [
+    "80dc80f108e24c577158c3d4",
+    "1720a1e665b3b30cf33bf5ac",
+    "edfd910460c9a3bda039d1c8"
+  ]
 }
