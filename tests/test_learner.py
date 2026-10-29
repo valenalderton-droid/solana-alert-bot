@@ -141,7 +141,17 @@ class LearnerTests(unittest.TestCase):
     def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
         rows = build_training_rows([make_flat_candles()])
         # The synthetic price range is far too small to hit either the 2%+
-        # stop or 4%+ target within four hours. These are timeouts, not losses.
+        # stop or configured 10%+ target within four hours. These are timeouts, not losses.
+        self.assertTrue(rows.empty)
+
+    def test_six_percent_move_is_not_a_training_target_when_live_target_is_ten_percent(self):
+        candles = make_flat_candles(160)
+        for i in range(60, len(candles), 8):
+            base = candles[i]["close"]
+            for j in range(i + 1, min(i + 5, len(candles))):
+                candles[j]["high"] = max(candles[j]["high"], base * 1.06)
+        rows = build_training_rows([candles], horizon=4)
+        # No stop was hit and 6% is below the live target barrier (10%).
         self.assertTrue(rows.empty)
 
     def test_training_rows_support_longer_horizons(self):
@@ -149,7 +159,7 @@ class LearnerTests(unittest.TestCase):
         for i in range(200, len(candles), 8):
             base = candles[i]["close"]
             for j in range(i + 1, min(i + 5, len(candles))):
-                candles[j]["high"] = max(candles[j]["high"], base * 1.06)
+                candles[j]["high"] = max(candles[j]["high"], base * 1.12)
         rows = build_training_rows([candles], horizon=12)
         self.assertFalse(rows.empty)
         self.assertTrue(((rows["label_end"] - rows["timestamp"]) == 12 * 3600).all())
@@ -196,7 +206,7 @@ class LearnerTests(unittest.TestCase):
         for i in range(200, len(candles), 8):
             base = candles[i]["close"]
             for j in range(i + 1, min(i + 5, len(candles))):
-                candles[j]["high"] = max(candles[j]["high"], base * 1.06)
+                candles[j]["high"] = max(candles[j]["high"], base * 1.12)
         rows = build_training_rows([candles])
         self.assertFalse(rows.empty)
         self.assertTrue(set(rows["y"].unique()).issubset({0, 1}))
