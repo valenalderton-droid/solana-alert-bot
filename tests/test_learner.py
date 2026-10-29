@@ -103,6 +103,8 @@ class LearnerTests(unittest.TestCase):
         self.assertGreaterEqual(report["folds"], 1)
         self.assertIn("mean_balanced_accuracy", report)
         self.assertIn("mean_brier_score", report)
+        self.assertIn("mean_baseline_brier_score", report)
+        self.assertIn("baseline_brier_score", report["fold_details"][0])
         self.assertIn("method", report)
 
     def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
