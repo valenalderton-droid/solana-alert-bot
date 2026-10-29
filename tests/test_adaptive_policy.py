@@ -1,0 +1,43 @@
+import unittest
+from datetime import datetime, timezone, timedelta
+from adaptive_policy import derive_policy
+
+
+class AdaptivePolicyTests(unittest.TestCase):
+    def test_small_sample_does_not_change_base_threshold(self):
+        result = derive_policy([], [], base_probability=0.60, base_cooldown_hours=6)
+        self.assertEqual(result["min_probability"], 0.60)
+        self.assertEqual(result["cooldown_hours"], 6)
+
+    def test_poor_outcomes_make_policy_stricter(self):
+        outcomes = [{"result": "loss"} for _ in range(10)] + [{"result": "win"} for _ in range(2)]
+        result = derive_policy(outcomes, [], base_probability=0.60, base_cooldown_hours=6)
+        self.assertEqual(result["min_probability"], 0.65)
+        self.assertEqual(result["cooldown_hours"], 8)
+
+    def test_strong_outcomes_adjust_policy_only_slightly(self):
+        outcomes = [{"result": "win"} for _ in range(8)] + [{"result": "loss"} for _ in range(4)]
+        result = derive_policy(outcomes, [], base_probability=0.60, base_cooldown_hours=6)
+        self.assertEqual(result["min_probability"], 0.58)
+        self.assertEqual(result["cooldown_hours"], 5)
+
+    def test_direct_bearish_news_temporarily_raises_threshold(self):
+        now = datetime.now(timezone.utc)
+        news = [{
+            "observed_at": (now - timedelta(hours=1)).isoformat(),
+            "sentiment": "BEARISH",
+            "relevance": "DIRECT — Solana network / protocol"
+        } for _ in range(2)]
+        result = derive_policy([], news, base_probability=0.60, now=now)
+        self.assertEqual(result["min_probability"], 0.63)
+        self.assertEqual(result["direct_bearish_news_24h"], 2)
+
+    def test_non_target_outcomes_do_not_count(self):
+        outcomes = [{"result": "timeout"} for _ in range(20)]
+        result = derive_policy(outcomes, [], base_probability=0.60)
+        self.assertEqual(result["resolved_outcomes_used"], 0)
+        self.assertEqual(result["min_probability"], 0.60)
+
+
+if __name__ == "__main__":
+    unittest.main()
