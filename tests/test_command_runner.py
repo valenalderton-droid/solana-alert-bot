@@ -162,7 +162,6 @@ class CommandRunnerTests(unittest.TestCase):
     def test_sender_is_restored_when_scan_raises(self):
         original_sender = scanner.send_telegram
         with patch.object(command_runner, "read_state", return_value={"open_positions": []}), \
-             patch.object(command_runner, "poll_pay", return_value=True), \
              patch.object(command_runner, "refresh_news_if_due"), \
              patch.object(command_runner, "run_self_improvement_if_due"), \
              patch.object(scanner, "main", side_effect=RuntimeError("test failure")), \
