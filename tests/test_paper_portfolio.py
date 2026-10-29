@@ -1,5 +1,5 @@
 import unittest
-from paper_portfolio import get_portfolio, open_paper_trade, update_paper_portfolio, portfolio_snapshot
+from paper_portfolio import get_portfolio, open_paper_trade, update_paper_portfolio, portfolio_snapshot, adaptive_risk_fraction
 
 
 class PaperPortfolioTests(unittest.TestCase):
@@ -58,6 +58,20 @@ class PaperPortfolioTests(unittest.TestCase):
         trade = state["paper_portfolio"]["closed_trades"][0]
         self.assertEqual(trade["exit_reason"], "stop_and_target_same_candle_assume_stop")
         self.assertLess(trade["pnl_usd"], 0)
+
+    def test_paper_results_reduce_risk_after_persistent_losses(self):
+        portfolio = get_portfolio({})
+        portfolio["closed_trades"] = [{"pnl_usd": -1.0} for _ in range(20)]
+        risk, diagnostics = adaptive_risk_fraction(portfolio)
+        self.assertEqual(risk, 0.005)
+        self.assertEqual(diagnostics["mode"], "defensive")
+
+    def test_learning_warms_up_before_changing_risk(self):
+        portfolio = get_portfolio({})
+        portfolio["closed_trades"] = [{"pnl_usd": -1.0} for _ in range(19)]
+        risk, diagnostics = adaptive_risk_fraction(portfolio)
+        self.assertEqual(risk, 0.01)
+        self.assertEqual(diagnostics["mode"], "warmup")
 
     def test_mark_to_market_tracks_drawdown(self):
         state = {}
