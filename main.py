@@ -12,7 +12,7 @@ from market import (
     discover_solana_projects, is_allowed_non_meme_project
 )
 from adaptive_policy import derive_policy
-from self_improver import update_self_improvement
+from self_improver import update_self_improvement, evaluate_experience_rules
 from signal_quality import score_signal
 from strategy_ensemble import evaluate_strategies, rank_candidate
 from learner import train_model, latest_features, price_action_ok
@@ -768,10 +768,10 @@ def main():
     # Manual entries take precedence for the same mint address.
     configured_projects = config.get("projects", [])
     discovered_projects = discover_solana_projects(
-        min_liquidity=MIN_LIQUIDITY,
-        min_volume_24h=float(os.getenv("MIN_VOLUME_24H_USD", "50000")),
-        min_age_days=int(os.getenv("MIN_POOL_AGE_DAYS", "30")),
-        max_projects=int(os.getenv("MAX_DISCOVERED_PROJECTS", "100"))
+        min_liquidity=0,
+        min_volume_24h=0,
+        min_age_days=0,
+        max_projects=int(os.getenv("MAX_DISCOVERED_PROJECTS", "500"))
     )
     combined = {}
     for project in discovered_projects:
@@ -1383,6 +1383,27 @@ def main():
               print(
                   f"Signal-quality rejection {project.get('name')}: "
                   f"{quality['score']}/100 < {quality['minimum_required']}"
+              )
+              continue
+
+          # Experience-derived strategy rules are learned from resolved outcomes.
+          # They can reject a weak setup, but cannot alter network or data-integrity gates.
+          learned_rule_result = evaluate_experience_rules({
+              "entry_deviation_pct": entry_deviation_pct,
+              "liquidity_usd": info["liquidity"],
+              "volume_24h_usd": info["volume24h"],
+              "ensemble_score": float(ensemble.get("score", 0) or 0),
+              "probability": probability,
+              "quality_score": float(quality.get("score", 0) or 0)
+          }, (policy.get("self_improvement") or {}).get("experience_rules", []))
+          if learned_rule_result.get("blocked"):
+              scan_diagnostics.setdefault("experience_rule_rejected", 0)
+              scan_diagnostics["experience_rule_rejected"] += 1
+              print(
+                  f"Experience rule rejected {project.get('name')}: "
+                  f"{learned_rule_result.get('rule_id')} — "
+                  f"{learned_rule_result.get('reason')}; "
+                  f"evidence={json.dumps(learned_rule_result.get('evidence', {}))}"
               )
               continue
 
