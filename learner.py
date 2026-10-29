@@ -113,7 +113,8 @@ def build_training_rows(candle_sets, horizon=4):
             if not np.isfinite(atr_pct) or atr_pct <= 0:
                 continue
             stop_pct = min(0.05, max(0.02, 1.5 * atr_pct))
-            target_pct = max(0.04, 3 * atr_pct)
+            # Keep training labels aligned with the live alert's minimum 2R target.
+            target_pct = max(0.04, 3 * atr_pct, 2.0 * stop_pct)
             target = entry * (1 + target_pct)
             stop = entry * (1 - stop_pct)
             label = None
