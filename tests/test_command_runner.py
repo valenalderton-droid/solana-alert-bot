@@ -138,11 +138,11 @@ class CommandRunnerTests(unittest.TestCase):
         with patch.object(command_runner, "read_state", side_effect=[
                  {"open_positions": []},
                  {"open_positions": [], "last_watchlist_ping_utc": recent}
-             ]), \\
-             patch.object(command_runner, "refresh_news_if_due"), \\
-             patch.object(command_runner, "run_self_improvement_if_due"), \\
-             patch.object(scanner, "main"), \\
-             patch.object(scanner, "send_telegram"), \\
+             ]), \
+             patch.object(command_runner, "refresh_news_if_due"), \
+             patch.object(command_runner, "run_self_improvement_if_due"), \
+             patch.object(scanner, "main"), \
+             patch.object(scanner, "send_telegram"), \
              patch.object(command_runner, "telegram_send", return_value=True) as send:
             command_runner.main()
         send.assert_called_once()
