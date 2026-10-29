@@ -223,7 +223,7 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
                 "reason": "Self-improvement cooldown: no new resolved outcomes; re-evaluate within six hours",
                 "sample_size": len(_joined_resolved(predictions, outcomes))
             },
-            "registry_path": str(IMPROVEMENT_FILE.relative_to(ROOT))
+            "registry_path": "data/self_improvement.json"
         }
 
     decision = choose_probability_threshold(predictions, outcomes, current_threshold)
@@ -307,5 +307,5 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
         "changed": active.get("value") != before or not active.get("enabled", True),
         "rule_status": active.get("status"),
         "decision": decision,
-        "registry_path": str(IMPROVEMENT_FILE.relative_to(ROOT))
+        "registry_path": "data/self_improvement.json"
     }
