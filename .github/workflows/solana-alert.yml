@@ -46,7 +46,8 @@ jobs:
           MIN_PROBABILITY: "0.60"
           MAX_STOP_PCT: "0.05"
           TARGET_PCT: "0.10"
-          MAX_DISCOVERED_PROJECTS: "100"
+          MAX_DISCOVERED_PROJECTS: "500"
+          MAX_PROJECTS_PER_SCAN: "12"
           ALERT_COOLDOWN_HOURS: "6"
         run: python command_runner.py
       - name: Save persistent history
