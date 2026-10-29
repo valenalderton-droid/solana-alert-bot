@@ -13,6 +13,7 @@ from market import (
 )
 from adaptive_policy import derive_policy
 from self_improver import update_self_improvement
+from signal_quality import score_signal
 from learner import train_model, latest_features, price_action_ok
 from news_analyzer import fetch_recent_news, analyze_news, format_news_alert
 
@@ -957,6 +958,24 @@ def main():
           stop = entry * (1 - stop_pct)
           target = entry * (1 + target_pct)
 
+          quality = score_signal(
+              row=row,
+              candles=candles,
+              liquidity_usd=info["liquidity"],
+              volume_24h_usd=info["volume24h"],
+              global_context=global_context,
+              stop_pct=stop_pct,
+              target_pct=target_pct
+          )
+          if not quality["passed"]:
+              scan_diagnostics.setdefault("quality_rejected", 0)
+              scan_diagnostics["quality_rejected"] += 1
+              print(
+                  f"Signal-quality rejection {project.get('name')}: "
+                  f"{quality['score']}/100 < {quality['minimum_required']}"
+              )
+              continue
+
           compact_metrics = {
               "active_horizons": metrics.get("active_horizons", []),
               "horizons": {
@@ -987,6 +1006,7 @@ def main():
               "liquidity_usd": info["liquidity"],
               "volume_24h_usd": info["volume24h"],
               "price_action": pa_reason,
+              "signal_quality": quality,
               "model_metrics": metrics
           }
 
@@ -1000,6 +1020,8 @@ def main():
               f"Probability by horizon: {json.dumps(horizon_probabilities)}\n"
               f"Model horizons available: {', '.join(metrics.get('active_horizons', []))}\n"
               f"Price-action check: {pa_reason}\n"
+              f"Signal quality: {quality['score']}/100 (grade {quality['grade']})\n"
+              f"Quality checks: {', '.join(reason for reason in quality['reasons'] if reason)}\n"
               f"Spot vs signal-candle deviation: {entry_deviation_pct:.2f}%\n"
               f"Liquidity: ${info['liquidity']:,.0f}\n"
               f"24h volume: ${info['volume24h']:,.0f}\n"
