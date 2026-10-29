@@ -97,6 +97,8 @@ def translate_telegram(message):
         "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE": "هشدار بررسی خرید سولانا — خرید خودکار انجام نمی‌شود",
         "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE": "هشدار فروش / خروج سولانا — معامله خودکار انجام نمی‌شود",
         "Exit reference:": "قیمت مرجع خروج:",
+        "Data warning: this exit check uses cached hourly candles; latest candle age:": "هشدار داده: بررسی خروج بر اساس کندل‌های ساعتی ذخیره‌شده است؛ سن آخرین کندل:",
+        "hours. Verify the current quote before acting.": " ساعت. پیش از اقدام، قیمت لحظه‌ای را بررسی کن.",
         "Estimated return before fees/slippage:": "بازده تخمینی پیش از کارمزد و لغزش قیمت:",
         "Reason:": "دلیل خروج:",
         "STOP LOSS reached": "حد ضرر لمس شد",
@@ -296,7 +298,14 @@ def monitor_open_positions(state, market_info):
 
         if exit_reason:
             pnl_pct = (float(exit_price) / entry - 1) * 100
-            message = (
+            data_warning = ""
+        if info.get("data_is_cached"):
+            data_warning = (
+                "Data warning: this exit check uses cached hourly candles; "
+                f"latest candle age: {info.get('candle_age_hours', 'unknown')} "
+                "hours. Verify the current quote before acting.\n"
+            )
+        message = (
                 "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE\n\n"
                 f"Project: {position.get('name', 'Unknown')} ({position.get('symbol', '')})\n"
                 f"Entry reference: ${entry:.8g}\n"
@@ -304,6 +313,7 @@ def monitor_open_positions(state, market_info):
                 f"Estimated return before fees/slippage: {pnl_pct:+.2f}%\n"
                 f"Reason: {exit_reason}\n"
                 f"Mint: {address}\n"
+                f"{data_warning}"
                 f"Time (UTC): {utc_now()}\n\n"
                 "This is an exit alert only; the bot does not place trades."
             )
