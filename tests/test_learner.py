@@ -135,6 +135,27 @@ class LearnerTests(unittest.TestCase):
         self.assertAlmostEqual(float(combined[0][1]), (0.30 * 0.8 + 0.18 * 0.4) / 0.48)
         self.assertEqual(horizon, {"4h": 0.8, "24h": 0.4})
 
+    def test_horizon_weights_favor_better_out_of_sample_validation(self):
+        class FakeModel:
+            def predict_proba(self, X):
+                return np.array([[0.4, 0.6]])
+
+        models = [(4, FakeModel()), (24, FakeModel())]
+        metrics = {
+            "4h": {
+                "balanced_accuracy": 0.68, "brier_score": 0.14,
+                "walk_forward": {"mean_balanced_accuracy": 0.65, "mean_brier_score": 0.16}
+            },
+            "24h": {
+                "balanced_accuracy": 0.48, "brier_score": 0.28,
+                "walk_forward": {"mean_balanced_accuracy": 0.49, "mean_brier_score": 0.27}
+            }
+        }
+        model = MultiHorizonModel(models, metrics)
+        self.assertGreater(model.weights[4], model.weights[24])
+        self.assertAlmostEqual(sum(model.weights.values()), 1.0, places=8)
+        self.assertIn("out-of-sample", model.weighting_method)
+
     def test_training_rows_include_binary_labels_only(self):
         candles = make_flat_candles(320)
         # Introduce clear future target hits for some samples, while keeping
