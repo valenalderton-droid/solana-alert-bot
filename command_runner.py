@@ -75,15 +75,22 @@ def poll_pay(state):
             matched_chat_message = True
             if command == "//Pay":
                 requested = True
-                telegram_send(
-                    token, chat_id,
-                    "درخواستت دریافت شد؛ اسکن بازار سولانا شروع می‌شود. نتیجه را همین‌جا می‌فرستم."
-                )
+                try:
+                    telegram_send(
+                        token, chat_id,
+                        "درخواستت دریافت شد؛ اسکن بازار سولانا شروع می‌شود. نتیجه را همین‌جا می‌فرستم."
+                    )
+                except Exception as send_exc:
+                    # A failed acknowledgement must not discard a valid command.
+                    print(f"Telegram acknowledgement failed; continuing scan: {send_exc}")
             else:
-                telegram_send(
-                    token, chat_id,
-                    "پیامت به ربات رسید، اما دستور را نشناختم. برای بررسی بازار دقیقاً این متن را بفرست: //Pay"
-                )
+                try:
+                    telegram_send(
+                        token, chat_id,
+                        "پیامت به ربات رسید، اما دستور را نشناختم. برای بررسی بازار دقیقاً این متن را بفرست: //Pay"
+                    )
+                except Exception as send_exc:
+                    print(f"Telegram help reply failed: {send_exc}")
 
         save_state(state)
         if not matched_chat_message:
