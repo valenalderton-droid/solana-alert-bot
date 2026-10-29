@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from learner import FEATURES, add_features, build_training_rows
+from learner import FEATURES, add_features, build_training_rows, price_action_ok
 
 
 def make_flat_candles(count=80):
@@ -37,6 +37,40 @@ class LearnerTests(unittest.TestCase):
         latest = features.dropna(subset=FEATURES)
         self.assertFalse(latest.empty)
         self.assertTrue(np.isfinite(latest[FEATURES].to_numpy()).all())
+
+    def test_price_action_rejects_price_below_ema21(self):
+        candles = [
+            {"timestamp": 1_800_000_000 + i * 3600,
+             "open": 99.0, "high": 101.0, "low": 98.0,
+             "close": 100.0, "volume": 2000.0}
+            for i in range(30)
+        ]
+        row = {
+            "close": 100.0, "ema_gap": 0.02, "ret6": 0.01,
+            "price_vs_ema21": -0.01, "trend_persistence": 0.8,
+            "rsi": 0.5, "close_location": 0.8,
+            "upper_wick_pct": 0.1, "volume_ratio": 2.0
+        }
+        ok, reason = price_action_ok(candles, row)
+        self.assertFalse(ok)
+        self.assertIn("EMA21", reason)
+
+    def test_price_action_rejects_rejection_wick_without_breakout(self):
+        candles = [
+            {"timestamp": 1_800_000_000 + i * 3600,
+             "open": 99.0, "high": 101.0, "low": 98.0,
+             "close": 100.0, "volume": 2000.0}
+            for i in range(30)
+        ]
+        row = {
+            "close": 100.0, "ema_gap": 0.02, "ret6": 0.01,
+            "price_vs_ema21": 0.01, "trend_persistence": 0.8,
+            "rsi": 0.5, "close_location": 0.3,
+            "upper_wick_pct": 0.7, "volume_ratio": 2.0
+        }
+        ok, reason = price_action_ok(candles, row)
+        self.assertFalse(ok)
+        self.assertIn("Weak candle", reason)
 
     def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
         rows = build_training_rows([make_flat_candles()])
