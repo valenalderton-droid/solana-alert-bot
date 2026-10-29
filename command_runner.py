@@ -344,13 +344,19 @@ def main():
                 delivered_messages.append(message)
             return sent
 
-        if "SOLANA TOP WATCHLIST — NO VALID BUY SETUP" in str(message):
-            # If no entry qualifies, return exactly one live-data-backed top candidate,
-            # explicitly labelled WATCHLIST (not a buy signal). Never force an entry.
+        status_headers = (
+            "SOLANA TOP WATCHLIST — NO VALID BUY SETUP",
+            "SOLANA WATCHLIST STATUS — MARKET DATA UNAVAILABLE",
+            "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED",
+        )
+        if any(header in str(message) for header in status_headers):
+            # Forward scanner-owned status/watchlist reports, including data/model
+            # readiness failures, instead of hiding the actionable diagnostic.
+            # These messages are explicitly not BUY signals.
             sent = original_send_telegram(message)
             if sent:
                 delivered_messages.append(message)
-                print("Single fallback watchlist candidate delivered; explicitly not a buy signal.")
+                print("Automatic watchlist/status report delivered; not a buy signal.")
             return sent
 
         # Suppress stale/no-data status, news, and routine messages.
