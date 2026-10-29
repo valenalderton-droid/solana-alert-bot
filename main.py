@@ -92,6 +92,20 @@ def translate_telegram(message):
         "Model details:": "جزئیات مدل:",
         "This is a status message, not a trading signal.": "این پیام فقط گزارش وضعیت است و سیگنال معاملاتی نیست.",
         "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE": "هشدار بررسی خرید سولانا — خرید خودکار انجام نمی‌شود",
+        "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE": "هشدار فروش / خروج سولانا — معامله خودکار انجام نمی‌شود",
+        "Exit reference:": "قیمت مرجع خروج:",
+        "Estimated return before fees/slippage:": "بازده تخمینی پیش از کارمزد و لغزش قیمت:",
+        "Reason:": "دلیل خروج:",
+        "STOP LOSS reached": "حد ضرر لمس شد",
+        "TAKE PROFIT reached": "حد سود لمس شد",
+        "Trend breakdown below EMA21": "شکست روند و افت زیر EMA21",
+        "14-day time limit reached": "رسیدن به سقف زمانی ۱۴ روز",
+        "STOP (both levels touched; conservative)": "حد ضرر (هر دو سطح در یک کندل لمس شدند؛ فرض محافظه‌کارانه)",
+        "This is an exit alert only; the bot does not place trades.": "این فقط هشدار خروج است و ربات معامله انجام نمی‌دهد.",
+        "Global market context:": "وضعیت کلی بازار:",
+        "BTC 24h:": "تغییر ۲۴ ساعته بیت‌کوین:",
+        "SOL 24h:": "تغییر ۲۴ ساعته سولانا:",
+        "New BUY alerts paused:": "هشدارهای خرید جدید متوقف شده‌اند:"
         "Project:": "پروژه:", "Entry reference:": "قیمت مرجع ورود:",
         "Stop reference:": "حد ضرر مرجع:", "Target reference:": "حد سود مرجع:",
         "Model probability:": "احتمال پیش‌بینی مدل:", "Liquidity:": "نقدینگی:",
@@ -156,6 +170,143 @@ def send_telegram(message):
     except requests.RequestException as exc:
         print(f"Telegram error: {exc}")
         return False
+
+
+
+def fetch_global_market_context():
+    """Check BTC/SOL market-wide risk before allowing a new BUY watch."""
+    url = "https://api.coingecko.com/api/v3/simple/price"
+    try:
+        response = requests.get(
+            url,
+            params={
+                "ids": "bitcoin,solana",
+                "vs_currencies": "usd",
+                "include_24hr_change": "true"
+            },
+            headers={"User-Agent": "SolanaAlertBot/1.0"},
+            timeout=(4, 8)
+        )
+        response.raise_for_status()
+        payload = response.json()
+        btc = payload.get("bitcoin", {})
+        sol = payload.get("solana", {})
+        btc_change = float(btc["usd_24h_change"])
+        sol_change = float(sol["usd_24h_change"])
+        # Avoid new entries during sharp market-wide selloffs; existing positions
+        # are still monitored and can generate EXIT alerts.
+        risk_off = btc_change <= -3.0 or sol_change <= -5.0 or (
+            btc_change <= -1.5 and sol_change <= -2.5
+        )
+        return {
+            "available": True,
+            "btc_24h_pct": round(btc_change, 2),
+            "sol_24h_pct": round(sol_change, 2),
+            "risk_off": bool(risk_off),
+            "reason": (
+                "Market-wide risk-off: pause new BUY alerts"
+                if risk_off else "No extreme BTC/SOL 24h selloff detected"
+            )
+        }
+    except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
+        # Do not falsely claim that global conditions were checked.
+        print(f"Global market context unavailable: {exc}")
+        return {
+            "available": False, "btc_24h_pct": None,
+            "sol_24h_pct": None, "risk_off": True,
+            "reason": "Global market context unavailable; fail closed for new BUY alerts"
+        }
+
+
+def monitor_open_positions(state, market_info):
+    """Send EXIT/SELL alerts at stop/target or clear trend failure; never trades."""
+    positions = state.setdefault("open_positions", [])
+    remaining = []
+    for position in positions:
+        address = position.get("token_address")
+        info = market_info.get(address)
+        if not info:
+            remaining.append(position)
+            continue
+        candles = sorted(info.get("candles", []), key=lambda c: int(c["timestamp"]))
+        entry = float(position.get("entry", 0) or 0)
+        stop = float(position.get("stop", 0) or 0)
+        target = float(position.get("target", 0) or 0)
+        entry_ts = int(position.get("timestamp", 0) or 0)
+        if entry <= 0 or stop <= 0 or target <= 0:
+            continue
+
+        exit_reason = None
+        exit_price = None
+        exit_ts = None
+        for candle in candles:
+            ts = int(candle["timestamp"])
+            if ts <= entry_ts or ts <= int(position.get("last_checked_ts", entry_ts) or entry_ts):
+                continue
+            low = float(candle["low"])
+            high = float(candle["high"])
+            # Conservative when OHLC cannot reveal which level was reached first.
+            if low <= stop and high >= target:
+                exit_reason, exit_price = "STOP (both levels touched; conservative)", stop
+            elif low <= stop:
+                exit_reason, exit_price = "STOP LOSS reached", stop
+            elif high >= target:
+                exit_reason, exit_price = "TAKE PROFIT reached", target
+            if exit_reason:
+                exit_ts = ts
+                break
+
+        latest = candles[-1] if candles else None
+        if not exit_reason and latest:
+            latest_ts = int(latest["timestamp"])
+            current_close = float(latest["close"])
+            # If structure breaks after entry, signal exit instead of waiting blindly.
+            try:
+                X, row = latest_features(candles)
+                if row is not None and latest_ts > entry_ts:
+                    if float(row.get("price_vs_ema21", 0)) < 0 and float(row.get("ema_gap", 0)) < 0:
+                        exit_reason, exit_price, exit_ts = "Trend breakdown below EMA21", current_close, latest_ts
+                    elif latest_ts - entry_ts >= 14 * 24 * 3600:
+                        exit_reason, exit_price, exit_ts = "14-day time limit reached", current_close, latest_ts
+            except Exception as exc:
+                print(f"Position trend check failed for {position.get('name')}: {exc}")
+            position["last_checked_ts"] = latest_ts
+
+        if exit_reason:
+            pnl_pct = (float(exit_price) / entry - 1) * 100
+            message = (
+                "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE\\n\\n"
+                f"Project: {position.get('name', 'Unknown')} ({position.get('symbol', '')})\\n"
+                f"Entry reference: ${entry:.8g}\\n"
+                f"Exit reference: ${float(exit_price):.8g}\\n"
+                f"Estimated return before fees/slippage: {pnl_pct:+.2f}%\\n"
+                f"Reason: {exit_reason}\\n"
+                f"Mint: {address}\\n"
+                f"Time (UTC): {utc_now()}\\n\\n"
+                "This is an exit alert only; the bot does not place trades."
+            )
+            sent = send_telegram(message)
+            print(f"Exit alert {position.get('signal_id')}; telegram_sent={sent}; reason={exit_reason}")
+            if not sent:
+                remaining.append(position)
+            else:
+                append_jsonl(OUTCOMES_FILE, {
+                    "signal_id": position.get("signal_id"),
+                    "token_address": address,
+                    "name": position.get("name", "Unknown"),
+                    "entry": entry,
+                    "stop": stop,
+                    "target": target,
+                    "exit": float(exit_price),
+                    "return_pct": round(pnl_pct, 4),
+                    "result": "win" if pnl_pct > 0 else "loss",
+                    "resolved_at": utc_now(),
+                    "method": "position_exit_alert",
+                    "exit_reason": exit_reason
+                })
+        else:
+            remaining.append(position)
+    state["open_positions"] = remaining
 
 
 def load_candle_store():
@@ -346,6 +497,7 @@ def main():
     state = read_json(STATE_FILE, {
         "last_alerts": {},
         "open_signals": [],
+        "open_positions": [],
         "stats": {
             "signals": 0,
             "resolved": 0,
@@ -357,6 +509,7 @@ def main():
 
     state.setdefault("last_alerts", {})
     state.setdefault("open_signals", [])
+    state.setdefault("open_positions", [])
     state.setdefault("stats", {
         "signals": 0, "resolved": 0, "wins": 0, "losses": 0
     })
@@ -407,6 +560,9 @@ def main():
         base_cooldown_hours=max(1, int(os.getenv("ALERT_COOLDOWN_HOURS", "6")))
     )
     print("Adaptive policy:", json.dumps(policy, ensure_ascii=False))
+
+    global_context = fetch_global_market_context()
+    print("Global market context:", json.dumps(global_context, ensure_ascii=False))
 
     store = load_candle_store()
     active_projects = []
@@ -495,8 +651,10 @@ def main():
 
     save_candle_store(store)
 
-    # Resolve older observations before adding new ones.
+    # Resolve paper-performance labels, then monitor real-time exit conditions
+    # for every BUY alert that was successfully delivered.
     resolve_old_signals(state, store)
+    monitor_open_positions(state, market_info)
 
     # Send a compact performance digest at most once every 24 hours.
     now = datetime.now(timezone.utc)
@@ -603,114 +761,118 @@ def main():
         write_json_atomic(STATE_FILE, state)
         return
 
-    for project in active_projects:
-        address = project["token_address"]
-        info = market_info.get(address)
-        if not info:
-            continue
+    if global_context.get("risk_off", True):
+        print("BUY generation paused by global market risk filter:", global_context.get("reason"))
+        scan_diagnostics["below_probability_threshold"] += len(active_projects)
+    else:
+      for project in active_projects:
+          address = project["token_address"]
+          info = market_info.get(address)
+          if not info:
+              continue
 
-        candles = info["candles"]
-        X, row = latest_features(candles)
-        if X is None or row is None:
-            scan_diagnostics["invalid_features"] += 1
-            continue
+          candles = info["candles"]
+          X, row = latest_features(candles)
+          if X is None or row is None:
+              scan_diagnostics["invalid_features"] += 1
+              continue
 
-        # Use the last completed candle as the signal timestamp.
-        candle_ts = int(row["timestamp"])
-        signal_id = f"{address}:{candle_ts}:BUY_WATCH"
+          # Use the last completed candle as the signal timestamp.
+          candle_ts = int(row["timestamp"])
+          signal_id = f"{address}:{candle_ts}:BUY_WATCH"
 
-        last_alert_ts = int(state["last_alerts"].get(address, 0) or 0)
-        cooldown_hours = policy["cooldown_hours"]
-        if last_alert_ts and candle_ts - last_alert_ts < cooldown_hours * 3600:
-            continue
+          last_alert_ts = int(state["last_alerts"].get(address, 0) or 0)
+          cooldown_hours = policy["cooldown_hours"]
+          if last_alert_ts and candle_ts - last_alert_ts < cooldown_hours * 3600:
+              continue
 
-        pa_ok, pa_reason = price_action_ok(candles, row)
-        if not pa_ok:
-            scan_diagnostics["price_action_rejected"] += 1
-            print(f"Price-action rejection {project.get('name')}: {pa_reason}")
-            continue
+          pa_ok, pa_reason = price_action_ok(candles, row)
+          if not pa_ok:
+              scan_diagnostics["price_action_rejected"] += 1
+              print(f"Price-action rejection {project.get('name')}: {pa_reason}")
+              continue
 
-        probability = float(model.predict_proba(X)[0][1])
-        if probability < policy["min_probability"]:
-            scan_diagnostics["below_probability_threshold"] += 1
-            print(
-                f"Probability rejection {project.get('name')}: "
-                f"{probability:.3f} < adaptive {policy['min_probability']:.3f}"
-            )
-            continue
+          probability = float(model.predict_proba(X)[0][1])
+          if probability < policy["min_probability"]:
+              scan_diagnostics["below_probability_threshold"] += 1
+              print(
+                  f"Probability rejection {project.get('name')}: "
+                  f"{probability:.3f} < adaptive {policy['min_probability']:.3f}"
+              )
+              continue
 
-        entry = float(row["close"])
-        atr_pct = float(row["atr_pct"])
-        if not math.isfinite(atr_pct) or atr_pct <= 0:
-            scan_diagnostics["invalid_atr"] += 1
-            continue
+          entry = float(row["close"])
+          atr_pct = float(row["atr_pct"])
+          if not math.isfinite(atr_pct) or atr_pct <= 0:
+              scan_diagnostics["invalid_atr"] += 1
+              continue
 
-        stop_pct = min(MAX_STOP_PCT, max(0.02, 1.5 * atr_pct))
-        target_pct = max(TARGET_PCT, 3 * atr_pct)
+          stop_pct = min(MAX_STOP_PCT, max(0.02, 1.5 * atr_pct))
+          target_pct = max(TARGET_PCT, 3 * atr_pct)
 
-        # Require a stop distance no greater than the configured cap.
-        if stop_pct > MAX_STOP_PCT:
-            continue
+          # Require a stop distance no greater than the configured cap.
+          if stop_pct > MAX_STOP_PCT:
+              continue
 
-        stop = entry * (1 - stop_pct)
-        target = entry * (1 + target_pct)
+          stop = entry * (1 - stop_pct)
+          target = entry * (1 + target_pct)
 
-        prediction = {
-            "signal_id": signal_id,
-            "timestamp": candle_ts,
-            "created_at": utc_now(),
-            "token_address": address,
-            "name": project.get("name", "Unknown"),
-            "symbol": project.get("symbol", ""),
-            "entry": entry,
-            "stop": stop,
-            "target": target,
-            "stop_pct": round(stop_pct * 100, 3),
-            "target_pct": round(target_pct * 100, 3),
-            "probability": round(probability, 4),
-            "liquidity_usd": info["liquidity"],
-            "volume_24h_usd": info["volume24h"],
-            "price_action": pa_reason,
-            "model_metrics": metrics
-        }
+          prediction = {
+              "signal_id": signal_id,
+              "timestamp": candle_ts,
+              "created_at": utc_now(),
+              "token_address": address,
+              "name": project.get("name", "Unknown"),
+              "symbol": project.get("symbol", ""),
+              "entry": entry,
+              "stop": stop,
+              "target": target,
+              "stop_pct": round(stop_pct * 100, 3),
+              "target_pct": round(target_pct * 100, 3),
+              "probability": round(probability, 4),
+              "liquidity_usd": info["liquidity"],
+              "volume_24h_usd": info["volume24h"],
+              "price_action": pa_reason,
+              "model_metrics": metrics
+          }
 
-        message = (
-            "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE\n\n"
-            f"Project: {prediction['name']} ({prediction['symbol']})\n"
-            f"Entry reference: ${entry:.8g}\n"
-            f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\n"
-            f"Target reference: ${target:.8g} ({target_pct * 100:.2f}%)\n"
-            f"Model probability: {probability:.1%}\n"
-            f"Liquidity: ${info['liquidity']:,.0f}\n"
-            f"24h volume: ${info['volume24h']:,.0f}\n"
-            f"Evaluation: {json.dumps(metrics)}\n"
-            f"Mint: {address}\n"
-            f"Time (UTC): {utc_now()}\n\n"
-            "This is a research alert, not financial advice. "
-            "Slippage, fees and execution can change results."
-        )
+          message = (
+              "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE\n\n"
+              f"Project: {prediction['name']} ({prediction['symbol']})\n"
+              f"Entry reference: ${entry:.8g}\n"
+              f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\n"
+              f"Target reference: ${target:.8g} ({target_pct * 100:.2f}%)\n"
+              f"Model probability: {probability:.1%}\n"
+              f"Liquidity: ${info['liquidity']:,.0f}\n"
+              f"24h volume: ${info['volume24h']:,.0f}\n"
+              f"Evaluation: {json.dumps(metrics)}\n"
+              f"Mint: {address}\n"
+              f"Time (UTC): {utc_now()}\n\n"
+              "This is a research alert, not financial advice. "
+              "Slippage, fees and execution can change results."
+          )
 
-        sent = send_telegram(message)
-        print(f"Signal {signal_id}; telegram_sent={sent}")
+          sent = send_telegram(message)
+          print(f"Signal {signal_id}; telegram_sent={sent}")
 
-        # Only record a new alert after Telegram confirms delivery. If delivery
-        # fails, the same completed candle can be retried on a later run.
-        if sent:
-            scan_diagnostics["alerts_created"] += 1
-            append_jsonl(PREDICTIONS_FILE, prediction)
-            state["open_signals"].append({
-                "signal_id": signal_id,
-                "token_address": address,
-                "name": prediction["name"],
-                "timestamp": candle_ts,
-                "entry": entry,
-                "stop": stop,
-                "target": target
-            })
-            state["last_alerts"][address] = candle_ts
-            state["stats"]["signals"] += 1
-        else:
-            print(f"Telegram delivery failed; will retry signal next run: {signal_id}")
+          # Only record a new alert after Telegram confirms delivery. If delivery
+          # fails, the same completed candle can be retried on a later run.
+          if sent:
+              scan_diagnostics["alerts_created"] += 1
+              append_jsonl(PREDICTIONS_FILE, prediction)
+              state["open_signals"].append({
+                  "signal_id": signal_id,
+                  "token_address": address,
+                  "name": prediction["name"],
+                  "timestamp": candle_ts,
+                  "entry": entry,
+                  "stop": stop,
+                  "target": target
+              })
+              state["last_alerts"][address] = candle_ts
+              state["stats"]["signals"] += 1
+          else:
+              print(f"Telegram delivery failed; will retry signal next run: {signal_id}")
 
     print("Final scan diagnostics:", json.dumps(scan_diagnostics))
     if scan_diagnostics["alerts_created"] == 0:
