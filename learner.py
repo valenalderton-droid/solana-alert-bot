@@ -150,6 +150,19 @@ def build_training_rows(candle_sets):
     return pd.DataFrame(rows)
 
 
+
+def recency_sample_weights(timestamps, half_life_days=21):
+    """Give newer observations more influence without discarding older regimes."""
+    values = pd.to_numeric(pd.Series(timestamps), errors="coerce").to_numpy(dtype=float)
+    if len(values) == 0 or not np.isfinite(values).all():
+        raise ValueError("timestamps must be non-empty finite epoch seconds")
+    half_life_seconds = max(1.0, float(half_life_days) * 86400.0)
+    age_seconds = np.maximum(0.0, float(np.max(values)) - values)
+    weights = np.power(2.0, -age_seconds / half_life_seconds)
+    # Keep a floor so older market regimes still contribute to training.
+    weights = np.maximum(weights, 0.20)
+    return weights / float(np.mean(weights))
+
 def train_model(candle_sets):
     data = build_training_rows(candle_sets)
     if data.empty:
@@ -209,7 +222,11 @@ def train_model(candle_sets):
         ))
     ])
 
-    model.fit(train[FEATURES], train["y"])
+    train_weights = recency_sample_weights(train["timestamp"])
+    model.fit(
+        train[FEATURES], train["y"],
+        logistic__sample_weight=train_weights
+    )
     probabilities = model.predict_proba(test[FEATURES])[:, 1]
     predictions = (probabilities >= 0.5).astype(int)
 
@@ -224,7 +241,12 @@ def train_model(candle_sets):
         ), 4),
         "brier_score": round(float(
             brier_score_loss(test["y"], probabilities)
-        ), 4)
+        ), 4),
+        "evaluation_method": "chronological holdout; training labels purged across test boundary",
+        "train_positive_rate": round(float(train["y"].mean()), 4),
+        "test_positive_rate": round(float(test["y"].mean()), 4),
+        "predicted_positive_rate": round(float(np.mean(predictions)), 4),
+        "recency_weighting": "21-day half-life; minimum relative weight 0.20"
     }
 
     # Refit on all labelled rows for the current prediction.
@@ -237,7 +259,11 @@ def train_model(candle_sets):
             random_state=42
         ))
     ])
-    final_model.fit(data[FEATURES], data["y"])
+    final_weights = recency_sample_weights(data["timestamp"])
+    final_model.fit(
+        data[FEATURES], data["y"],
+        logistic__sample_weight=final_weights
+    )
 
     return final_model, metrics
 
