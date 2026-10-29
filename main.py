@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from market import get_best_solana_pair, get_hourly_candles, utc_now
+from market import get_best_solana_pair, get_hourly_candles, utc_now, discover_solana_projects
 from learner import train_model, latest_features, price_action_ok
 
 ROOT = Path(__file__).resolve().parent
@@ -189,6 +189,32 @@ def main():
     DATA.mkdir(parents=True, exist_ok=True)
 
     config = read_json(PROJECTS_FILE, {"projects": []})
+
+    # Combine any manually configured projects with automatic discovery.
+    # Manual entries take precedence for the same mint address.
+    configured_projects = config.get("projects", [])
+    discovered_projects = discover_solana_projects(
+        min_liquidity=MIN_LIQUIDITY,
+        min_volume_24h=float(os.getenv("MIN_VOLUME_24H_USD", "50000")),
+        min_age_days=int(os.getenv("MIN_POOL_AGE_DAYS", "30")),
+        max_projects=int(os.getenv("MAX_DISCOVERED_PROJECTS", "80"))
+    )
+    combined = {}
+    for project in discovered_projects:
+        address = str(project.get("token_address", "")).strip()
+        if address:
+            combined[address] = project
+    for project in configured_projects:
+        address = str(project.get("token_address", "")).strip()
+        if address:
+            combined[address] = project
+    config["projects"] = list(combined.values())
+    print(
+        f"Project list: {len(configured_projects)} configured + "
+        f"{len(discovered_projects)} discovered; "
+        f"{len(config['projects'])} unique candidates."
+    )
+
     state = read_json(STATE_FILE, {
         "last_alerts": {},
         "open_signals": [],
