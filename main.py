@@ -514,12 +514,10 @@ def main():
         "signals": 0, "resolved": 0, "wins": 0, "losses": 0
     })
 
-    # News is supplemental context: it never directly creates a buy/sell order.
-    # Store IDs only after Telegram confirms delivery, so failed sends can retry.
+    # Analyze news internally; Telegram is reserved for BUY/SELL alerts.
     seen_news = state.setdefault("seen_news_ids", [])
     seen_news_set = set(seen_news)
-    news_sent = 0
-    for item in fetch_recent_news():
+    for item in fetch_recent_news()[:12]:
         if item["id"] in seen_news_set:
             continue
         analyzed = analyze_news(item)
@@ -530,26 +528,24 @@ def main():
             "sentiment": analyzed.get("sentiment", "NEUTRAL / UNCLEAR"),
             "impact_score": int(analyzed.get("impact_score", 0)),
             "relevance": analyzed.get("relevance", "UNCERTAIN"),
+            "feed_category": analyzed.get("feed_category", "Uncategorized"),
             "title": analyzed.get("title", "")[:250],
             "url": analyzed.get("url", "")
         })
         state["news_observations"] = observations[-500:]
+        seen_news.append(item["id"])
+        seen_news_set.add(item["id"])
         print(
             "News analysis:",
             json.dumps({
                 "title": analyzed["title"],
+                "source": analyzed.get("source", ""),
+                "feed_category": analyzed.get("feed_category", ""),
                 "sentiment": analyzed["sentiment"],
                 "impact_score": analyzed["impact_score"],
                 "relevance": analyzed["relevance"]
             }, ensure_ascii=False)
         )
-        if send_telegram(format_news_alert(analyzed)):
-            seen_news.append(item["id"])
-            seen_news_set.add(item["id"])
-            news_sent += 1
-        if news_sent >= int(os.getenv("MAX_NEWS_ALERTS_PER_RUN", "3")):
-            break
-    # Bound the state file while retaining enough history for deduplication.
     state["seen_news_ids"] = seen_news[-500:]
 
     # Adaptive policy learns cautiously from resolved paper outcomes and recent news.
@@ -562,6 +558,17 @@ def main():
     print("Adaptive policy:", json.dumps(policy, ensure_ascii=False))
 
     global_context = fetch_global_market_context()
+    global_bearish = int(policy.get("global_bearish_news_24h", 0))
+    global_bullish = int(policy.get("global_bullish_news_24h", 0))
+    direct_bearish = int(policy.get("direct_bearish_news_24h", 0))
+    if (global_bearish >= 3 and global_bearish > global_bullish) or direct_bearish >= 3:
+        global_context["risk_off"] = True
+        global_context["reason"] = (
+            "Multiple bearish global or direct Solana news observations; pause new BUY alerts"
+        )
+    global_context["global_bearish_news_24h"] = global_bearish
+    global_context["global_bullish_news_24h"] = global_bullish
+    global_context["direct_bearish_news_24h"] = direct_bearish
     print("Global market context:", json.dumps(global_context, ensure_ascii=False))
 
     store = load_candle_store()
@@ -713,8 +720,8 @@ def main():
             "Win rate uses target/stop outcomes only; average return includes numeric resolved outcomes. Data gaps are excluded from average return. "
             "This is not a guarantee of future performance."
         )
-        if send_telegram(digest):
-            state["last_stats_report_utc"] = utc_now()
+        print("Performance digest (log only; Telegram reserved for BUY/SELL):", digest)
+        state["last_stats_report_utc"] = utc_now()
 
     candle_sets = [
         sorted(store[p["token_address"]].values(),
@@ -730,32 +737,10 @@ def main():
     if model is None:
         print("Model is not ready; no BUY alerts will be generated.")
 
-        # Send a status message on first run and then at most every 6 hours,
-        # so the owner can distinguish "no signal" from a broken Telegram setup.
-        now = datetime.now(timezone.utc)
-        last_status = state.get("last_status_message_utc")
-        send_status = not last_status
-        if last_status:
-            try:
-                previous = datetime.fromisoformat(last_status.replace("Z", "+00:00"))
-                send_status = (now - previous).total_seconds() >= 6 * 3600
-            except (ValueError, TypeError):
-                send_status = True
-
-        if send_status:
-            status_message = (
-                "SOLANA BOT STATUS — RUNNING\n\n"
-                "The bot ran successfully, but the model is not ready yet, "
-                "so no BUY alert was generated.\n"
-                f"Model details: {json.dumps(metrics)}\n"
-                f"Projects with usable market data: {len(active_projects)}\n"
-                f"Time (UTC): {utc_now()}\n\n"
-                "This is a status message, not a trading signal."
-            )
-            sent = send_telegram(status_message)
-            print(f"Status heartbeat sent={sent}")
-            if sent:
-                state["last_status_message_utc"] = utc_now()
+        print(
+            "Model not ready; status is log-only. "
+            f"Metrics={json.dumps(metrics)}; usable_projects={len(active_projects)}"
+        )
 
         state["last_run_utc"] = utc_now()
         write_json_atomic(STATE_FILE, state)
