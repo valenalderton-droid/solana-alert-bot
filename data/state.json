@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T11:11:39.408142+00:00",
+  "last_run_utc": "2026-10-29T11:19:40.679144+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -40,7 +40,9 @@
     "d2e67b2d7ad8c6a701f85b56",
     "ef6966d6f4eec3a520903730",
     "4083e47ec658f0dff5cf98dd",
-    "f7daef4a47fc04daed0da83a"
+    "f7daef4a47fc04daed0da83a",
+    "ac540d1e11ea7d2a56866578",
+    "a05ed6eb377e3cc6399e3252"
   ],
   "news_observations": [
     {
@@ -315,9 +317,34 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Solana Price News Today: SOL Holds $100 After a Speed Upgrade as Pepeto's Bridge Draws 100x Calls - TechBullion",
       "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQNklDTTZGQ1ZNOWtwTkZabmlhSWRYWk9rT2lFZXpyWEhXbk9DYm93Y0ZWZ2tiSXhhVm9sbmdPdkZKRGhwbWE4ZVdtWmJ6azFXQjRGX0N0aXFaeG9oaEFHSl9kekdCZzhhQms5NFBaeEVDb2ZhdmswQmZLVEpfN20zalNsRmxoemZsVjJ5dW1OYjR2Ui1NQTVaYzNobVNndTNVdWk1QU1NbTEzdWdtLVBjUGw4WlBsTUZDOHJN?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T11:18:53.669887+00:00",
+      "published_at": "2026-10-29T11:03:32+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana’s Tokenized Commodities Supply Surges to $63.2M - Coinfomania",
+      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQWGNEeW53R2RJdEdOeVFaQ29GcC1ZX2h0Z0N4bG9Bb3piUTRvXzFLRXpzM3NnS3NNLWZUd01EdVVlZ3ZhQXNkVVBDN1lFeXVEcTRjaEJDODVBei1jU0tyazFFMVFlbVFHTHlXbWg3QllOZUxKbGlCWDI1V2d2NFBhSVdiQQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T11:18:53.669977+00:00",
+      "published_at": "2026-10-29T10:59:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana Could Surpass XRP in Market Cap by the End of 2027. Here's a Realistic Timeline for How It Happens. - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxObVRzbDNMel8ydVhsb0VQMVl0dWpMSkJHQnJpOFZkZnFhSzFMSUlrSFowZUVSdWdUTWxISWN2bEE3c0hBd0FMS0ZfWVE4T2Q0TmNsSlJyb3ZXc3NSQ1NpU2R5dU9UOHlnRTB2S3RCNG9ReGRCQjlGQldna09yLWl3dDdlb2c5Z3pPakZSUzRBcUFkMU5GWF9LVmlsSF8?oc=5"
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952310,
-  "last_news_refresh_utc": "2026-10-29T11:10:51.304879+00:00"
+  "telegram_update_offset": 806952311,
+  "last_news_refresh_utc": "2026-10-29T11:18:53.670003+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T11:19:40.239690+00:00"
 }
