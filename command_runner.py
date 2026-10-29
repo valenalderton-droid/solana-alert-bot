@@ -91,117 +91,8 @@ def telegram_send(token, chat_id, text):
 
 
 def intelligent_reply(user_text, state):
-    """Route common Persian/English Telegram messages to safe, state-aware replies."""
-    raw = str(user_text or "").strip()
-    text = raw.lower()
-    normalized = re.sub(r"[\\s\\u200c]+", " ", text).strip()
-    normalized = normalized.replace("ي", "ی").replace("ك", "ک")
-    compact = normalized.replace(" ", "")
-
-    def has_any(*terms):
-        return any(term in normalized or term in compact for term in terms)
-
-    if not raw:
-        return None
-
-    # The explicit scan trigger is handled separately by poll_pay.
-    if raw == "//Pay":
-        return None
-
-    if has_any("/start", "/help", "راهنما", "کمک", "چه دستور", "دستورات", "help"):
-        return (
-            "🤖 راهنمای ربات سولانا\n\n"
-            "• //Pay — اجرای اسکن و دریافت بهترین ستاپ واجد شرایط\n"
-            "• /status یا «وضعیت» — خلاصه وضعیت ذخیره‌شده ربات\n"
-            "• /news یا «اخبار» — خلاصه آخرین خبرهای ثبت‌شده و اثر احتمالی بر سولانا\n"
-            "• /signals یا «سیگنال‌ها» — خلاصه آمار سیگنال‌های ثبت‌شده\n"
-            "• /why یا «چرا خریدی پیدا نشد» — توضیح درباره فیلترهای سخت‌گیرانه\n\n"
-            "من قیمت زنده یا نتیجه‌ای که در داده‌های ذخیره‌شده نیست جعل نمی‌کنم. "
-            "هشدارها تحلیلی‌اند، نه دستور قطعی خریدوفروش."
-        )
-
-    if has_any("/status", "وضعیت", "ربات کار می کنه", "ربات کار میکنه", "آنلاین", "online", "status"):
-        stats = state.get("stats", {}) if isinstance(state.get("stats", {}), dict) else {}
-        positions = state.get("open_positions", [])
-        signals = state.get("open_signals", [])
-        last_run = state.get("last_run_utc", "هنوز ثبت نشده")
-        last_news = state.get("last_news_refresh_utc", "هنوز ثبت نشده")
-        return (
-            "📊 وضعیت ذخیره‌شده ربات\n"
-            f"• آخرین اجرای ثبت‌شده: {last_run}\n"
-            f"• آخرین به‌روزرسانی خبر: {last_news}\n"
-            f"• موقعیت‌های بازِ ثبت‌شده: {len(positions) if isinstance(positions, list) else 0}\n"
-            f"• سیگنال‌های بازِ ثبت‌شده: {len(signals) if isinstance(signals, list) else 0}\n"
-            f"• مجموع سیگنال‌های ثبت‌شده: {stats.get('signals', 0)}\n\n"
-            "این خلاصه از فایل وضعیت است و به‌تنهایی تضمین نمی‌کند که آخرین اجرای GitHub Actions موفق بوده باشد."
-        )
-
-    if has_any("/news", "اخبار", "خبر جدید", "خبرها", "تاثیر خبر", "تأثیر خبر", "news"):
-        observations = state.get("news_observations", [])
-        if not isinstance(observations, list) or not observations:
-            return (
-                "📰 هنوز خبر قابل‌گزارشی در حافظه ربات ثبت نشده است. "
-                "چرخه بررسی خبر باید اجرا شود؛ نبود خبر در حافظه به معنی نبود خبر در بازار نیست."
-            )
-        rows = observations[-4:][::-1]
-        lines = ["📰 آخرین خبرهای ذخیره‌شده (جدیدترین اول):"]
-        for item in rows:
-            if not isinstance(item, dict):
-                continue
-            title = str(item.get("title") or "بدون عنوان").strip()[:180]
-            sentiment = str(item.get("sentiment") or "نامشخص")
-            impact = item.get("impact_score", "?")
-            confidence = str(item.get("confidence") or "نامشخص")
-            url = str(item.get("url") or "").strip()
-            lines.append(f"• {title}\n  جهت: {sentiment} | اثر: {impact} | اطمینان: {confidence}")
-            if url.startswith("https://") or url.startswith("http://"):
-                lines.append(f"  منبع: {url}")
-        lines.append("این‌ها خلاصه خبرهای ذخیره‌شده‌اند؛ اثر خبر قطعی نیست و باید با نمودار تأیید شود.")
-        return "\n".join(lines)
-
-    if has_any("/signals", "سیگنال", "عملکرد", "آمار", "چندتا خرید", "signals", "performance"):
-        stats = state.get("stats", {}) if isinstance(state.get("stats", {}), dict) else {}
-        positions = state.get("open_positions", [])
-        return (
-            "📈 آمار ثبت‌شده\n"
-            f"• سیگنال‌های ایجادشده: {stats.get('signals', 0)}\n"
-            f"• موقعیت‌های باز ثبت‌شده: {len(positions) if isinstance(positions, list) else 0}\n\n"
-            "این اعداد آمار ذخیره‌شده‌اند، نه نرخ برد یا سود واقعی. برای محاسبه عملکرد باید نتایج بسته‌شده و کارمزد/لغزش قیمت هم ثبت شوند."
-        )
-
-    if has_any("/why", "چرا خرید", "چرا سیگنال", "ستاپ پیدا نشد", "هیچ خرید", "خریدی پیدا", "no setup"):
-        return (
-            "🔎 چرا ممکن است ستاپ خرید پیدا نشود؟\n"
-            "ربات فقط وقتی هشدار می‌دهد که چند شرط هم‌زمان برقرار باشند: داده بازار کافی و تازه، "
-            "پرایس‌اکشن قابل‌قبول، نقدینگی و حجم مناسب، کنترل ریسک، و عبور از فیلتر خبر/بازار.\n\n"
-            "نبود هشدار الزاماً باگ نیست؛ اما اگر چند اجرا پشت‌سرهم هیچ نتیجه‌ای نداد، "
-            "در GitHub → Actions آخرین اجرا را باز کن و بخش diagnostic counters / خطاها را بررسی کن. "
-            "برای اسکن دوباره دقیقاً //Pay بفرست."
-        )
-
-    if has_any("سلام", "درود", "hi", "hello", "hey"):
-        return "سلام! 👋 من ربات پایش سولانا هستم. برای فهرست قابلیت‌ها «راهنما» را بفرست؛ برای اسکن بازار دقیقاً //Pay را ارسال کن."
-
-    if has_any("ممنون", "مرسی", "تشکر", "thanks", "thank you"):
-        return "خواهش می‌کنم 🌱 اگر سؤال دیگری درباره وضعیت ربات، خبرها یا سیگنال‌ها داری بپرس؛ برای اسکن بازار هم //Pay را بفرست."
-
-    if has_any("بخرم", "بفروشم", "خرید کنم", "فروش کنم", "کدوم ارز", "کدام ارز", "پیش بینی", "پیش‌بینی", "قیمت سول", "قیمت sol"):
-        return (
-            "برای تصمیم خرید/فروش، از این پیام به‌تنهایی داده زنده و کافی ندارم و نمی‌خواهم حدس را به‌عنوان تحلیل جا بزنم. "
-            "برای اسکن پروژه‌های سولانا دقیقاً //Pay بفرست. هشدار ربات هم باید با نمودار، نقدینگی، حد ضرر و شرایط بازار بررسی شود."
-        )
-
-    if raw.startswith("/"):
-        return (
-            "این دستور را نمی‌شناسم. «راهنما» را بفرست تا دستورهای پشتیبانی‌شده را ببینی. "
-            "برای اجرای اسکن، متن دقیق //Pay است."
-        )
-
-    return (
-        "پیامت را دریافت کردم، اما برای این سؤال پاسخ مطمئنی در داده‌های فعلی ندارم. "
-        "می‌توانی درباره «وضعیت ربات»، «اخبار»، «سیگنال‌ها» یا «چرا خریدی پیدا نشد» بپرسی. "
-        "برای اسکن بازار هم دقیقاً //Pay بفرست."
-    )
+    """Only //Pay is supported; all other Telegram text is intentionally ignored."""
+    return None
 
 
 def poll_pay(state):
@@ -263,13 +154,8 @@ def poll_pay(state):
                     # A failed acknowledgement must not discard a valid command.
                     print(f"Telegram acknowledgement failed; continuing scan: {send_exc}")
             else:
-                reply = intelligent_reply(command, state)
-                if reply:
-                    matched_chat_message = True
-                    try:
-                        telegram_send(token, chat_id, reply)
-                    except Exception as send_exc:
-                        print(f"Telegram intelligent reply failed: {send_exc}")
+                # //Pay is the only supported Telegram command. Ignore all other text.
+                continue
 
         save_state(state)
         print(
