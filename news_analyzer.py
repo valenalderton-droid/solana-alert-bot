@@ -201,6 +201,7 @@ def analyze_news(item):
         "sentiment": sentiment,
         "impact_score": score,
         "relevance": relevance,
+        "confidence": confidence,
         "analysis": concept,
     }
 
