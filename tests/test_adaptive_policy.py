@@ -53,6 +53,19 @@ class AdaptivePolicyTests(unittest.TestCase):
         self.assertEqual(result["min_probability"], 0.64)
         self.assertEqual(result["cooldown_hours"], 7)
 
+    def test_old_headline_is_not_treated_as_fresh_when_discovered_late(self):
+        now = datetime.now(timezone.utc)
+        news = [{
+            "observed_at": now.isoformat(),
+            "published_at": (now - timedelta(hours=30)).isoformat(),
+            "sentiment": "BEARISH",
+            "feed_category": "Geopolitics / global risk",
+            "relevance": "UNCERTAIN"
+        }]
+        result = derive_policy([], news, base_probability=0.60, now=now)
+        self.assertEqual(result["global_bearish_news_24h"], 0)
+        self.assertEqual(result["min_probability"], 0.60)
+
     def test_non_target_outcomes_do_not_count(self):
         outcomes = [{"result": "timeout"} for _ in range(20)]
         result = derive_policy(outcomes, [], base_probability=0.60)
