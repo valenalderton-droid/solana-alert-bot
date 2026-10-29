@@ -24,6 +24,20 @@ def save_state(state):
     os.replace(temp, STATE_FILE)
 
 
+def telegram_send(token, chat_id, text):
+    """Send a Telegram message and fail loudly if Telegram rejects it."""
+    response = requests.post(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        json={"chat_id": chat_id, "text": text, "disable_web_page_preview": True},
+        timeout=20,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    if not payload.get("ok"):
+        raise RuntimeError(f"Telegram sendMessage failed: {payload}")
+    return True
+
+
 def poll_pay(state):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = str(os.getenv("TELEGRAM_CHAT_ID", "")).strip()
@@ -41,9 +55,11 @@ def poll_pay(state):
         response.raise_for_status()
         payload = response.json()
         if not payload.get("ok"):
+            print(f"Telegram getUpdates rejected: {payload}")
             return False
 
         requested = False
+        matched_chat_message = False
         for update in payload.get("result", []):
             state["telegram_update_offset"] = max(
                 int(state.get("telegram_update_offset", 0) or 0),
@@ -54,14 +70,30 @@ def poll_pay(state):
             if str(chat.get("id", "")) != chat_id:
                 continue
             command = str(message.get("text", "")).strip()
+            if not command:
+                continue
+            matched_chat_message = True
             if command == "//Pay":
                 requested = True
+                telegram_send(
+                    token, chat_id,
+                    "درخواستت دریافت شد؛ اسکن بازار سولانا شروع می‌شود. نتیجه را همین‌جا می‌فرستم."
+                )
+            else:
+                telegram_send(
+                    token, chat_id,
+                    "پیامت به ربات رسید، اما دستور را نشناختم. برای بررسی بازار دقیقاً این متن را بفرست: //Pay"
+                )
+
         save_state(state)
+        if not matched_chat_message:
+            print("Telegram polling succeeded; no text message for the configured chat was found.")
+        elif requested:
+            print("Telegram //Pay command received and acknowledged.")
         return requested
-    except (requests.RequestException, ValueError, TypeError) as exc:
+    except (requests.RequestException, ValueError, TypeError, RuntimeError) as exc:
         print(f"Telegram command polling failed: {exc}")
         return False
-
 
 def refresh_news_if_due(state, interval_minutes=15):
     """Refresh source-linked news between trade scans without hammering market APIs."""
