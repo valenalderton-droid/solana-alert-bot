@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 IMPROVEMENT_FILE = ROOT / "data" / "self_improvement.json"
+RULE_FILES_DIR = ROOT / "data" / "experience_rules"
 MIN_RESOLVED = 20
 MIN_VALIDATION = 8
 PROBABILITY_CANDIDATES = (0.55, 0.58, 0.60, 0.62, 0.65, 0.68, 0.70)
@@ -334,6 +335,61 @@ def build_experience_rules(diagnostics, minimum_samples=12,
     return rules
 
 
+def sync_experience_rule_files(rules, now=None):
+    """Create/update/delete only bot-owned JSON rule files from validated rule objects.
+
+    File names are restricted to the hard-coded rule allowlist. This function
+    never edits Python source, workflow files, credentials, or project filters.
+    """
+    now = now or datetime.now(timezone.utc)
+    allowed_ids = set(EXPERIENCE_RULE_DEFINITIONS)
+    active = {}
+    for rule in rules or []:
+        if not isinstance(rule, dict):
+            continue
+        rule_id = str(rule.get("id", ""))
+        if rule_id in allowed_ids and rule.get("enabled") is True:
+            active[rule_id] = rule
+
+    RULE_FILES_DIR.mkdir(parents=True, exist_ok=True)
+    actions = {"created": [], "edited": [], "deleted": [], "active": []}
+    for rule_id, rule in active.items():
+        path = RULE_FILES_DIR / (rule_id + ".json")
+        payload = {
+            "schema_version": 1,
+            "managed_by": "solana-alert-bot-self-improver",
+            "id": rule_id,
+            "enabled": True,
+            "status": rule.get("status", "experience_derived"),
+            "field": rule.get("field"),
+            "operator": rule.get("operator"),
+            "value": rule.get("value"),
+            "reason": rule.get("reason", ""),
+            "evidence": rule.get("evidence", {}),
+            "updated_at": rule.get("updated_at") or now.isoformat()
+        }
+        serialized = json.dumps(payload, ensure_ascii=False, indent=2) + "\\n"
+        previous = None
+        try:
+            previous = path.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            pass
+        if previous != serialized:
+            temp = path.with_suffix(".json.tmp")
+            temp.write_text(serialized, encoding="utf-8")
+            temp.replace(path)
+            actions["created" if previous is None else "edited"].append(path.name)
+        actions["active"].append(path.name)
+
+    # Delete only JSON files whose stem is in our fixed allowlist. Never sweep
+    # arbitrary files from the directory.
+    for path in RULE_FILES_DIR.glob("*.json"):
+        if path.stem in allowed_ids and path.stem not in active:
+            path.unlink()
+            actions["deleted"].append(path.name)
+    return actions
+
+
 def evaluate_experience_rules(candidate, rules):
     """Return the first active learned rule that matches a new candidate."""
     candidate = candidate if isinstance(candidate, dict) else {}
@@ -366,7 +422,7 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
     registry["learning_diagnostics"] = diagnose_failure_modes(predictions, outcomes)
     # Rebuild strategy rules from resolved outcomes each run. A rule that no
     # longer meets the evidence criteria is automatically retired.
-    registry["experience_rules"] = build_experience_rules(registry["learning_diagnostics"])
+    registry["experience_rules"] = build_experience_rules(registry["learning_diagnostics"])\n    file_actions = sync_experience_rule_files(registry["experience_rules"], now=now)
     rules = registry.setdefault("rules", [])
     active = next((rule for rule in rules
                    if rule.get("id") == "validated_probability_floor"), None)
