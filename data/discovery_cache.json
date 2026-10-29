@@ -1,5 +1,5 @@
 {
-  "saved_at": "2026-10-29T14:37:56.567217+00:00",
+  "saved_at": "2026-10-29T15:23:47.459264+00:00",
   "filters": {
     "discovery_version": 2,
     "min_liquidity": 100000.0,
@@ -18,8 +18,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 2069709762.77,
-      "volume_24h_usd_at_discovery": 328355.72
+      "liquidity_usd_at_discovery": 2069709741.23,
+      "volume_24h_usd_at_discovery": 328414.41
     },
     {
       "name": "Render",
@@ -32,7 +32,7 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 1709830971.77,
-      "volume_24h_usd_at_discovery": 200856.94
+      "volume_24h_usd_at_discovery": 200846.77
     },
     {
       "name": "Helium",
@@ -45,20 +45,7 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 664291225.41,
-      "volume_24h_usd_at_discovery": 327840.4
-    },
-    {
-      "name": "Lido DAO",
-      "symbol": "LDO",
-      "token_address": "FpBCuYT7MfWAecWKiweqjMuWGW7dVQ3qJ3c4zAVmdS7w",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 432669573.46,
-      "volume_24h_usd_at_discovery": 200857.04
+      "volume_24h_usd_at_discovery": 327840.08
     },
     {
       "name": "Render",
@@ -71,33 +58,7 @@
       "has_project_website": false,
       "has_project_social": false,
       "liquidity_usd_at_discovery": 159802737.84,
-      "volume_24h_usd_at_discovery": 130557.56
-    },
-    {
-      "name": "JUST",
-      "symbol": "JST",
-      "token_address": "Dg5KsG6zrcWVEX8c5nGEBRG99ngueKC5JmMiSNskoNBq",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 129737863.93,
-      "volume_24h_usd_at_discovery": 327850.86
-    },
-    {
-      "name": "Meteora",
-      "symbol": "MET",
-      "token_address": "METvsvVRapdj9cFLzq4Tr43xK4tAjQfwX76z3n6mWQL",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 155717.26,
-      "volume_24h_usd_at_discovery": 15260380.0
+      "volume_24h_usd_at_discovery": 112534.48
     },
     {
       "name": "Parcl",
@@ -113,19 +74,6 @@
       "volume_24h_usd_at_discovery": 112532.88
     },
     {
-      "name": "cat in a dogs world",
-      "symbol": "MEW",
-      "token_address": "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5",
-      "approved_non_meme": true,
-      "discovery_source": "dexscreener_category_search",
-      "discovery_category": "Solana MEV trading infrastructure",
-      "discovery_confidence": 0.8,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 9020908.89,
-      "volume_24h_usd_at_discovery": 392734.69
-    },
-    {
       "name": "Raydium",
       "symbol": "RAY",
       "token_address": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
@@ -135,8 +83,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 6299150.48,
-      "volume_24h_usd_at_discovery": 1112058.78
+      "liquidity_usd_at_discovery": 6294341.73,
+      "volume_24h_usd_at_discovery": 1147689.49
     },
     {
       "name": "Metaplex Token",
@@ -148,21 +96,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 2674678.27,
-      "volume_24h_usd_at_discovery": 4450095.74
-    },
-    {
-      "name": "Jito Staked SOL",
-      "symbol": "JITOSOL",
-      "token_address": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 5733714.95,
-      "volume_24h_usd_at_discovery": 1173305.22
+      "liquidity_usd_at_discovery": 2691689.86,
+      "volume_24h_usd_at_discovery": 4292888.97
     },
     {
       "name": "Kamino",
@@ -174,8 +109,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 1940818.31,
-      "volume_24h_usd_at_discovery": 3152235.3
+      "liquidity_usd_at_discovery": 1930895.72,
+      "volume_24h_usd_at_discovery": 3166952.12
     },
     {
       "name": "Jupiter Perps LP",
@@ -187,8 +122,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 2215661.03,
-      "volume_24h_usd_at_discovery": 1036812.89
+      "liquidity_usd_at_discovery": 2228573.98,
+      "volume_24h_usd_at_discovery": 1087558.26
     },
     {
       "name": "Jupiter",
@@ -200,8 +135,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 1982325.13,
-      "volume_24h_usd_at_discovery": 897033.56
+      "liquidity_usd_at_discovery": 2023385.16,
+      "volume_24h_usd_at_discovery": 868405.89
     },
     {
       "name": "Marinade staked SOL (mSOL)",
@@ -213,21 +148,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 1748513.0,
-      "volume_24h_usd_at_discovery": 134953.23
-    },
-    {
-      "name": "Star Atlas",
-      "symbol": "ATLAS",
-      "token_address": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 128952.15,
-      "volume_24h_usd_at_discovery": 1110968.66
+      "liquidity_usd_at_discovery": 1754711.35,
+      "volume_24h_usd_at_discovery": 135038.23
     },
     {
       "name": "JITO",
@@ -239,8 +161,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 1065455.03,
-      "volume_24h_usd_at_discovery": 141103.05
+      "liquidity_usd_at_discovery": 1088426.16,
+      "volume_24h_usd_at_discovery": 144481.72
     },
     {
       "name": "Orca",
@@ -252,8 +174,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 699268.99,
-      "volume_24h_usd_at_discovery": 424159.01
+      "liquidity_usd_at_discovery": 706578.48,
+      "volume_24h_usd_at_discovery": 426443.72
     },
     {
       "name": "Pyth Network",
@@ -265,8 +187,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": true,
       "has_project_social": true,
-      "liquidity_usd_at_discovery": 415106.94,
-      "volume_24h_usd_at_discovery": 501431.74
+      "liquidity_usd_at_discovery": 412786.68,
+      "volume_24h_usd_at_discovery": 574769.59
     },
     {
       "name": "BlazeStake Staked SOL (bSOL)",
@@ -278,47 +200,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 594445.31,
-      "volume_24h_usd_at_discovery": 71269.0
-    },
-    {
-      "name": "Nosana",
-      "symbol": "NOS",
-      "token_address": "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 600375.83,
-      "volume_24h_usd_at_discovery": 57004.09
-    },
-    {
-      "name": "SwissBorg Token",
-      "symbol": "BORG",
-      "token_address": "3dQTr7ror2QPKQ3GbBCokJUmjErGg8kTJzdnYjNfvi3Z",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 442535.81,
-      "volume_24h_usd_at_discovery": 98990.4
-    },
-    {
-      "name": "ZEUS",
-      "symbol": "ZEUS",
-      "token_address": "ZEUS1aR7aX8DFFJf5QjWj2ftDDdNTroMNGo8YoQm3Gq",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": true,
-      "has_project_social": true,
-      "liquidity_usd_at_discovery": 112779.69,
-      "volume_24h_usd_at_discovery": 371052.12
+      "liquidity_usd_at_discovery": 600365.85,
+      "volume_24h_usd_at_discovery": 70576.94
     },
     {
       "name": "Render Token",
@@ -330,8 +213,8 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 355520.39,
-      "volume_24h_usd_at_discovery": 125403.68
+      "liquidity_usd_at_discovery": 359421.76,
+      "volume_24h_usd_at_discovery": 129543.94
     },
     {
       "name": "Helium Network Token",
@@ -343,30 +226,17 @@
       "discovery_confidence": 1.0,
       "has_project_website": false,
       "has_project_social": false,
-      "liquidity_usd_at_discovery": 337731.99,
-      "volume_24h_usd_at_discovery": 66367.49
-    },
-    {
-      "name": "Infinity",
-      "symbol": "INF",
-      "token_address": "5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm",
-      "approved_non_meme": true,
-      "discovery_source": "curated_symbol_search",
-      "discovery_category": "known_ecosystem_symbol",
-      "discovery_confidence": 1.0,
-      "has_project_website": false,
-      "has_project_social": false,
-      "liquidity_usd_at_discovery": 294953.4,
-      "volume_24h_usd_at_discovery": 86357.18
+      "liquidity_usd_at_discovery": 342260.0,
+      "volume_24h_usd_at_discovery": 67373.51
     }
   ],
   "discovery_diagnostics": {
-    "queries": 91,
-    "pairs_seen": 2572,
-    "wrong_chain": 1052,
-    "meme_rejected": 23,
-    "metadata_rejected": 1,
-    "liquidity_volume_age_rejected": 941,
-    "eligible": 27
+    "queries": 42,
+    "pairs_seen": 1203,
+    "wrong_chain": 499,
+    "meme_rejected": 19,
+    "metadata_rejected": 2,
+    "liquidity_volume_age_rejected": 522,
+    "eligible": 17
   }
 }
