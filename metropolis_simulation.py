@@ -173,6 +173,72 @@ def _research_round(city, core_specs, timestamp):
         residents[proposal["owner"]]["research_contributions"] += 1
 
 
+def _review_experiments(system, city, timestamp):
+    """Use a chronological holdout only as descriptive evidence; never auto-promote."""
+    research = city["research"]
+    for experiment in research.get("experiments", []):
+        if experiment.get("status") != "queued_for_evidence":
+            continue
+        owner = experiment.get("owner")
+        core = (system.get("cores") or {}).get(owner) or {}
+        trades = [t for t in ((core.get("portfolio") or {}).get("closed_trades") or [])
+                  if isinstance(t, dict) and isinstance(t.get("pnl_usd"), (int, float))]
+        # 30 observations total, with the latest 20 reserved as chronological holdout.
+        if len(trades) < 30:
+            experiment["observations_available"] = len(trades)
+            continue
+        holdout = trades[-20:]
+        pnl = [_num(t.get("pnl_usd")) for t in holdout]
+        wins = sum(x > 0 for x in pnl)
+        running = peak = 0.0
+        max_drawdown = 0.0
+        for value in pnl:
+            running += value
+            peak = max(peak, running)
+            max_drawdown = max(max_drawdown, peak - running)
+        experiment["status"] = "evidence_ready_for_review"
+        experiment["completed_at"] = timestamp
+        experiment["result"] = {
+            "total_observations": len(trades),
+            "holdout_observations": len(holdout),
+            "holdout_net_pnl_usd": round(sum(pnl), 4),
+            "holdout_win_rate": round(wins / len(holdout), 4),
+            "holdout_max_drawdown_usd": round(max_drawdown, 4),
+            "method": "last 20 chronologically ordered closed paper trades",
+            "interpretation": "descriptive evidence only; not proof that the named topic caused performance",
+        }
+        research.setdefault("findings", []).append({
+            "at": timestamp, "experiment_id": experiment["id"], "topic": experiment["topic"],
+            "status": "evidence_ready_for_review",
+            "holdout_net_pnl_usd": experiment["result"]["holdout_net_pnl_usd"],
+            "holdout_win_rate": experiment["result"]["holdout_win_rate"],
+            "decision": "manual review required; no automatic strategy promotion",
+        })
+    research["findings"] = research.get("findings", [])[-100:]
+
+
+def _update_city_dynamics(city):
+    """Slow, bounded city dynamics; avoid random or explosive population changes."""
+    economy = city["economy"]
+    districts = city["districts"]
+    avg_service = sum(_num(s.get("satisfaction"), 60) for s in city["services"].values()) / max(1, len(city["services"]))
+    for district in districts.values():
+        service = _num(district.get("service_level"), 60)
+        infra = _num(district.get("infrastructure_health"), 75)
+        district["service_level"] = round(max(0.0, min(100.0, service + (0.15 if avg_service >= 55 else -0.2))), 2)
+        district["infrastructure_health"] = round(max(0.0, min(100.0, infra + (0.1 if _num(economy.get("treasury_usd")) > 100 else -0.15))), 2)
+        population = int(district.get("population", 0))
+        # Population changes by at most one resident per simulated day and district.
+        if district["service_level"] >= 70 and population < 500:
+            district["population"] = population + 1
+        elif district["service_level"] < 35 and population > 50:
+            district["population"] = population - 1
+        district["jobs"] = min(int(district["population"]), max(0, int(district["population"] * district["service_level"] / 100)))
+    economy["housing_pressure"] = round(max(0.0, min(1.0,
+        sum(int(d.get("population", 0)) for d in districts.values()) / 5000.0
+        + (100.0 - avg_service) / 500.0)), 3)
+
+
 def _daily_tick(system, city, core_specs, timestamp):
     economy = city["economy"]
     services = city["services"]
@@ -212,6 +278,8 @@ def _daily_tick(system, city, core_specs, timestamp):
             _num(chain.get("reliability"), 0.8) * 0.8 + target * 0.2)), 3)
         chain["backlog"] = services[service_key]["backlog"]
     _research_round(city, core_specs, timestamp)
+    _review_experiments(system, city, timestamp)
+    _update_city_dynamics(city)
     city["simulated_day"] += 1
     city["events"].append({"at": timestamp, "type": "daily_economy",
                            "message": "Daily city budget, services, supply chains and research queue updated.",
