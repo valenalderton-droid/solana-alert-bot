@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T09:42:12.365966+00:00",
+  "last_run_utc": "2026-10-29T09:47:23.404335+00:00",
   "last_status_message_utc": "2026-10-29T03:39:02.533088+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -19,7 +19,10 @@
     "fbbe9ed1c230c6c1ded02e2a",
     "4efdb5d3ef64c29afb9d0399",
     "a136058668c86838b9f7d0b9",
-    "2a673060f36599245a60b423"
+    "2a673060f36599245a60b423",
+    "d91d2d979bbabb6b628dba72",
+    "0f23f622f6a4cfb697501120",
+    "6e8cfc00053f0499f5c27e31"
   ],
   "news_observations": [
     {
@@ -75,6 +78,33 @@
       "relevance": "DIRECT — SOL market / regulation",
       "title": "Solana ETFs Post Their Worst Day Since December While SOL Holds Above $100 - BeInCrypto",
       "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTFB3bFBDUWJNakJESmN4QnBIOGZBc1ltbDJULWRPOWRXbXZ2R2JLc29GTExBRTN2NFpDVmFJd2ViMUVzckhmQm1STTFYUElxU0s0TzlNYTBwVW05MFM3VEtPd1k3LTM0dFlQenZ6SllfQld1amc?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:47:01.078557+00:00",
+      "published_at": "2026-10-28T21:29:40+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "XMR to SOL: Moving From Monero Into the Solana Ecosystem - blockchain.news",
+      "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPd0FHcFdPSzJEZmJjMVRzWjhlLVBRNm5VLWphakZkNnp3VVlxT24yMFJNNXhjanJpNkZGMTBOQ2dTcFVnWWpHb2xyZjB2ZEJoR0VkSktNaXl6aFZkbGVTS01aTFJSRmVjVVVqaHphNzVJOTRMQnd4NUg4aHd2M09paTBjZFN0VWZJY1VBcw?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:47:01.408042+00:00",
+      "published_at": "2026-10-28T05:55:02+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana (SOL) Price News Today: SOL Near $100.55 Puts Morgan Stanley's Trust and Remittix's Launch in Focus - TechBullion",
+      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNd0JIVE1vSTZTSlZNX0ZNTkUwRDlQd0U0dm9mVVBvenByZFNmSktRWFdJbHl6RDZ2WjNuT0NSeDZBOVVJd0ctREptakNaVHduZC00Uk0tSGhkdXdFQ185ek5xSXRfQngtYzhweWl2ZkRZcHBvR1ppX2dwSVVTWjhhaTlLUWt1c0NSZllLQmxQMUxDNDhtSGlRdzZBUnpweWwyd3lzYTd4RnhHSDlIZ29zcnYtNy00SmhwelJyTFMtYkVCaFU?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:47:01.731249+00:00",
+      "published_at": "2026-10-28T05:41:21+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana (SOL): Is a Market Rebound Coming? Key Trends Every Trader Should Watch - Binance",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1McUdTWXN0SDZoSEJFUVdvdm9tYWh5Z0llTmtGdXZKVlZyX0xUcWlFdGw1NDRaZkx3dXhCWndPTFd0aGRMYkYzM21FN0tQejBEZC1wZ3JTVnZZeUFHRk10d0Z4Szh3WXlz?oc=5"
     }
   ]
 }
