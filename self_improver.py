@@ -374,7 +374,20 @@ def sync_experience_rule_files(rules, now=None):
             previous = path.read_text(encoding="utf-8")
         except FileNotFoundError:
             pass
-        if previous != serialized:
+        unchanged = False
+        if previous is not None:
+            try:
+                old_payload = json.loads(previous)
+                old_compare = dict(old_payload)
+                new_compare = dict(payload)
+                # A timestamp alone is not a rule edit; avoid rewriting files
+                # on every scheduled scan when evidence and rule semantics match.
+                old_compare.pop("updated_at", None)
+                new_compare.pop("updated_at", None)
+                unchanged = old_compare == new_compare
+            except (json.JSONDecodeError, TypeError, ValueError):
+                unchanged = False
+        if previous is None or not unchanged:
             temp = path.with_suffix(".json.tmp")
             temp.write_text(serialized, encoding="utf-8")
             temp.replace(path)
