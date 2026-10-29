@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T17:23:04.667003+00:00",
+  "last_run_utc": "2026-10-29T17:24:33.945812+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -670,9 +670,9 @@
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T17:22:08.523096+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T17:23:04.026536+00:00",
-  "project_scan_cursor": 103,
+  "last_news_refresh_utc": "2026-10-29T17:23:33.997690+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T17:24:33.432167+00:00",
+  "project_scan_cursor": 133,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
@@ -1101,6 +1101,16 @@
       "entry": 0.002241988991538861,
       "stop": 0.0015028757180803806,
       "target": 0.0037202155384558214
+    },
+    {
+      "signal_id": "5YMkXAYccHSGnHn9nob9xEvv6Pvka9DZWH7nTbotTu9E:1793289600:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "5YMkXAYccHSGnHn9nob9xEvv6Pvka9DZWH7nTbotTu9E",
+      "name": "hyUSD",
+      "timestamp": 1793289600,
+      "entry": 0.9973704803144086,
+      "stop": 0.9895134368086559,
+      "target": 1.013084567325914
     }
   ]
 }
