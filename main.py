@@ -365,6 +365,28 @@ def get_closed_candles(raw_candles):
     ]
 
 
+def select_projects_for_scan(projects, cursor=0, max_projects=5, always_include_addresses=None):
+    """Rotate through the project universe while always monitoring open positions."""
+    projects = list(projects or [])
+    if not projects:
+        return [], 0
+    limit = max(1, int(max_projects))
+    start = int(cursor or 0) % len(projects)
+    count = min(limit, len(projects))
+    selected = [projects[(start + offset) % len(projects)] for offset in range(count)]
+    selected_addresses = {
+        str(project.get("token_address", "")).strip()
+        for project in selected if isinstance(project, dict)
+    }
+    always_include_addresses = set(always_include_addresses or [])
+    for project in projects:
+        address = str(project.get("token_address", "")).strip()
+        if address in always_include_addresses and address not in selected_addresses:
+            selected.append(project)
+            selected_addresses.add(address)
+    return selected, (start + count) % len(projects)
+
+
 def resolve_old_signals(state, store):
     pending = state.get("open_signals", [])
     still_pending = []
@@ -775,7 +797,23 @@ def main():
         "alerts_created": 0
     }
 
-    for project in config.get("projects", []):
+    configured_universe = config.get("projects", [])
+    scan_limit = max(1, int(os.getenv("MAX_PROJECTS_PER_SCAN", "5")))
+    projects_to_scan, state["project_scan_cursor"] = select_projects_for_scan(
+        configured_universe,
+        cursor=state.get("project_scan_cursor", 0),
+        max_projects=scan_limit,
+        always_include_addresses=open_position_addresses
+    )
+    print(
+        f"Rotating scan: checking {len(projects_to_scan)} of "
+        f"{len(configured_universe)} approved projects this run; "
+        f"configured limit={scan_limit}, open positions always included."
+    )
+    scan_diagnostics["projects_scheduled"] = len(projects_to_scan)
+    scan_diagnostics["cached_fallbacks"] = 0
+
+    for project in projects_to_scan:
         scan_diagnostics["projects_seen"] += 1
         if not is_allowed_non_meme_project(project):
             scan_diagnostics["not_approved_or_missing_address"] += 1
@@ -846,7 +884,36 @@ def main():
 
         except Exception as exc:
             scan_diagnostics["market_errors"] += 1
-            print(f"Market data error for {project.get('name')}: {exc}")
+            # If GeckoTerminal is rate-limiting, reuse only a recent completed
+            # candle history and a freshly fetched DexScreener quote. Never
+            # fabricate a quote or use cached candles older than three hours.
+            cached = sorted(
+                store.get(address, {}).values(),
+                key=lambda candle: int(candle.get("timestamp", 0))
+            )
+            cached_latest = int(cached[-1].get("timestamp", 0)) if cached else 0
+            current_hour = int(datetime.now(timezone.utc).timestamp() // 3600) * 3600
+            cached_age_hours = (current_hour - cached_latest) / 3600 if cached_latest else float("inf")
+            if (
+                pair is not None and len(cached) >= 65
+                and 0 <= cached_age_hours <= 3
+            ):
+                market_info[address] = {
+                    "pair": pair,
+                    "candles": cached,
+                    "price": float(pair.get("priceUsd") or cached[-1]["close"]),
+                    "liquidity": float((pair.get("liquidity") or {}).get("usd") or 0),
+                    "volume24h": float((pair.get("volume") or {}).get("h24") or 0)
+                }
+                active_projects.append(project)
+                scan_diagnostics["usable_projects"] += 1
+                scan_diagnostics["cached_fallbacks"] += 1
+                print(
+                    f"Using recent cached candles for {project.get('name')} "
+                    f"after market-data error; candle age={cached_age_hours:.1f}h."
+                )
+            else:
+                print(f"Market data error for {project.get('name')}: {exc}")
 
     save_candle_store(store)
 
@@ -915,11 +982,15 @@ def main():
         print("Performance digest (log only; Telegram reserved for BUY/SELL):", digest)
         state["last_stats_report_utc"] = utc_now()
 
+    # Train on all approved projects with persisted historical candles,
+    # not just the small rotating subset fetched in this run.
     candle_sets = [
-        sorted(store[p["token_address"]].values(),
-               key=lambda c: c["timestamp"])
-        for p in active_projects
-        if p["token_address"] in store
+        sorted(store[address].values(), key=lambda candle: int(candle["timestamp"]))
+        for address in {
+            str(project.get("token_address", "")).strip()
+            for project in config.get("projects", [])
+        }
+        if address in store and len(store[address]) >= 65
     ]
 
     model, metrics = train_model(candle_sets)
