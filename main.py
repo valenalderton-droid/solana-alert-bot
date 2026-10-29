@@ -790,6 +790,10 @@ def main():
               continue
 
           probability = float(model.predict_proba(X)[0][1])
+          horizon_probabilities = (
+              model.predict_horizon_proba(X)
+              if hasattr(model, "predict_horizon_proba") else {}
+          )
           if probability < policy["min_probability"]:
               scan_diagnostics["below_probability_threshold"] += 1
               print(
@@ -840,6 +844,7 @@ def main():
               "stop_pct": round(stop_pct * 100, 3),
               "target_pct": round(target_pct * 100, 3),
               "probability": round(probability, 4),
+              "horizon_probabilities": horizon_probabilities,
               "entry_deviation_pct": round(entry_deviation_pct, 3),
               "liquidity_usd": info["liquidity"],
               "volume_24h_usd": info["volume24h"],
@@ -853,7 +858,9 @@ def main():
               f"Entry reference: ${entry:.8g}\n"
               f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\n"
               f"Target reference: ${target:.8g} ({target_pct * 100:.2f}%)\n"
-              f"Model probability: {probability:.1%}\n"
+              f"Combined model probability: {probability:.1%}\n"
+              f"Probability by horizon: {json.dumps(horizon_probabilities)}\n"
+              f"Model horizons available: {', '.join(metrics.get('active_horizons', []))}\n"
               f"Price-action check: {pa_reason}\n"
               f"Spot vs signal-candle deviation: {entry_deviation_pct:.2f}%\n"
               f"Liquidity: ${info['liquidity']:,.0f}\n"
