@@ -32,6 +32,8 @@ jobs:
         run: |
           python -m py_compile main.py market.py learner.py
           python -c "import json; json.load(open('data/projects.json', encoding='utf-8'))"
+      - name: Run regression tests
+        run: python -m unittest discover -s tests -v
       - name: Run bot
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
