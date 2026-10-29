@@ -39,7 +39,7 @@ KEYWORDS = {
     ],
     "positive": [
         "etf filing", "etf application", "partnership", "integrates solana",
-        "integration", "mainnet upgrade", "upgrade goes live", "adoption",
+        "integration", "integrates", "mainnet upgrade", "upgrade goes live", "adoption",
         "institutional", "payments launch", "launches on solana", "record activity",
         "record volume", "fund inflows", "funding round"
     ],
