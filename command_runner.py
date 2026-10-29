@@ -140,9 +140,12 @@ def poll_pay(state):
                 matching_chat_count += 1
             if not command:
                 continue
-            # The documented trigger is case-sensitive and must be exactly //Pay.
-            # Ignore ordinary text; explain other slash commands without scanning.
-            if command == "//Pay":
+            # Accept only the Pay trigger, case-insensitively, with common Telegram spellings.
+            # No other text or command can start a market scan.
+            normalized_command = command.strip().casefold()
+            if normalized_command in {"pay", "/pay", "//pay"} or (
+                normalized_command.startswith("/pay@") and len(normalized_command) > 5
+            ):
                 matched_chat_message = True
                 requested = True
                 try:
@@ -181,7 +184,7 @@ def poll_pay(state):
             else:
                 print("No usable text message for the configured chat was found.")
         elif requested:
-            print("Telegram //Pay command received and acknowledged.")
+            print("Telegram Pay command received and acknowledged.")
         return requested
     except (requests.RequestException, ValueError, TypeError, RuntimeError) as exc:
         print(f"Telegram command polling failed: {exc}")
