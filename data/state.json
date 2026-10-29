@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T10:17:45.894713+00:00",
+  "last_run_utc": "2026-10-29T10:27:32.204488+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -36,7 +36,8 @@
     "48f6e6f8ea0db8caeff0b08f",
     "7cf5cffe6333ef8a77530e3d",
     "0bca9475989b43c0cd73db2f",
-    "e73a638e0b5dc2275a0f373f"
+    "e73a638e0b5dc2275a0f373f",
+    "d2e67b2d7ad8c6a701f85b56"
   ],
   "news_observations": [
     {
@@ -264,7 +265,19 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Bitcoin (BTCUSD) Volatility Intensified on Oct 29: What You Should Know - TradingKey",
       "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQbm5idUJtdjVEVUdFVUJTZC1JWkZHVWJlV0RScWtBcVZkNUdUTUJ1el8ybC0wRE5PMElhMk02SHRVdFNuRlVObkpnX0hSYXRPRl9Kd01Idk5lbHRNNGtCYk9aRWU1Y2FNdnBLYS1tYWREdmlnWnNyQkphYmF6dHBaX0RiNEVMc3lPV1Jzb3B3?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:27:07.853667+00:00",
+      "published_at": "2026-10-28T13:15:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Why Positive News for Ripple May Not Lift XRP When Broader Market Conditions are Weak - Analytics Insight",
+      "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxNTXNEU3R3X1dwakVneGl4ZWRCaEtraXlCalhNUElUc2Nab25CWFlHYlZMQmtfN25MSnpreWhYcTFJQlpBa0tlLXZ2NEF4VHg0NmtoY3dkdnpQUUFEYzJ4WkJtclFOYXdSblFQdTdlYWdaQ0pHY0kxaGloUDBBcjU1d19SWlR2RE9hQnN0bmR3b3dhN0xYbDNIbno3ZGFBUUcweDBZaGlUcVJqUDhlSUhmRTFVZklyazdjZDNzSlFHRUVwNjJaUUR4Njdwc0x4QnJ2Y29FRnBocHMzUjBiX0RmQ2s5N1dUUdIB8wFBVV95cUxObXRmOEtYVEV1eTh2dlVTWFdEem5VM0VSQTFjbDlPZTc0ZERSUThnMnZvV09aVGItVUU2UjdZQ2NhME0tRUFMRGVUNURzalg3dUpIV0lIS0FOZ2p6ckFKNm15eW9qbFpLVTVQZUJhN3RTU3FPZVluaEFjTXJ1aTBBTEVCc1p5ekF0OTI5WGd2SVRqOGxNaFNENTd4Q3F1b0JrcDJ1cjA3VHVwc0cwc0NhaUNvS05kWkNoX0VJMDczNlBtWGtyZ0xyU1ZwNWxJeE5qWHE3OXFSTjMzdTBxR2N2a2JDNnFPNVVZVlRCUWhHYjVDY3M?oc=5"
     }
   ],
-  "open_positions": []
+  "open_positions": [],
+  "telegram_update_offset": 806952298
 }
