@@ -9,6 +9,7 @@ import requests
 
 from market import get_best_solana_pair, get_hourly_candles, utc_now, discover_solana_projects
 from learner import train_model, latest_features, price_action_ok
+from news_analyzer import fetch_recent_news, analyze_news, format_news_alert
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -289,6 +290,33 @@ def main():
     state.setdefault("stats", {
         "signals": 0, "resolved": 0, "wins": 0, "losses": 0
     })
+
+    # News is supplemental context: it never directly creates a buy/sell order.
+    # Store IDs only after Telegram confirms delivery, so failed sends can retry.
+    seen_news = state.setdefault("seen_news_ids", [])
+    seen_news_set = set(seen_news)
+    news_sent = 0
+    for item in fetch_recent_news():
+        if item["id"] in seen_news_set:
+            continue
+        analyzed = analyze_news(item)
+        print(
+            "News analysis:",
+            json.dumps({
+                "title": analyzed["title"],
+                "sentiment": analyzed["sentiment"],
+                "impact_score": analyzed["impact_score"],
+                "relevance": analyzed["relevance"]
+            }, ensure_ascii=False)
+        )
+        if send_telegram(format_news_alert(analyzed)):
+            seen_news.append(item["id"])
+            seen_news_set.add(item["id"])
+            news_sent += 1
+        if news_sent >= int(os.getenv("MAX_NEWS_ALERTS_PER_RUN", "3")):
+            break
+    # Bound the state file while retaining enough history for deduplication.
+    state["seen_news_ids"] = seen_news[-500:]
 
     store = load_candle_store()
     active_projects = []
