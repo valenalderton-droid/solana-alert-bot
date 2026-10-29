@@ -42,6 +42,7 @@ jobs:
           MIN_PROBABILITY: "0.60"
           MAX_STOP_PCT: "0.05"
           TARGET_PCT: "0.04"
+          ALERT_COOLDOWN_HOURS: "6"
         run: python main.py
       - name: Save persistent history
         run: |
