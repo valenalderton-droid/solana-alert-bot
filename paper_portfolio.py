@@ -10,6 +10,25 @@ ONE_WAY_COST_PCT = 0.0015
 MAX_HOLD_SECONDS = 14 * 24 * 3600
 
 
+def adaptive_risk_fraction(portfolio):
+    """Use only the last 20 closed virtual trades; never raise risk above 1%."""
+    trades = [t for t in portfolio.get("closed_trades", [])[-20:]
+              if isinstance(t, dict) and isinstance(t.get("pnl_usd"), (int, float))]
+    if len(trades) < 20:
+        return RISK_PER_TRADE_PCT, {"sample_size": len(trades), "mode": "warmup"}
+    wins = sum(float(t["pnl_usd"]) > 0 for t in trades)
+    win_rate = wins / len(trades)
+    avg_pnl = sum(float(t["pnl_usd"]) for t in trades) / len(trades)
+    if avg_pnl <= 0 or win_rate < 0.45:
+        return 0.005, {"sample_size": len(trades), "mode": "defensive",
+                       "win_rate": round(win_rate, 4), "average_net_pnl_usd": round(avg_pnl, 4)}
+    if avg_pnl > 0 and win_rate >= 0.55:
+        return RISK_PER_TRADE_PCT, {"sample_size": len(trades), "mode": "baseline",
+                                    "win_rate": round(win_rate, 4), "average_net_pnl_usd": round(avg_pnl, 4)}
+    return 0.0075, {"sample_size": len(trades), "mode": "cautious",
+                    "win_rate": round(win_rate, 4), "average_net_pnl_usd": round(avg_pnl, 4)}
+
+
 def _positive(value):
     try:
         x = float(value)
@@ -96,7 +115,8 @@ def open_paper_trade(state, prediction, now=None):
     stop_fraction = (entry - stop) / entry
     if not math.isfinite(stop_fraction) or stop_fraction <= 0:
         return {"opened": False, "reason": "invalid_risk"}
-    notional = min(equity * RISK_PER_TRADE_PCT / stop_fraction,
+    risk_fraction, learning = adaptive_risk_fraction(p)
+    notional = min(equity * risk_fraction / stop_fraction,
                    equity * MAX_POSITION_PCT, cash / (1 + ONE_WAY_COST_PCT))
     if not math.isfinite(notional) or notional < 10:
         return {"opened": False, "reason": "insufficient_virtual_cash"}
@@ -113,7 +133,8 @@ def open_paper_trade(state, prediction, now=None):
         "probability": prediction.get("probability"), "rank_score": prediction.get("rank_score")})
     p["updated_at"] = now or _now()
     return {"opened": True, "signal_id": signal_id, "notional_usd": round(notional, 2),
-            "quantity": quantity, "entry_fee_usd": round(fee, 4)}
+            "quantity": quantity, "entry_fee_usd": round(fee, 4),
+            "risk_fraction": risk_fraction, "learning": learning}
 
 
 def update_paper_portfolio(state, market_info, now=None):
