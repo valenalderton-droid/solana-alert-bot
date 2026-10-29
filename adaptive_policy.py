@@ -84,7 +84,7 @@ def derive_policy(outcomes, news_observations, base_probability=0.60,
     for row in news_observations:
         if not isinstance(row, dict):
             continue
-        observed = _parse_time(row.get("observed_at") or row.get("published_at"))
+        observed = _parse_time(row.get("published_at") or row.get("observed_at"))
         if observed is None or observed < recent_cutoff or observed > now + timedelta(minutes=10):
             continue
         relevance = str(row.get("relevance", ""))
