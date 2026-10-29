@@ -367,18 +367,36 @@ def send_telegram(message):
         return False
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
+    # Telegram sendMessage has a 4096-character limit. Split at line boundaries
+    # so comprehensive research alerts are delivered rather than silently rejected.
+    translated = translate_telegram(message)
+    limit = 3600
+    chunks = []
+    remaining = translated
+    while len(remaining) > limit:
+        split_at = remaining.rfind("\\n", 0, limit)
+        if split_at < limit // 2:
+            split_at = limit
+        chunks.append(remaining[:split_at].strip())
+        remaining = remaining[split_at:].lstrip()
+    if remaining:
+        chunks.append(remaining)
     try:
-        response = requests.post(
-            url,
-            json={
-                "chat_id": chat_id,
-                "text": translate_telegram(message),
-                "disable_web_page_preview": True
-            },
-            timeout=20
-        )
-        response.raise_for_status()
-        return bool(response.json().get("ok"))
+        for index, chunk in enumerate(chunks, start=1):
+            text = chunk if len(chunks) == 1 else f"[بخش {index}/{len(chunks)}]\\n{chunk}"
+            response = requests.post(
+                url,
+                json={
+                    "chat_id": chat_id,
+                    "text": text,
+                    "disable_web_page_preview": True
+                },
+                timeout=20
+            )
+            response.raise_for_status()
+            if not response.json().get("ok"):
+                return False
+        return True
     except requests.RequestException as exc:
         print(f"Telegram error: {exc}")
         return False
