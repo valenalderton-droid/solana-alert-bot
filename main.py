@@ -132,13 +132,15 @@ def build_comprehensive_analysis(candles, price, ensemble=None, quality=None,
                 lines.append(f"بازده {label}: {fmt_pct(pct_change(closes[-span-1], closes[-1]))}")
         last = closes[-1]
         for span, label in ((24, "۲۴ساعت"), (72, "۷۲ساعت"), (168, "۷روز")):
-            if len(lows) >= min(span, len(lows)):
+            if len(lows) >= span:
                 subset_lows, subset_highs = lows[-span:], highs[-span:]
                 support, resistance = min(subset_lows), max(subset_highs)
                 lines.append(
                     f"سطوح {label}: حمایت تقریبی ${support:.8g} ({pct_change(last, support):+.2f}%)؛ "
                     f"مقاومت تقریبی ${resistance:.8g} ({pct_change(last, resistance):+.2f}%)"
                 )
+            else:
+                lines.append(f"سطوح {label}: تاریخچه کامل این بازه موجود نیست")
         if len(closes) >= 50:
             ema20 = sum(closes[-20:]) / 20
             ema50 = sum(closes[-50:]) / 50
