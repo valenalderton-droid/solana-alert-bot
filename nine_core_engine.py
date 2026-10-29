@@ -20,6 +20,26 @@ CORE_SPECS = [
     {"id": "quality", "name": "Signal-quality analyst", "threshold": 60},
     {"id": "context", "name": "News/regime analyst", "threshold": 60},
 ]
+
+SHARED_DATA_SOURCES = [
+    {"name": "DexScreener", "purpose": "Solana token discovery, pair price, liquidity and volume"},
+    {"name": "GeckoTerminal", "purpose": "Hourly OHLCV candles"},
+    {"name": "Google News RSS", "purpose": "Ecosystem, security, macro and geopolitical headlines"},
+    {"name": "Strategy ensemble", "purpose": "Trend, breakout, momentum, volume-flow, structure and risk scores"},
+    {"name": "Learner and signal-quality modules", "purpose": "Model estimates, validation metrics and signal quality"},
+]
+CORE_TOOLSETS = {
+    "trend": ["OHLCV", "trend score", "structure score", "momentum score", "model probability"],
+    "breakout": ["OHLCV", "breakout score", "volume-flow score", "structure score"],
+    "momentum": ["OHLCV", "momentum score", "trend score", "volume-flow score"],
+    "volume": ["pair volume/liquidity", "volume-flow score", "breakout score", "momentum score"],
+    "structure": ["OHLCV", "structure score", "trend score", "candle-rejection score"],
+    "risk": ["liquidity/volume", "risk-control score", "signal quality", "stop/target", "risk flags"],
+    "model": ["learner probability", "rank score", "model validation metrics when available"],
+    "quality": ["signal quality", "risk-control score", "probability", "stop/target"],
+    "context": ["recent news when available", "market regime", "trend/risk scores", "risk flags"],
+}
+
 STARTING_CASH_PER_CORE = 10_000.0
 MAJORITY_VOTES = 5
 
@@ -222,6 +242,8 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
                         "votes": row["vote_count"], "voting_cores": row["votes"],
                         "core_scores": row["scores"]} for row in ranked[:10]],
         "core_choices": core_choices,
+        "shared_data_sources": SHARED_DATA_SOURCES,
+        "core_access": {spec["id"]: {"name": spec["name"], "tools": CORE_TOOLSETS[spec["id"]], "uses_shared_scan_data": True, "independent_external_fetch": False} for spec in CORE_SPECS},
         "core_accounts": {spec["id"]: {
             "name": system["cores"][spec["id"]]["name"],
             "initial_cash_usd": system["cores"][spec["id"]]["portfolio"]["initial_cash_usd"],
@@ -249,6 +271,7 @@ def format_core_result(result):
         lines.append(f"برندهٔ رأی‌گیری: {result.get('winner_name')} — {result.get('winner_votes')}/9 رأی")
     else:
         lines.append("هیچ توکنی اکثریت ۵ از ۹ را نگرفت؛ هشدار خرید صادر نشود.")
+    lines.append(f"ابزارهای اختصاصی تعریف‌شده: {len(result.get('core_access', {}))}/9 هسته؛ منابع مشترک: {len(result.get('shared_data_sources', []))}")
     for candidate in result.get("candidates", [])[:5]:
         lines.append(f"{candidate.get('name')} ({candidate.get('symbol')}): {candidate.get('votes')}/9")
     return "\n".join(lines)
