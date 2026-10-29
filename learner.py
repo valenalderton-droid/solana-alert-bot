@@ -101,9 +101,23 @@ def build_training_rows(candle_sets):
 
 def train_model(candle_sets):
     data = build_training_rows(candle_sets)
+    if data.empty:
+        return None, {
+            "ready": False,
+            "labelled_examples": 0,
+            "positive_labels": 0,
+            "negative_labels": 0,
+            "reason": "No usable labelled examples; check candle history and feature calculation"
+        }
+
+    positive_labels = int((data["y"] == 1).sum())
+    negative_labels = int((data["y"] == 0).sum())
     if len(data) < 250:
         return None, {
             "ready": False,
+            "labelled_examples": int(len(data)),
+            "positive_labels": positive_labels,
+            "negative_labels": negative_labels,
             "reason": f"Not enough labelled examples: {len(data)} (need 250)"
         }
 
@@ -124,6 +138,13 @@ def train_model(candle_sets):
     ):
         return None, {
             "ready": False,
+            "labelled_examples": int(len(data)),
+            "positive_labels": positive_labels,
+            "negative_labels": negative_labels,
+            "train_rows": int(len(train)),
+            "test_rows": int(len(test)),
+            "train_classes": int(train["y"].nunique()),
+            "test_classes": int(test["y"].nunique()),
             "reason": "Insufficient class diversity or chronological test data"
         }
 
