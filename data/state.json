@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T15:00:53.109059+00:00",
+  "last_run_utc": "2026-10-29T15:17:57.944047+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -51,7 +51,8 @@
     "5d3a48e1dd64273a795ddbb2",
     "bde8d79a7a48a9d1160c0f5d",
     "7b30382e5f6ad2c9b2941c05",
-    "df88323fd10d22bda867d4b4"
+    "df88323fd10d22bda867d4b4",
+    "35370c379c51383ec9b12d7e"
   ],
   "news_observations": [
     {
@@ -536,40 +537,52 @@
       "title": "Next Crypto to Hit $1 in 2026: 7 Realistic Picks + Reclaim Candidates - 99Bitcoins",
       "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1ZQ2c0OHBCVGdVTGdlWlBWWklpc2pNdW4xV1FCSzY0eW1hUktzS0JpWUpNRXQ0VVB1d1kyOEthRmJFNzFXY2NiVTJmcmZSOWloUFJhRFFEZjNmRXZfalNtN1VqRmNtTXVDaE9PZVVFemlZSjQ1?oc=5",
       "research_topic": "tokenomics"
+    },
+    {
+      "observed_at": "2026-10-29T15:17:01.291801+00:00",
+      "published_at": "2026-10-29T14:15:46+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana regulation",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Switzerland breaks from European fund limits with first spot bitcoin ETF on SIX - CoinDesk",
+      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQRE5PODNoLUZCLWpzeFIxN1A1bXdwQkZ6dVhNU2ZzbzFfVEM2NTJSQ3dpajZxZ0JCX1NWYUZJa21hcE1XY2JPSE5qOF9VUEU1c2JuTi1LWDRGYVBNbGJnYWNLTW8xNEtUX3FKNHF6ak9JOEJmak90TzBhZkxvcjhJNTdVVFBFTFExVFhmUEhVUnpjTWNyLXFxcWZ5aEpzZ2NsajdMUlhuNnpTWmc0UjBoSkIwcU9sR1lMMmFNNGt4OV9qYkJw?oc=5"
     }
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T14:59:43.025641+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T15:00:52.525685+00:00",
-  "project_scan_cursor": 10,
+  "last_news_refresh_utc": "2026-10-29T15:17:05.259528+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T15:17:57.355139+00:00",
+  "project_scan_cursor": 22,
   "research_status": {
-    "last_tvl_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
-    "last_activity_metrics_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
-    "last_run_utc": "2026-10-29T14:57:22.267474+00:00",
+    "last_tvl_refresh_utc": "2026-10-29T15:17:01.292287+00:00",
+    "last_activity_metrics_refresh_utc": "2026-10-29T15:17:01.292287+00:00",
+    "last_run_utc": "2026-10-29T15:17:01.292287+00:00",
     "queries_attempted": 2,
-    "new_articles": 1,
-    "failures": 0,
+    "new_articles": 0,
+    "failures": 1,
     "last_topics": [
-      "security",
-      "tokenomics"
+      "liquidity",
+      "regulation"
     ],
     "query_results": [
       {
-        "topic": "security",
+        "topic": "liquidity",
         "results": 0,
         "ok": true
       },
       {
-        "topic": "tokenomics",
-        "results": 1,
+        "topic": "regulation",
+        "results": 0,
         "ok": true
       }
     ],
-    "total_evidence": 11,
-    "latest_tvl_change_24h_pct": -1.174,
-    "activity_metrics_refreshed": false,
-    "activity_metrics_count": 0
+    "total_evidence": 13,
+    "latest_tvl_change_24h_pct": -0.986,
+    "activity_metrics_refreshed": true,
+    "activity_metrics_count": 2
   },
   "research_observations": [
     {
@@ -702,29 +715,67 @@
       "research_topic": "tokenomics",
       "research_query": "Solana token unlock vesting emissions inflation supply schedule",
       "observed_at": "2026-10-29T14:57:22.267474+00:00"
+    },
+    {
+      "id": "defillama-solana-dex-volume-498135",
+      "kind": "metric",
+      "metric": "Solana DEX volume",
+      "value_usd": 1733397982.06,
+      "change_24h_pct": 9.5,
+      "observed_at": "2026-10-29T15:17:01.292287+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/dexs/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
+    },
+    {
+      "id": "defillama-solana-fees-498135",
+      "kind": "metric",
+      "metric": "Solana fees",
+      "value_usd": 10347405.24,
+      "change_24h_pct": -7.89,
+      "observed_at": "2026-10-29T15:17:01.292287+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/fees/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
     }
   ],
   "seen_research_ids": [
     "defillama-solana-fees-498132",
-    "72a212867d341f762a9caebd",
-    "27a5c8aa52c8ad8b00475135",
     "4e6f63935b0dece899d71ca8",
-    "6da0f87d5326c4ed4ab9ff0f",
-    "defillama-solana-fees-498134",
+    "72a212867d341f762a9caebd",
+    "defillama-solana-fees-498135",
+    "27a5c8aa52c8ad8b00475135",
+    "defillama-solana-dex-volume-498134",
     "defillama-solana-tvl-1793232000",
+    "defillama-solana-fees-498134",
     "77fac538df29ffa61e07e9d1",
-    "defillama-solana-dex-volume-498132",
-    "f86123a7a1f53fc2863ccef2",
-    "defillama-solana-dex-volume-498134"
-  ],
-  "research_query_cursor": 6,
-  "seen_research_news_ids": [
-    "27a5c8aa52c8ad8b00475135",
-    "72a212867d341f762a9caebd",
-    "4e6f63935b0dece899d71ca8",
+    "defillama-solana-dex-volume-498135",
     "6da0f87d5326c4ed4ab9ff0f",
-    "77fac538df29ffa61e07e9d1",
+    "defillama-solana-dex-volume-498132",
     "f86123a7a1f53fc2863ccef2"
   ],
-  "research_priority_signature": ""
+  "research_query_cursor": 8,
+  "seen_research_news_ids": [
+    "4e6f63935b0dece899d71ca8",
+    "72a212867d341f762a9caebd",
+    "27a5c8aa52c8ad8b00475135",
+    "77fac538df29ffa61e07e9d1",
+    "6da0f87d5326c4ed4ab9ff0f",
+    "f86123a7a1f53fc2863ccef2"
+  ],
+  "research_priority_signature": "",
+  "paper_open_signals": [
+    {
+      "signal_id": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn:1793282400:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+      "name": "Jito Staked SOL",
+      "timestamp": 1793282400,
+      "entry": 132.68077275314667,
+      "stop": 129.6447625001099,
+      "target": 138.75279325922023
+    }
+  ]
 }
