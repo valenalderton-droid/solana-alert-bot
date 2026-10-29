@@ -194,14 +194,14 @@ def resolve_old_signals(state, store):
         state["stats"]["wins" if ret > 0 else "losses"] = state["stats"].get("wins" if ret > 0 else "losses", 0) + 1
 
         message = (
-            "SOLANA SELL / EXIT ALERT\\n\\n"
-            f"Project: {outcome['name']}\\n"
-            f"Exit reason: {exit_reason}\\n"
-            f"Entry reference: ${entry:.8g}\\n"
-            f"Exit reference: ${exit_price:.8g}\\n"
-            f"Observed return: {ret * 100:+.2f}% (before fees/slippage)\\n"
-            f"Mint: {address}\\n"
-            f"Time (UTC): {utc_now()}\\n\\n"
+            "SOLANA SELL / EXIT ALERT\n\n"
+            f"Project: {outcome['name']}\n"
+            f"Exit reason: {exit_reason}\n"
+            f"Entry reference: ${entry:.8g}\n"
+            f"Exit reference: ${exit_price:.8g}\n"
+            f"Observed return: {ret * 100:+.2f}% (before fees/slippage)\n"
+            f"Mint: {address}\n"
+            f"Time (UTC): {utc_now()}\n\n"
             "Research alert only; not an executed trade."
         )
         send_telegram(message)
@@ -317,11 +317,11 @@ def main():
         last_heartbeat = float(state.get("last_heartbeat_epoch", 0) or 0)
         if now - last_heartbeat >= 6 * 3600:
             message = (
-                "SOLANA BOT STATUS\\n"
-                f"Scan completed: {utc_now()}\\n"
-                f"Candidates discovered: {len(candidates)}\\n"
-                f"Eligible projects: {len(active_projects)}\\n"
-                f"Model not ready: {metrics.get('reason', 'unknown reason')}\\n"
+                "SOLANA BOT STATUS\n"
+                f"Scan completed: {utc_now()}\n"
+                f"Candidates discovered: {len(candidates)}\n"
+                f"Eligible projects: {len(active_projects)}\n"
+                f"Model not ready: {metrics.get('reason', 'unknown reason')}\n"
                 "No trade signal was generated. This is a status message, not a BUY alert."
             )
             if send_telegram(message):
