@@ -129,61 +129,84 @@ def get_closed_candles(raw_candles):
 
 
 def resolve_old_signals(state, store):
+    """Monitor open BUY alerts and send a SELL alert at stop, target, or 14-day expiry."""
     pending = state.get("open_signals", [])
     still_pending = []
-    known_outcomes = {
-        row.get("signal_id") for row in read_jsonl(OUTCOMES_FILE)
-    }
+    known_outcomes = {row.get("signal_id") for row in read_jsonl(OUTCOMES_FILE)}
 
     for signal in pending:
-        signal_id = signal["signal_id"]
-        if signal_id in known_outcomes:
+        signal_id = signal.get("signal_id")
+        if not signal_id or signal_id in known_outcomes:
             continue
+        address = signal.get("token_address")
+        candles = sorted(store.get(address, {}).values(), key=lambda c: c["timestamp"])
+        entry = float(signal.get("entry") or 0)
+        if entry <= 0:
+            continue
+        entry_ts = int(signal.get("timestamp") or 0)
+        stop = float(signal.get("stop") or entry * 0.95)
+        target = float(signal.get("target") or entry * 1.04)
+        after_entry = [c for c in candles if int(c["timestamp"]) > entry_ts]
+        exit_candle = None
+        exit_reason = None
 
-        address = signal["token_address"]
-        candles = sorted(
-            store.get(address, {}).values(),
-            key=lambda c: c["timestamp"]
-        )
-        exit_time = int(signal["timestamp"]) + 4 * 3600
+        for candle in after_entry:
+            hit_stop = float(candle["low"]) <= stop
+            hit_target = float(candle["high"]) >= target
+            # Conservative handling if both levels occur within one hourly candle.
+            if hit_stop and hit_target:
+                exit_candle, exit_reason = candle, "STOP (both levels touched; conservative)"
+                break
+            if hit_stop:
+                exit_candle, exit_reason = candle, "STOP"
+                break
+            if hit_target:
+                exit_candle, exit_reason = candle, "TARGET"
+                break
 
-        eligible = [
-            c for c in candles
-            if int(c["timestamp"]) >= exit_time
-        ]
-        if not eligible:
+        if exit_candle is None:
+            expiry = entry_ts + 14 * 24 * 3600
+            eligible = [c for c in after_entry if int(c["timestamp"]) >= expiry]
+            if eligible:
+                exit_candle, exit_reason = eligible[0], "TIME EXIT (14 days)"
+
+        if exit_candle is None:
             still_pending.append(signal)
             continue
 
-        exit_candle = eligible[0]
-        exit_price = float(exit_candle["close"])
-        entry_price = float(signal["entry"])
-        if entry_price <= 0:
-            continue
-
-        ret = exit_price / entry_price - 1
+        exit_price = stop if "STOP" in exit_reason else (target if exit_reason == "TARGET" else float(exit_candle["close"]))
+        ret = exit_price / entry - 1
         outcome = {
             "signal_id": signal_id,
             "token_address": address,
-            "name": signal["name"],
-            "entry": entry_price,
+            "name": signal.get("name", "Unknown"),
+            "entry": entry,
             "exit": exit_price,
             "return_pct": round(ret * 100, 4),
             "result": "win" if ret > 0 else "loss",
             "exit_timestamp": int(exit_candle["timestamp"]),
             "resolved_at": utc_now(),
-            "method": "close_after_4h_not_stop_target_simulation"
+            "method": exit_reason
         }
         append_jsonl(OUTCOMES_FILE, outcome)
-
+        state.setdefault("stats", {}).setdefault("resolved", 0)
         state["stats"]["resolved"] += 1
-        if ret > 0:
-            state["stats"]["wins"] += 1
-        else:
-            state["stats"]["losses"] += 1
+        state["stats"]["wins" if ret > 0 else "losses"] = state["stats"].get("wins" if ret > 0 else "losses", 0) + 1
+
+        message = (
+            "SOLANA SELL / EXIT ALERT\\n\\n"
+            f"Project: {outcome['name']}\\n"
+            f"Exit reason: {exit_reason}\\n"
+            f"Entry reference: ${entry:.8g}\\n"
+            f"Exit reference: ${exit_price:.8g}\\n"
+            f"Observed return: {ret * 100:+.2f}% (before fees/slippage)\\n"
+            f"Mint: {address}\\n"
+            f"Time (UTC): {utc_now()}\\n\\n"
+            "Research alert only; not an executed trade."
+        )
+        send_telegram(message)
 
     state["open_signals"] = still_pending
-
 
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
@@ -373,7 +396,9 @@ def main():
             "token_address": address,
             "name": prediction["name"],
             "timestamp": candle_ts,
-            "entry": entry
+            "entry": entry,
+            "stop": stop,
+            "target": target
         })
         state["last_alerts"][address] = candle_ts
         state["stats"]["signals"] += 1
