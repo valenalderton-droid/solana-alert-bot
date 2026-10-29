@@ -224,18 +224,29 @@ def poll_pay(state):
             print(f"Telegram getUpdates rejected: {payload}")
             return False
 
+        updates = payload.get("result", [])
+        if not isinstance(updates, list):
+            print("Telegram getUpdates returned an invalid result list.")
+            return False
+
         requested = False
         matched_chat_message = False
-        for update in payload.get("result", []):
+        text_update_count = 0
+        matching_chat_count = 0
+        for update in updates:
             state["telegram_update_offset"] = max(
                 int(state.get("telegram_update_offset", 0) or 0),
                 int(update.get("update_id", 0)),
             )
             message = update.get("message") or {}
             chat = message.get("chat") or {}
+            command = str(message.get("text", "")).strip()
+            if command:
+                text_update_count += 1
             if str(chat.get("id", "")) != chat_id:
                 continue
-            command = str(message.get("text", "")).strip()
+            if command:
+                matching_chat_count += 1
             if not command:
                 continue
             # The documented trigger is case-sensitive and must be exactly //Pay.
@@ -261,8 +272,28 @@ def poll_pay(state):
                         print(f"Telegram intelligent reply failed: {send_exc}")
 
         save_state(state)
+        print(
+            "Telegram poll diagnostics: "
+            f"updates_received={len(updates)}, "
+            f"text_updates={text_update_count}, "
+            f"configured_chat_text_updates={matching_chat_count}, "
+            f"saved_offset={state.get('telegram_update_offset', 0)}"
+        )
         if not matched_chat_message:
-            print("Telegram polling succeeded; no text message for the configured chat was found.")
+            if not updates:
+                print(
+                    "No pending Telegram updates were returned. If a message was just sent, "
+                    "check the next scheduled run; if this repeats, verify the bot token and "
+                    "that no other process is polling this bot."
+                )
+            elif text_update_count and not matching_chat_count:
+                print(
+                    "Telegram received text updates, but none matched TELEGRAM_CHAT_ID. "
+                    "Check that the secret is the destination chat ID (private chat ID or group chat ID), "
+                    "not the bot's ID."
+                )
+            else:
+                print("No usable text message for the configured chat was found.")
         elif requested:
             print("Telegram //Pay command received and acknowledged.")
         return requested
