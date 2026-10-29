@@ -681,7 +681,8 @@ def main():
         outcomes=read_jsonl(OUTCOMES_FILE),
         news_observations=state.get("news_observations", []),
         base_probability=MIN_PROBABILITY,
-        base_cooldown_hours=max(1, int(os.getenv("ALERT_COOLDOWN_HOURS", "6")))
+        base_cooldown_hours=max(1, int(os.getenv("ALERT_COOLDOWN_HOURS", "6"))),
+        research_observations=state.get("research_observations", [])
     )
     # Self-improvement can tune only an allowlisted probability floor after
     # chronological holdout validation; the user-configured floor and hard
