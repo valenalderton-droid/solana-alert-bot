@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T17:31:22.099666+00:00",
+  "last_run_utc": "2026-10-29T17:41:10.501871+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -670,9 +670,9 @@
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T17:30:11.393272+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T17:31:21.542976+00:00",
-  "project_scan_cursor": 12,
+  "last_news_refresh_utc": "2026-10-29T17:39:04.077406+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T17:41:10.092279+00:00",
+  "project_scan_cursor": 42,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
@@ -1121,6 +1121,16 @@
       "entry": 1.7120895422097195,
       "stop": 1.7013631500477886,
       "target": 1.7335423265335814
+    },
+    {
+      "signal_id": "npz2FhoufQ7pKqhGpaipYWacrAkidyW2yDpVWSvpump:1793289600:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "npz2FhoufQ7pKqhGpaipYWacrAkidyW2yDpVWSvpump",
+      "name": "Dessa",
+      "timestamp": 1793289600,
+      "entry": 0.007999612437854721,
+      "stop": 0.0006855667236217397,
+      "target": 0.022627703866320684
     }
   ]
 }
