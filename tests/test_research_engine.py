@@ -84,7 +84,7 @@ class ResearchEngineTests(unittest.TestCase):
         with patch("builtins.open", side_effect=fake_open):
             plan = build_research_plan(state, outcomes=[], configured_projects=[])
         self.assertEqual(plan[0][2], "liquidity")
-        self.assertEqual(state["research_query_cursor"], 2)
+        self.assertEqual(state["research_query_cursor"], 3)
         self.assertEqual(state["research_priority_signature"], "liquidity")
 
 
