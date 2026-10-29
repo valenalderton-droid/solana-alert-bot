@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "updated_at": "2026-10-29T10:42:07.678801+00:00",
+  "rules": [
+    {
+      "id": "validated_probability_floor",
+      "type": "min_probability",
+      "value": 0.6,
+      "enabled": true,
+      "status": "baseline",
+      "created_at": "2026-10-29T10:42:07.678731+00:00"
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-10-29T10:42:07.678731+00:00",
+      "action": "kept",
+      "rule_id": "validated_probability_floor",
+      "old_value": 0.6,
+      "new_value": 0.6,
+      "decision": {
+        "threshold": 0.6,
+        "changed": false,
+        "reason": "Need at least 20 joined resolved alerts; have 0",
+        "sample_size": 0
+      }
+    }
+  ],
+  "research_evidence": [
+    {
+      "title": "Solana Captures 37% Of Blockchain Revenue Share In October - TronWeekly",
+      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTFA5YUVpWm9LN0Z2M28xcE5HdXJOV0g3QkNkMWM5cXhKRi1ZZEVvcno4V3RNRFdmTi1NWVltYWltdTc4OWJUTVlZbzhWT2ZOSjJ0VkZqUHFsZVlsbGZkSE9IMUFGWEc1TU8zNXhzb0lyeGhhRGdkeFpJ?oc=5",
+      "published_at": "2026-10-28T21:00:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "SOL market"
+    },
+    {
+      "title": "Fed Holds Interest Rates at 3.75% - 4.00%: What it Means for Bitcoin and Crypto Markets - Altcoin Buzz",
+      "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNR29xMUxnMUtQSnZVNk5LVjYzYlBWamdidWhFRndqbkhIRjNDLTZfT1l0QVJScUljMW9hREVBMFgtbTVuYXN0WXlSM1JLQnJKWDhaVTA0R2dET1ZMM05KbzhmS0JNVjBqMmdsdzRhb1RLbGdZZjRfdmpjN1RPU0ZMYXVueUpqUnVjbldndA?oc=5",
+      "published_at": "2026-10-28T18:58:54+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Oil's War Premium Could Vanish Fast Once a Hormuz Deal Lands, Analysts Warn - BeInCrypto",
+      "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBFZ2VRak1zdjhnYjY4MmJ0Z0ZKSGRtMzM4NXJScU9sRjJRdk5uVFkxUEdiVTY5WDdwQzdSVXBvdkpGcUphQW94LXI4cUlTTkFxaHhldnF5Mmh6andmS1lsOC1GX21Gc2FvTngyaA?oc=5",
+      "published_at": "2026-10-29T00:40:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Geopolitics / global risk"
+    },
+    {
+      "title": "Bitcoin Price Tops USD 80K as ETF Flows Rise Before Fed Vote - Analytics Insight",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQTVpXVDdqODc5LTd4RWpPWTQ5LVV5QTlsR1p2eEJ6akFuelNaeXlNLW9tb1V6YmtOUG1NOEZ0ekFDeGk4aEJjTGtGWVlWMmFzeXFHS0ZvUkR3SWdiLVJjeG9qSXFSbkNvLXhXcUk4Y1hrWlNlN0JsYkpJVzltZGRGX1dSaUU1M0ZLaGZXWFN3dUxHa3ZLU255dDhsMTFXVmPSAawBQVVfeXFMTnB5eVVkSGtTbnpmSkFRd2FmZXZrcVpZcjVISmhWa1E3cjJLbkQwXzhVblpueFZSV3N1bXpWUE5JT0tSZ2hRZG1udFY4NUp4YVBLNmVrcEFkQWRUZ1FXVFd6cFlGYWtpZVlHSnlhbHFzejVvNWtidTJ6a0RuZ1QtZm5nazJ6aHVDRGdBMExLNUVSMlpJclJEQ2xxOGpZNE1wVy1pb2xUQ1c0MUNWeQ?oc=5",
+      "published_at": "2026-10-28T14:45:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Solana (SOL) Climbs 3% Amid Fed Decision Anticipation - NameCoinNews",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1OVkxzZzlDQ0d3UEdzTTRLYWZXTmF2WjdDUHlLemN4c053MUI0bXpKa2pfaXZzQ29xVUd0MWN6aE5tTEI1ZXRqaUlCVFNEc05kdFFDQWRHcV9KNzFreDQ5Z1dFS3hWSHdlZ01aanZkMm1hcE1Nc0xKUUFuRjRGQQ?oc=5",
+      "published_at": "2026-10-28T13:30:30+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "SOL market"
+    },
+    {
+      "title": "Bitcoin price dips below $80K after Fed holds i... - Pluang",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxQS1BfNjFPLVNzZW53QURkbDZYTGluMUZNbWFzTHBCVElUQ2NoalgxWl9LejdNQXZwSEZwN0R5cVR0UlBKTjU1NXNnOTRjUVZXdVFoRXIzR1huYUI5cERpSVVNU0FOUVZ4a2ZkdkE2UWJDNFRQTmdjVHR3Q0gzUWZBMmdwYnUxdzhvdzl6dTBMN1BYMUdTd3ZMdk8zRVVJQQ?oc=5",
+      "published_at": "2026-10-29T09:04:25+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Crypto News Today: BTC, ETH, XRP Slide After Fed Decision Keeps Rates Unchanged - Brave New Coin",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPb3EwZmIyZkx2czJWNmZIYVJmNjJMNHFQNXZCbmVBTmF2X0lnZGJTbUg2dVFZSDJqYlFtaUtCUkpvVUhGZEstOENRa3BiYVB1TWxPVUQyOVUtNmF4NURPVUZmM0hTRlJQaG15WjE5eHNEa0NoS0FCUE9KMi1sYkh6eEtDa0lyRHpoTHp5Njk3SmF3UkdzVjNaQWJhc1hrOElDR1FqUkJtZ2U3RFQ5d3hV?oc=5",
+      "published_at": "2026-10-29T05:51:04+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Why Is BTC Falling as Crypto Derivatives Face Fresh Pressure? - Kalkine Media",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNMVl0RlRRM0RJSmxvQTZpZ2JHbzVEeWJvSE1kVm5XckNjQk53bzA4VF9YLXJOeVBOMjJJSFVFc2xuM1V1bDRoNWtMOGJfZGJKREtMS1hUVVFyeFZCMUJpS3J5U0hUbDBDRXlKNi1pM1FKM256azB1U0ZldVNBQjZreGxKMEc4bmtWT1laSmMxTVRoWDRfY0xJQTBHYWJxV3ZiWmpaeDR6ZWk?oc=5",
+      "published_at": "2026-10-29T04:40:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Stock Market LIVE Updates, Sensex Today: Markets Likely To Open In Green Amid Mixed Global Cues - شبكة تواصل الإخبارية",
+      "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE5hZ2VrSE5QSTVzdjRDXzRkQm1RQzY5WmxrdmNoaDRmeXREUkZ0RWFQajNOWjh1OVBDRmNad3RZYXo1LUVKMUxPT2ZrajNsdUd2b2x3?oc=5",
+      "published_at": "2026-10-29T03:03:56+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Bitcoin (BTCUSD) Volatility Intensified on Oct 29: What You Should Know - TradingKey",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQbm5idUJtdjVEVUdFVUJTZC1JWkZHVWJlV0RScWtBcVZkNUdUTUJ1el8ybC0wRE5PMElhMk02SHRVdFNuRlVObkpnX0hSYXRPRl9Kd01Idk5lbHRNNGtCYk9aRWU1Y2FNdnBLYS1tYWREdmlnWnNyQkphYmF6dHBaX0RiNEVMc3lPV1Jzb3B3?oc=5",
+      "published_at": "2026-10-29T01:50:14+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Why Positive News for Ripple May Not Lift XRP When Broader Market Conditions are Weak - Analytics Insight",
+      "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxNTXNEU3R3X1dwakVneGl4ZWRCaEtraXlCalhNUElUc2Nab25CWFlHYlZMQmtfN25MSnpreWhYcTFJQlpBa0tlLXZ2NEF4VHg0NmtoY3dkdnpQUUFEYzJ4WkJtclFOYXdSblFQdTdlYWdaQ0pHY0kxaGloUDBBcjU1d19SWlR2RE9hQnN0bmR3b3dhN0xYbDNIbno3ZGFBUUcweDBZaGlUcVJqUDhlSUhmRTFVZklyazdjZDNzSlFHRUVwNjJaUUR4Njdwc0x4QnJ2Y29FRnBocHMzUjBiX0RmQ2s5N1dUUdIB8wFBVV95cUxObXRmOEtYVEV1eTh2dlVTWFdEem5VM0VSQTFjbDlPZTc0ZERSUThnMnZvV09aVGItVUU2UjdZQ2NhME0tRUFMRGVUNURzalg3dUpIV0lIS0FOZ2p6ckFKNm15eW9qbFpLVTVQZUJ",
+      "published_at": "2026-10-28T13:15:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "UNKNOWN",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Polymarket Makes a Remarkable Move for Bitcoin (BTC), Ethereum (ETH), Solana (SOL), and XRP! Time Limit Reduced to 5 Minutes! - Bitcoin Sistemi",
+      "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQRXlyZ09WcG5LZTNMbUs0ZTB5eFM1SHEwZVItVHdkd1lFRThNSmtyUXZZSlhEVXdnQkNMcnFxbS1QOUVBb2RTZW52S1hhbVpUai15MnBFM19MWTdyT1hsVFJ6NENjLW00VFZsUkFmVkoxdmwyamdiZXJzR0tTXzdNWjVTNjd4TnRIdndsSERkYlZsTkRNSUpCMllyYi1qS1NqYTlBcFpmZkFSNXpWNkw5bFlWQ2V6RFJZSVQ3Y0xUY1ZYa3VyWlN1RHJNTQ?oc=5",
+      "published_at": "2026-10-28T13:16:10+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market"
+    }
+  ],
+  "guardrails": [
+    "paper-only validation",
+    "source code and secrets are immutable to the agent",
+    "Solana-only and approved non-meme checks cannot be disabled",
+    "hard liquidity, stale-data, stop and risk-off protections cannot be removed",
+    "no rule changes without chronological holdout evidence"
+  ],
+  "last_evaluated_at": "2026-10-29T10:42:07.678731+00:00",
+  "last_outcome_signature": "0:"
+}
