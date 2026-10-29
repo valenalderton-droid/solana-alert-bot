@@ -269,6 +269,7 @@ def main():
         "not_approved_or_missing_address": 0,
         "no_eligible_pair": 0,
         "insufficient_candles": 0,
+        "stale_market_data": 0,
         "market_errors": 0,
         "usable_projects": 0,
         "price_action_rejected": 0,
@@ -302,6 +303,17 @@ def main():
             if len(candles) < 35:
                 scan_diagnostics["insufficient_candles"] += 1
                 print(f"Not enough candles: {project.get('name')}")
+                continue
+
+            latest_candle_ts = int(candles[-1]["timestamp"])
+            current_hour_ts = int(datetime.now(timezone.utc).timestamp() // 3600) * 3600
+            candle_age_hours = (current_hour_ts - latest_candle_ts) / 3600
+            if candle_age_hours > 3:
+                scan_diagnostics["stale_market_data"] += 1
+                print(
+                    f"Stale hourly data for {project.get('name')}: "
+                    f"latest candle is {candle_age_hours:.1f} hours old"
+                )
                 continue
 
             address_store = store.setdefault(address, {})
