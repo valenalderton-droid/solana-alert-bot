@@ -1674,7 +1674,7 @@ def main():
               "SOLANA TOP-RANKED BUY WATCH — NOT AN AUTOMATIC TRADE\n\n"
               f"Nine-core majority vote: {core_result.get('winner_votes', 0)}/9\n"
               f"Candidate rank: {candidate_alerts.index(chosen) + 1} of {len(candidate_alerts)} qualified candidates\n"
-              + format_core_result(core_result) + "\n"
+              f"{format_core_result(core_result)}\n"
               f"Project: {prediction['name']} ({prediction['symbol']})\n"
               f"Entry reference: ${entry:.8g}\n"
               f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\n"
