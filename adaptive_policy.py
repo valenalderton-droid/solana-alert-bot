@@ -78,6 +78,9 @@ def derive_policy(outcomes, news_observations, base_probability=0.60,
 
     recent_cutoff = now - timedelta(hours=24)
     recent_direct_bearish = 0
+    recent_global_bearish = 0
+    recent_global_bullish = 0
+    global_categories = ("Macro / global markets", "Geopolitics / global risk")
     for row in news_observations:
         if not isinstance(row, dict):
             continue
@@ -85,8 +88,15 @@ def derive_policy(outcomes, news_observations, base_probability=0.60,
         if observed is None or observed < recent_cutoff or observed > now + timedelta(minutes=10):
             continue
         relevance = str(row.get("relevance", ""))
-        if row.get("sentiment") == "BEARISH" and relevance.startswith("DIRECT"):
+        category = str(row.get("feed_category", ""))
+        sentiment = str(row.get("sentiment", ""))
+        if sentiment == "BEARISH" and relevance.startswith("DIRECT"):
             recent_direct_bearish += 1
+        if category in global_categories:
+            if sentiment == "BEARISH":
+                recent_global_bearish += 1
+            elif sentiment == "BULLISH":
+                recent_global_bullish += 1
 
     if recent_direct_bearish >= 2:
         probability = min(0.75, probability + 0.03)
@@ -95,11 +105,23 @@ def derive_policy(outcomes, news_observations, base_probability=0.60,
     else:
         notes.append(f"{recent_direct_bearish} direct bearish Solana news observations in 24h")
 
+    if recent_global_bearish >= 2 and recent_global_bearish > recent_global_bullish:
+        probability = min(0.75, probability + 0.04)
+        cooldown = min(12, cooldown + 1)
+        notes.append("global macro/geopolitical news skew is bearish: temporary caution")
+    else:
+        notes.append(
+            f"global news in 24h: {recent_global_bearish} bearish, "
+            f"{recent_global_bullish} bullish"
+        )
+
     return {
         "min_probability": round(min(0.75, max(0.55, probability)), 3),
         "cooldown_hours": int(min(12, max(3, cooldown))),
         "resolved_outcomes_used": len(resolved),
         "direct_bearish_news_24h": recent_direct_bearish,
+        "global_bearish_news_24h": recent_global_bearish,
+        "global_bullish_news_24h": recent_global_bullish,
         "notes": notes,
         "guardrails": "non-meme allowlist and Solana-only market checks are fixed"
     }
