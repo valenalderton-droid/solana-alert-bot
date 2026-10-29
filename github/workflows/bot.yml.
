@@ -1,0 +1,56 @@
+
+name: Solana Project Trader
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7,37 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: solana-project-trader
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MIN_LIQUIDITY_USD: "100000"
+          MIN_PROBABILITY: "0.60"
+          MAX_STOP_PCT: "0.05"
+          TARGET_PCT: "0.04"
+        run: python main.py
+
+      - name: Save persistent history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/state.json data/candles.jsonl data/predictions.jsonl data/outcomes.jsonl
+          if git diff --cached --quiet; then
+            echo "No history changes to commit."
+          else
+            git commit -m "Update bot history"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
