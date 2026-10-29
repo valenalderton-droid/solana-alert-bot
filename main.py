@@ -186,6 +186,8 @@ def build_comprehensive_analysis(candles, price, ensemble=None, quality=None,
         lines.append("امتیاز استراتژی‌ها (از ۱۰۰، نه احتمال برد): " + " | ".join(
             f"{key}={num(value, 0):.0f}" for key, value in strategies.items()
         ))
+    if ensemble.get("market_regime"):
+        lines.append(f"رژیم بازار: {ensemble.get('market_regime')}؛ اجماع جهت‌دار: {num(ensemble.get('consensus_strength'), 0) * 100:.0f}%؛ اختلاف استراتژی‌ها: {num(ensemble.get('strategy_dispersion'), 0):.1f}")
     lines.append(
         f"اجماع استراتژی: {num(ensemble.get('score'), 0):.1f}/100؛ "
         f"استراتژی‌های صعودی: {ensemble.get('bullish_strategies', 'ناموجود')}؛ "
