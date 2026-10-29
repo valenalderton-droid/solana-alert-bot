@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 import command_runner
@@ -160,6 +161,75 @@ class CommandRunnerTests(unittest.TestCase):
             "SOLANA NEWS IMPACT — RESEARCH, NOT A TRADE SIGNAL",
         ):
             self.assertFalse(command_runner.is_trade_alert(message), message)
+
+    def test_ordinary_text_does_not_trigger_a_reply(self):
+        response = Mock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {
+            "ok": True,
+            "result": [
+                {"update_id": 40, "message": {"chat": {"id": 123}, "text": "hello"}},
+            ],
+        }
+        with patch.dict("os.environ", {
+            "TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "123"
+        }), patch.object(command_runner.requests, "get", return_value=response), \\
+             patch.object(command_runner.requests, "post") as post, \\
+             patch.object(command_runner, "save_state"):
+            self.assertFalse(command_runner.poll_pay({}))
+            post.assert_not_called()
+
+    def test_recent_cached_candles_are_exit_only_fallback(self):
+        now = datetime(2026, 10, 29, 12, 30, tzinfo=timezone.utc)
+        current_hour = int(now.timestamp() // 3600) * 3600
+        candles = []
+        for i in range(40):
+            price = 10.0 + i * 0.1
+            candles.append({
+                "timestamp": current_hour - (40 - i) * 3600,
+                "open": price,
+                "high": price * 1.01,
+                "low": price * 0.99,
+                "close": price,
+                "volume": 1000.0,
+            })
+        store = {"mint-open": {row["timestamp"]: row for row in candles}}
+        info = scanner.recent_cached_position_market_info("mint-open", store, now=now)
+        self.assertIsNotNone(info)
+        self.assertTrue(info["data_is_cached"])
+        self.assertIsNone(info["pair"])
+        self.assertEqual(info["liquidity"], 0.0)
+        self.assertLessEqual(info["candle_age_hours"], 3.0)
+
+    def test_stale_cached_candles_are_rejected_for_exit_fallback(self):
+        now = datetime(2026, 10, 29, 12, 30, tzinfo=timezone.utc)
+        current_hour = int(now.timestamp() // 3600) * 3600
+        candles = []
+        for i in range(40):
+            price = 10.0 + i * 0.1
+            candles.append({
+                "timestamp": current_hour - 5 * 3600 - (39 - i) * 3600,
+                "open": price,
+                "high": price * 1.01,
+                "low": price * 0.99,
+                "close": price,
+                "volume": 1000.0,
+            })
+        store = {"mint-open": {row["timestamp"]: row for row in candles}}
+        self.assertIsNone(
+            scanner.recent_cached_position_market_info("mint-open", store, now=now)
+        )
+
+    def test_sender_is_restored_when_scan_raises(self):
+        original_sender = scanner.send_telegram
+        with patch.object(command_runner, "read_state", return_value={"open_positions": []}), \\
+             patch.object(command_runner, "poll_pay", return_value=True), \\
+             patch.object(command_runner, "refresh_news_if_due"), \\
+             patch.object(command_runner, "run_self_improvement_if_due"), \\
+             patch.object(scanner, "main", side_effect=RuntimeError("test failure")):
+            with self.assertRaises(RuntimeError):
+                command_runner.main()
+        self.assertIs(scanner.send_telegram, original_sender)
 
 
 if __name__ == "__main__":
