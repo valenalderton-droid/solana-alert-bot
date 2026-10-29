@@ -324,7 +324,7 @@ def build_experience_rules(diagnostics, minimum_samples=12,
                 or negative_rate < maximum_negative_rate):
             continue
         rules.append({
-            "id": rule_id, "enabled": True, "status": "experience_validated",
+            "id": rule_id, "enabled": True, "status": "experience_derived",
             "field": definition["field"], "operator": definition["operator"],
             "value": definition["value"], "reason": definition["reason"],
             "evidence": {"samples": n, "mean_net_return_pct": round(mean_return, 4),
@@ -393,7 +393,9 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
                 "reason": "Self-improvement cooldown: no new resolved outcomes; re-evaluate within six hours",
                 "sample_size": len(_joined_resolved(predictions, outcomes))
             },
-            "registry_path": "data/self_improvement.json"
+            "registry_path": "data/self_improvement.json",
+            "experience_rules": registry.get("experience_rules", []),
+            "experience_rule_count": len(registry.get("experience_rules", []))
         }
 
     decision = choose_probability_threshold(predictions, outcomes, current_threshold)
@@ -477,5 +479,7 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
         "changed": active.get("value") != before or not active.get("enabled", True),
         "rule_status": active.get("status"),
         "decision": decision,
-        "registry_path": "data/self_improvement.json"
+        "registry_path": "data/self_improvement.json",
+        "experience_rules": registry.get("experience_rules", []),
+        "experience_rule_count": len(registry.get("experience_rules", []))
     }
