@@ -1,5 +1,5 @@
 import unittest
-from nine_core_engine import CORE_SPECS, evaluate_nine_cores, score_for_core
+from nine_core_engine import CORE_SPECS, evaluate_nine_cores, score_for_core, evolve_core_population
 
 
 def candidate(address, name, trend=90, breakout=90, momentum=90, volume=90, structure=90,
@@ -60,6 +60,42 @@ class NineCoreTests(unittest.TestCase):
         cores["trend"]["portfolio"]["cash_usd"] -= 123
         self.assertNotEqual(cores["trend"]["portfolio"]["cash_usd"],
                             cores["breakout"]["portfolio"]["cash_usd"])
+
+    def test_successful_core_spawns_mutated_offspring_for_persistently_weak_core(self):
+        from copy import deepcopy
+        parent_trades = [{"pnl_usd": 25.0} for _ in range(10)]
+        weak_trades = [{"pnl_usd": -15.0} for _ in range(14)]
+        system = {"cores": {
+            "trend": {"portfolio": {"closed_trades": parent_trades, "cash_usd": 9000},
+                      "genome": {"profile_id": "trend", "threshold": 58, "risk_multiplier": 1.0,
+                                 "generation": 0, "parent_id": None, "generation_start_closed_count": 0,
+                                 "last_evaluated_closed_count": 10, "bad_streak": 0, "status": "founder"}},
+            "breakout": {"portfolio": {"closed_trades": weak_trades, "cash_usd": 8500},
+                         "genome": {"profile_id": "breakout", "threshold": 58, "risk_multiplier": 1.0,
+                                    "generation": 0, "parent_id": None, "generation_start_closed_count": 0,
+                                    "last_evaluated_closed_count": 13, "bad_streak": 1, "status": "founder"}}
+        }}
+        old_ledger = deepcopy(system["cores"]["breakout"]["portfolio"])
+        evolution = evolve_core_population(system)
+        child = system["cores"]["breakout"]["genome"]
+        self.assertEqual(len(evolution["replacements"]), 1)
+        self.assertEqual(child["status"], "offspring")
+        self.assertEqual(child["parent_id"], "trend")
+        self.assertEqual(child["generation"], 1)
+        self.assertNotEqual(child["profile_id"], "trend")
+        self.assertEqual(system["cores"]["breakout"]["portfolio"], old_ledger)
+        self.assertEqual(evolution["active_offspring"], 1)
+
+    def test_evolution_does_not_remove_core_before_minimum_sample(self):
+        system = {"cores": {
+            "trend": {"portfolio": {"closed_trades": [{"pnl_usd": -10.0} for _ in range(5)]},
+                      "genome": {"profile_id": "trend", "threshold": 58, "risk_multiplier": 1.0,
+                                 "generation": 0, "parent_id": None, "generation_start_closed_count": 0,
+                                 "last_evaluated_closed_count": 4, "bad_streak": 1, "status": "founder"}}
+        }}
+        evolution = evolve_core_population(system)
+        self.assertEqual(evolution["replacements"], [])
+        self.assertEqual(system["cores"]["trend"]["genome"]["status"], "founder")
 
 
 if __name__ == "__main__":
