@@ -265,15 +265,17 @@ DISCOVERY_CACHE_FILE = Path(__file__).resolve().parent / "data" / "discovery_cac
 
 def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
                              min_age_days=30, max_projects=500):
-    """Build a broad, cached Solana utility-token universe from many category searches.
+    """Discover a broad Solana token universe using parallel query and trending-source search.
 
-    The API cannot enumerate literally every Solana project. This gathers a much
-    broader candidate set, rotates through it in main.py, and fails closed when
-    metadata or market-quality evidence is missing.
+    DexScreener search is relevance-based, not an exhaustive token registry.
+    Candidate discovery is intentionally broad; explicit meme filtering and
+    downstream price/liquidity/signal validation remain separate safeguards.
     """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     found = {}
     filters = {
-        "discovery_version": 3,
+        "discovery_version": 4,
         "min_liquidity": float(min_liquidity),
         "min_volume_24h": float(min_volume_24h),
         "min_age_days": int(min_age_days),
@@ -295,88 +297,200 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
     except (OSError, ValueError, TypeError, AttributeError):
         cached_projects = []
 
-    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     counts = {
-        "queries": 0, "pairs_seen": 0, "wrong_chain": 0,
-        "meme_rejected": 0, "metadata_rejected": 0,
-        "liquidity_volume_age_rejected": 0, "eligible": 0,
+        "queries": 0, "pairs_seen": 0, "wrong_chain": 0, "meme_rejected": 0,
+        "invalid_candidates": 0, "eligible": 0, "search_errors": 0,
+        "profile_seed_addresses": 0, "boost_seed_addresses": 0,
+        "unique_mints": 0, "query_sources": 0
     }
-
-    # Search known protocol symbols plus broad categories. A bounded request count
-    # reduces API hammering while finding projects outside the old fixed allowlist.
     queries = [("symbol", symbol) for symbol in DISCOVERY_SYMBOL_QUERIES]
     queries.extend(("category", query) for query in DISCOVERY_QUERIES)
-    for query_type, query in queries:
-        counts["queries"] += 1
+    # Synonyms and sub-sector terms improve recall beyond a small set of broad phrases.
+    queries.extend(("category", query) for query in (
+        "Solana DeFi TVL protocol token",
+        "Solana lending protocol token",
+        "Solana borrow money market",
+        "Solana DEX AMM liquidity",
+        "Solana perpetuals trading protocol",
+        "Solana options derivatives protocol",
+        "Solana liquid staking token LST",
+        "Solana staking validator infrastructure",
+        "Solana oracle data feeds",
+        "Solana bridge interoperability",
+        "Solana stablecoin payments",
+        "Solana real world asset tokenization",
+        "Solana treasury yield token",
+        "Solana DePIN wireless mapping compute",
+        "Solana AI agent infrastructure token",
+        "Solana developer tooling RPC indexing",
+        "Solana storage bandwidth infrastructure",
+        "Solana privacy cryptography security",
+        "Solana gaming metaverse utility token",
+        "Solana NFT infrastructure marketplace",
+        "Solana governance DAO protocol",
+        "Solana restaking security",
+        "Solana MEV validator staking",
+        "Solana tokenized equities funds",
+        "Solana insurance risk management protocol",
+        "Solana cross-chain messaging",
+        "Solana launchpad infrastructure",
+        "Solana portfolio analytics protocol",
+        "Solana payments card fintech",
+        "Solana data availability compute"
+    ))
+    counts["queries"] = len(queries)
+
+    def search_query(task):
+        query_type, query = task
+        try:
+            payload = get_json("https://api.dexscreener.com/latest/dex/search", params={"q": query})
+            return query_type, query, payload.get("pairs") or [], None
+        except Exception as exc:
+            return query_type, query, [], str(exc)
+
+    # Execute independent searches concurrently while keeping a bounded request rate.
+    max_workers = max(2, min(8, int(os.getenv("DISCOVERY_SEARCH_WORKERS", "6"))))
+    results = []
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = [pool.submit(search_query, task) for task in queries]
+        for future in as_completed(futures):
+            results.append(future.result())
+
+    # Newly promoted/updated token profiles and boosts act only as extra discovery
+    # seeds; promotion is not treated as quality, legitimacy, or a BUY signal.
+    seed_addresses = {"profile": set(), "boost": set()}
+    seed_urls = (
+        ("profile", "https://api.dexscreener.com/token-profiles/latest/v1"),
+        ("boost", "https://api.dexscreener.com/token-boosts/latest/v1"),
+    )
+    def fetch_seed(kind, url):
+        try:
+            response = SESSION.get(url, timeout=(4, 10))
+            response.raise_for_status()
+            payload = response.json()
+            rows = payload if isinstance(payload, list) else payload.get("data", []) if isinstance(payload, dict) else []
+            addresses = []
+            for row in rows:
+                if not isinstance(row, dict) or str(row.get("chainId", "")).lower() != "solana":
+                    continue
+                address = str(row.get("tokenAddress") or "").strip()
+                if address:
+                    addresses.append(address)
+            return kind, addresses, None
+        except Exception as exc:
+            return kind, [], str(exc)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        seed_results = list(pool.map(lambda args: fetch_seed(*args), seed_urls))
+    for kind, addresses, error in seed_results:
+        seed_addresses[kind].update(addresses)
+        counts[f"{kind}_seed_addresses"] = len(set(addresses))
+        if error:
+            counts["search_errors"] += 1
+            print(f"Discovery seed feed failed ({kind}): {error}")
+
+    # Look up seed mints in small bounded batches to avoid unbounded API traffic.
+    seed_list = list(dict.fromkeys(
+        list(seed_addresses["profile"])[:25] + list(seed_addresses["boost"])[:25]
+    ))
+    def lookup_mints(batch):
         try:
             payload = get_json(
-                "https://api.dexscreener.com/latest/dex/search",
-                params={"q": query}
+                "https://api.dexscreener.com/latest/dex/tokens/" + ",".join(batch)
             )
-            for pair in payload.get("pairs") or []:
-                counts["pairs_seen"] += 1
-                if pair.get("chainId") != "solana":
-                    counts["wrong_chain"] += 1
-                    continue
-                token = pair.get("baseToken") or {}
-                address = str(token.get("address") or "").strip()
-                name = str(token.get("name") or "").strip()
-                symbol = str(token.get("symbol") or "").strip().upper()
-                if not address or not name or not symbol:
-                    continue
-                if query_type == "symbol" and symbol != query:
-                    continue
-                if _is_meme_like(name, symbol):
-                    counts["meme_rejected"] += 1
-                    continue
+            return payload.get("pairs") or [], None
+        except Exception as exc:
+            return [], str(exc)
+    seed_results_pairs = []
+    batches = [seed_list[i:i + 25] for i in range(0, len(seed_list), 25)]
+    if batches:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            for pairs, error in pool.map(lookup_mints, batches):
+                seed_results_pairs.extend(pairs)
+                if error:
+                    counts["search_errors"] += 1
+                    print(f"Discovery seed token lookup failed: {error}")
+        results.append(("seed", "latest_profiles_and_boosts", seed_results_pairs, None))
 
+    now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+    for query_type, query, pairs, error in results:
+        counts["query_sources"] += 1
+        if error:
+            counts["search_errors"] += 1
+            print(f"Discovery query failed ({query}): {error}")
+            continue
+        for pair in pairs:
+            counts["pairs_seen"] += 1
+            if not isinstance(pair, dict) or pair.get("chainId") != "solana":
+                counts["wrong_chain"] += 1
+                continue
+            token = pair.get("baseToken") or {}
+            address = str(token.get("address") or "").strip()
+            name = str(token.get("name") or "").strip()
+            symbol = str(token.get("symbol") or "").strip().upper()
+            if not address or not name or not symbol:
+                counts["invalid_candidates"] += 1
+                continue
+            if query_type == "symbol" and symbol != query:
+                continue
+            if _is_meme_like(name, symbol):
+                counts["meme_rejected"] += 1
+                continue
+            try:
                 liquidity = float((pair.get("liquidity") or {}).get("usd") or 0)
                 volume = float((pair.get("volume") or {}).get("h24") or 0)
                 price = float(pair.get("priceUsd") or 0)
-                created = pair.get("pairCreatedAt")
-                if (price <= 0):
-                    counts["liquidity_volume_age_rejected"] += 1
-                    continue
+            except (TypeError, ValueError, OverflowError):
+                counts["invalid_candidates"] += 1
+                continue
+            if not all(math.isfinite(x) for x in (liquidity, volume, price)) or price <= 0 or liquidity < 0 or volume < 0:
+                counts["invalid_candidates"] += 1
+                continue
 
-                has_website, has_social = _has_project_metadata(pair)
-                curated = symbol in ECOSYSTEM_SYMBOLS
-                # New symbols are admitted only when category-discovered and an
-                # official website is present. Social-only tokens are too easy to fake.
-                # No curated-symbol or website gate: the only project-universe
-                # exclusion is the explicit meme-coin classifier above. Actual
-                # market-data and signal safeguards are enforced downstream.
-
-                score = liquidity + volume
-                project = {
-                    "name": name,
-                    "symbol": symbol,
-                    "token_address": address,
-                    "approved_non_meme": True,
-                    "discovery_source": (
-                        "curated_symbol_search" if curated
-                        else "dexscreener_category_search"
-                    ),
-                    "discovery_category": query if query_type == "category" else "known_ecosystem_symbol",
-                    "discovery_confidence": 1.0 if curated else 0.8,
-                    "has_project_website": bool(has_website),
-                    "has_project_social": bool(has_social),
-                    "liquidity_usd_at_discovery": liquidity,
-                    "volume_24h_usd_at_discovery": volume,
-                }
-                previous = found.get(address)
-                if previous and previous["_score"] >= score:
-                    continue
-                project["_score"] = score
-                found[address] = project
-        except Exception as exc:
-            print(f"Discovery query failed ({query}): {exc}")
+            has_website, has_social = _has_project_metadata(pair)
+            created = pair.get("pairCreatedAt")
+            try:
+                pair_age_days = max(0.0, (now_ms - int(created)) / 86400000) if created else None
+            except (TypeError, ValueError, OverflowError):
+                pair_age_days = None
+            # Logarithmic score avoids a single huge pool dominating discovery order.
+            score = (
+                0.45 * math.log1p(liquidity)
+                + 0.45 * math.log1p(volume)
+                + (0.7 if has_website else 0.0)
+                + (0.25 if has_social else 0.0)
+                + (0.15 if pair_age_days is not None and pair_age_days >= 30 else 0.0)
+                + (0.1 if query_type == "seed" else 0.0)
+            )
+            project = {
+                "name": name, "symbol": symbol, "token_address": address,
+                "chain": "solana", "approved_non_meme": True,
+                "discovery_source": (
+                    "dexscreener_profile_or_boost" if query_type == "seed"
+                    else "curated_symbol_search" if query_type == "symbol"
+                    else "dexscreener_search"
+                ),
+                "discovery_category": query if query_type != "symbol" else "known_ecosystem_symbol",
+                "discovery_confidence": 1.0 if query_type == "symbol" else 0.8,
+                "has_project_website": bool(has_website),
+                "has_project_social": bool(has_social),
+                "liquidity_usd_at_discovery": liquidity,
+                "volume_24h_usd_at_discovery": volume,
+                "pair_age_days_at_discovery": round(pair_age_days, 2) if pair_age_days is not None else None,
+            }
+            previous = found.get(address)
+            if previous and previous["_score"] >= score:
+                continue
+            project["_score"] = score
+            found[address] = project
 
     projects = sorted(found.values(), key=lambda item: item["_score"], reverse=True)
     for project in projects:
         project.pop("_score", None)
     counts["eligible"] = len(projects)
-    print("Discovery diagnostics: " + str(counts))
-    print(f"Automatic discovery found {len(projects)} eligible Solana utility/protocol candidates.")
+    counts["unique_mints"] = len(projects)
+    print("Discovery diagnostics: " + json.dumps(counts, ensure_ascii=False))
+    print(f"Expanded discovery found {len(projects)} unique Solana non-meme candidates.")
     if projects:
         try:
             DISCOVERY_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
