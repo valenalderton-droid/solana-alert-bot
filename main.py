@@ -342,13 +342,13 @@ def main():
         win_rate = (wins / resolved * 100) if resolved else 0.0
         avg_return = (sum(returns) / len(returns)) if returns else 0.0
         digest = (
-            "SOLANA BOT — 24H PERFORMANCE LOG\\n\\n"
-            f"BUY-watch alerts recorded: {state['stats'].get('signals', 0)}\\n"
-            f"Resolved alerts: {resolved} (wins: {wins}, losses: {losses})\\n"
-            f"Historical win rate: {win_rate:.1f}%\\n"
-            f"Average recorded return: {avg_return:.2f}%\\n"
-            f"Projects with usable market data this run: {len(active_projects)}\\n"
-            f"Time (UTC): {utc_now()}\\n\\n"
+            "SOLANA BOT — 24H PERFORMANCE LOG\n\n"
+            f"BUY-watch alerts recorded: {state['stats'].get('signals', 0)}\n"
+            f"Resolved alerts: {resolved} (wins: {wins}, losses: {losses})\n"
+            f"Historical win rate: {win_rate:.1f}%\n"
+            f"Average recorded return: {avg_return:.2f}%\n"
+            f"Projects with usable market data this run: {len(active_projects)}\n"
+            f"Time (UTC): {utc_now()}\n\n"
             "Paper-tracking statistics only; not a guarantee of future performance."
         )
         if send_telegram(digest):
