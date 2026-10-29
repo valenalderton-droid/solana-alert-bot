@@ -7,9 +7,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_score, brier_score_loss
 
 FEATURES = [
-    "ret1", "ret3", "ret6", "ret12",
-    "ema_gap", "rsi", "atr_pct",
-    "volume_ratio", "body_pct", "range_pct"
+    "ret1", "ret3", "ret6", "ret12", "ret24",
+    "ema_gap", "ema_gap34", "rsi", "atr_pct",
+    "volatility_ratio", "volume_ratio", "volume_trend",
+    "body_pct", "range_pct", "close_location", "breakout_distance"
 ]
 
 
@@ -22,12 +23,14 @@ def add_features(candles):
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
     close = df["close"]
-    for n in [1, 3, 6, 12]:
+    for n in [1, 3, 6, 12, 24]:
         df[f"ret{n}"] = close.pct_change(n)
 
     ema9 = close.ewm(span=9, adjust=False).mean()
     ema21 = close.ewm(span=21, adjust=False).mean()
+    ema34 = close.ewm(span=34, adjust=False).mean()
     df["ema_gap"] = (ema9 / ema21) - 1
+    df["ema_gap34"] = (ema9 / ema34) - 1
 
     delta = close.diff()
     gain = delta.clip(lower=0).rolling(14).mean()
@@ -43,10 +46,20 @@ def add_features(candles):
     ], axis=1).max(axis=1)
 
     df["atr_pct"] = tr.rolling(14).mean() / close
+    atr_baseline = df["atr_pct"].rolling(48, min_periods=24).median()
+    df["volatility_ratio"] = df["atr_pct"] / atr_baseline.replace(0, np.nan)
+
     vol_avg = df["volume"].rolling(20).mean()
     df["volume_ratio"] = df["volume"] / vol_avg.replace(0, np.nan)
+    prior_vol_avg = df["volume"].shift(5).rolling(20).mean()
+    df["volume_trend"] = vol_avg / prior_vol_avg.replace(0, np.nan) - 1
+
     df["body_pct"] = (df["close"] - df["open"]) / close
     df["range_pct"] = (df["high"] - df["low"]) / close
+    candle_range = (df["high"] - df["low"]).replace(0, np.nan)
+    df["close_location"] = (df["close"] - df["low"]) / candle_range
+    prior_high = df["high"].shift(1).rolling(20).max()
+    df["breakout_distance"] = close / prior_high - 1
 
     return df.replace([np.inf, -np.inf], np.nan)
 
@@ -175,8 +188,9 @@ def train_model(candle_sets):
     model = Pipeline([
         ("scale", StandardScaler()),
         ("logistic", LogisticRegression(
-            class_weight="balanced",
-            max_iter=1000,
+            class_weight=None,
+            C=0.5,
+            max_iter=1500,
             random_state=42
         ))
     ])
