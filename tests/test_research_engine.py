@@ -28,8 +28,8 @@ class ResearchEngineTests(unittest.TestCase):
         projects = [{"name": "Jupiter", "symbol": "JUP", "approved_non_meme": True}]
         first = build_research_plan(state, [], projects)
         second = build_research_plan(state, [], projects)
-        self.assertEqual(len(first), 2)
-        self.assertEqual(len(second), 2)
+        self.assertEqual(len(first), 3)
+        self.assertEqual(len(second), 3)
         self.assertTrue(all(row[1] for row in first + second))
         self.assertIn("Jupiter", first[0][1])
         self.assertIn("Jupiter", second[0][1])
