@@ -412,16 +412,14 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
     # longer meets the evidence criteria is automatically retired.
     registry["experience_rules"] = build_experience_rules(registry["learning_diagnostics"])
     file_actions = sync_experience_rule_files(registry["experience_rules"], now=now)
-    audit = registry.setdefault("file_editor_audit", [])
-    audit.append({
-        "at": now.isoformat(),
-        "created": list(file_actions.get("created", [])),
-        "edited": list(file_actions.get("edited", [])),
-        "deleted": list(file_actions.get("deleted", [])),
-        "unchanged": list(file_actions.get("unchanged", [])),
-        "rejected": list(file_actions.get("rejected", [])),
-    })
-    registry["file_editor_audit"] = audit[-100:]
+    audit_actions = {
+        key: list(file_actions.get(key, []))
+        for key in ("created", "edited", "deleted", "rejected")
+    }
+    if any(audit_actions.values()):
+        audit = registry.setdefault("file_editor_audit", [])
+        audit.append({"at": now.isoformat(), **audit_actions})
+        registry["file_editor_audit"] = audit[-100:]
     rules = registry.setdefault("rules", [])
     active = next((rule for rule in rules
                    if rule.get("id") == "validated_probability_floor"), None)
@@ -438,6 +436,8 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
         current_value = float(current_threshold)
         if active and active.get("enabled", True):
             current_value = max(current_value, float(active.get("value", current_value)))
+        if any(audit_actions.values()):
+            _save_registry(registry)
         return {
             "min_probability": round(current_value, 3),
             "changed": False,
