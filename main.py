@@ -627,25 +627,29 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
                 if float(c.get("low") or 0) > 0
             ]
             stop = min(recent_lows) if recent_lows else 0.0
-            if price > 0 and 0 < stop < price:
-                risk_pct = (price - stop) / price * 100
-                # Always report the nearest plausible resistance as a chart
-                # reference. Separately state whether it meets the 2:1 setup rule.
+            if price > 0:
+                has_valid_stop = 0 < stop < price
+                risk_pct = (price - stop) / price * 100 if has_valid_stop else 0.0
+                # Always show the valid current quote even if stop/target cannot be found.
                 target = find_resistance_target(candles, price, 0.0)
                 target_reward_pct = ((target / price) - 1.0) * 100 if target else 0.0
                 reward_risk = target_reward_pct / risk_pct if target and risk_pct > 0 else 0.0
-                exit_lines = (
-                    f"قیمت مرجع فعلی: ${price:.8g}\n"
-                    f"حد خروج/ابطال زیر کف ۲۰ کندل اخیر: ${stop:.8g} ({risk_pct:.2f}% پایین‌تر)\n"
-                    + (
-                        f"هدف مرجع تکنیکال: ${target:.8g} ({target_reward_pct:.2f}% بالاتر؛ نسبت سود به ریسک تقریبی {reward_risk:.2f}:1)\n"
-                        if target is not None else
-                        "هدف مرجع: مقاومت قابل‌تشخیص در داده‌های فعلی پیدا نشد؛ قیمت مرجع همچنان معتبر است.\n"
-                    )
+                stop_line = (
+                    f"حد خروج/ابطال زیر کف ۲۰ کندل اخیر: ${stop:.8g} ({risk_pct:.2f}% پایین‌تر)\\n"
+                    if has_valid_stop else
+                    "حد خروج/ابطال: تعیین نشد؛ کف معتبر زیر قیمت فعلی در داده‌ها مشخص نیست.\\n"
                 )
+                target_line = (
+                    f"هدف مرجع تکنیکال: ${target:.8g} ({target_reward_pct:.2f}% بالاتر"
+                    + (f"؛ نسبت سود به ریسک تقریبی {reward_risk:.2f}:1" if risk_pct > 0 else "")
+                    + ")\\n"
+                    if target is not None else
+                    "هدف مرجع: مقاومت قابل‌تشخیص در داده‌های فعلی پیدا نشد؛ قیمت مرجع همچنان معتبر است.\\n"
+                )
+                exit_lines = f"قیمت مرجع فعلی: ${price:.8g}\\n" + stop_line + target_line
                 exit_warning = (
-                    "این گزارش پروژهٔ برتر سیگنال خرید نیست. هدف فقط در صورت وجود مقاومت مشخص و "
-                    "فاصله کافی نسبت به حد ضرر اعلام می‌شود؛ قیمت اجرا تضمین نمی‌شود.\n"
+                    "این گزارش پروژهٔ برتر سیگنال خرید نیست؛ قیمت مرجع، قیمت نمایش‌داده‌شده توسط استخر است "
+                    "و قیمت اجرای معامله را تضمین نمی‌کند.\\n"
                 )
             else:
                 deviation = info.get("price_deviation_pct")
@@ -655,11 +659,10 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
                     else ""
                 )
                 exit_lines = (
-                    "قیمت مرجع فعلی و حد خروج/هدف اعلام نمی‌شوند، چون قیمت لحظه‌ای "
-                    "با آخرین کندل بسته‌شده سازگار نیست یا داده کافی نیست.\n"
-                    + deviation_note + "\n"
+                    "قیمت مرجع فعلی در پاسخ API معتبر نیست؛ دادهٔ بازار ناکافی یا نامعتبر است."
+                    + deviation_note + "\\n"
                 )
-                exit_warning = "تا دریافت قیمت معتبر و سازگار، ورود نکن.\n"
+                exit_warning = "تا دریافت قیمت مرجع معتبر، ورود نکن.\\n"
             message = (
                 "SOLANA TOP-RANKED PROJECT — NOT A BUY SIGNAL\n\n"
                 "بهترین پروژه قابل رتبه‌بندی این نوبت (نه الزاماً برنده آینده): "
