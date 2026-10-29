@@ -875,6 +875,31 @@ def main():
               )
               continue
 
+          # Demand agreement across independently trained horizons. A strong
+          # ensemble average can otherwise hide a sharply bearish short horizon.
+          horizon_values = {
+              str(key): float(value)
+              for key, value in horizon_probabilities.items()
+              if isinstance(value, (int, float)) and math.isfinite(float(value))
+          }
+          short_horizon = horizon_values.get("4h")
+          if short_horizon is not None and short_horizon < 0.50:
+              scan_diagnostics["below_probability_threshold"] += 1
+              print(
+                  f"Horizon disagreement rejection {project.get('name')}: "
+                  f"4h score={short_horizon:.3f} is below neutral"
+              )
+              continue
+          if len(horizon_values) >= 3:
+              horizon_consensus = sum(value >= 0.50 for value in horizon_values.values()) / len(horizon_values)
+              if horizon_consensus < 0.60:
+                  scan_diagnostics["below_probability_threshold"] += 1
+                  print(
+                      f"Horizon consensus rejection {project.get('name')}: "
+                      f"{horizon_consensus:.0%} horizons are neutral/bullish"
+                  )
+                  continue
+
           signal_close = float(row["close"])
           atr_pct = float(row["atr_pct"])
           if not math.isfinite(atr_pct) or atr_pct <= 0:
@@ -895,7 +920,9 @@ def main():
               continue
 
           stop_pct = min(MAX_STOP_PCT, max(0.02, 1.5 * atr_pct))
-          target_pct = max(TARGET_PCT, 3 * atr_pct)
+          # Preserve a minimum 2:1 gross reward/risk before fees and slippage.
+          # If the volatility-based target is farther away, keep that distance.
+          target_pct = max(TARGET_PCT, 3 * atr_pct, 2.0 * stop_pct)
 
           # Require a stop distance no greater than the configured cap.
           if stop_pct > MAX_STOP_PCT:
