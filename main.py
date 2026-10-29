@@ -73,6 +73,37 @@ def append_jsonl(path, row):
         file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
+def translate_telegram(message):
+    """Translate fixed English Telegram labels and status text into Persian."""
+    replacements = {
+        "SOLANA BOT — LAST 24H PERFORMANCE": "گزارش عملکرد ربات سولانا — ۲۴ ساعت گذشته",
+        "BUY-watch alerts recorded in last 24h:": "تعداد هشدارهای بررسی خرید در ۲۴ ساعت گذشته:",
+        "Target/stop outcomes in last 24h:": "نتایج بررسی حد سود/ضرر در ۲۴ ساعت گذشته:",
+        "wins:": "موفق:", "losses:": "ناموفق:", "timeouts:": "پایان زمان:", "data gaps:": "کمبود داده:",
+        "Target-hit rate among target/stop outcomes:": "درصد رسیدن به حد سود:",
+        "Average return of alerts resolved in last 24h:": "میانگین بازده نتایج بررسی‌شده در ۲۴ ساعت گذشته:",
+        "Projects with usable market data this run:": "تعداد پروژه‌های دارای داده معتبر در این اجرا:",
+        "Projects with usable market data:": "پروژه‌های دارای داده معتبر:",
+        "Time (UTC):": "زمان (UTC):",
+        "Win rate uses target/stop outcomes only; average return includes numeric resolved outcomes. Data gaps are excluded from average return. ": "درصد موفقیت فقط بر اساس برخورد به حد سود یا ضرر است؛ میانگین بازده شامل نتایج عددی است و کمبود داده محاسبه نمی‌شود. ",
+        "This is not a guarantee of future performance.": "عملکرد گذشته تضمین‌کننده نتیجه آینده نیست.",
+        "SOLANA BOT STATUS — RUNNING": "وضعیت ربات سولانا — فعال است",
+        "The bot ran successfully, but the model is not ready yet, so no BUY alert was generated.": "ربات با موفقیت اجرا شد، اما مدل هنوز آماده نیست؛ بنابراین هشدار خریدی صادر نشد.",
+        "Model details:": "جزئیات مدل:",
+        "This is a status message, not a trading signal.": "این پیام فقط گزارش وضعیت است و سیگنال معاملاتی نیست.",
+        "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE": "هشدار بررسی خرید سولانا — خرید خودکار انجام نمی‌شود",
+        "Project:": "پروژه:", "Entry reference:": "قیمت مرجع ورود:",
+        "Stop reference:": "حد ضرر مرجع:", "Target reference:": "حد سود مرجع:",
+        "Model probability:": "احتمال پیش‌بینی مدل:", "Liquidity:": "نقدینگی:",
+        "24h volume:": "حجم معاملات ۲۴ ساعته:", "Evaluation:": "ارزیابی مدل:",
+        "Mint:": "آدرس توکن:",
+        "This is a research alert, not financial advice. ": "این هشدار صرفاً برای بررسی است و توصیه مالی نیست. ",
+        "Slippage, fees and execution can change results.": "لغزش قیمت، کارمزد و نحوه اجرا می‌توانند نتیجه را تغییر دهند.",
+    }
+    for english, persian in replacements.items():
+        message = message.replace(english, persian)
+    return message
+
 def send_telegram(message):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
@@ -87,7 +118,7 @@ def send_telegram(message):
             url,
             json={
                 "chat_id": chat_id,
-                "text": message,
+                "text": translate_telegram(message),
                 "disable_web_page_preview": True
             },
             timeout=20
