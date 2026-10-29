@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T14:42:07.842491+00:00",
+  "last_run_utc": "2026-10-29T14:59:10.461744+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -50,7 +50,8 @@
     "4e3500f937ca847efa3b4032",
     "5d3a48e1dd64273a795ddbb2",
     "bde8d79a7a48a9d1160c0f5d",
-    "7b30382e5f6ad2c9b2941c05"
+    "7b30382e5f6ad2c9b2941c05",
+    "df88323fd10d22bda867d4b4"
   ],
   "news_observations": [
     {
@@ -510,40 +511,65 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Solana Price Prediction: SOL Eyes $111 as Its Network Stays Busy, Analysts Tip Pepeto for 100x - openPR.com",
       "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNUUt1MlFMSm9reGp3dWw0azlKa29RWnltd0d2ZlFDSjd4eG1fWUNUVDZ0N2trTXlWOXdjVGtmVDhzNU9zUFJwaFYyQnA2TDZITW9uVk00SFFDVzBJYXZmUndyaVdkQ2Nlbms2bXpSNDVYeV9Oay1lZVBkVnZiSnZPeFJQSWpCZ2dBRGpYRGdXLVZDT2tIbHdQZmhmUTlDOEk?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T14:57:22.266913+00:00",
+      "published_at": "2026-10-29T14:01:09+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Why Bitcoin, ETH and XRP are falling despite the Fed rate pause - Altcoin Buzz",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQb0FnbkQwVTh1dU9CN2hwckRZWGJHUVUtYS1QOGZEZ29GVWpjMTgzV2h1elBNZGx6UDBXWTlBYVVubXREaG93d2E0alBIdjI0Ri1lVVBFTDV5X3FfdHNmX2djLWJDdElPZFBCTkJqSFQxdzVsYWVaZnlENHBuTHR0eGJBX0ROU1E?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T14:57:22.267474+00:00",
+      "published_at": "2026-10-26T07:00:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Next Crypto to Hit $1 in 2026: 7 Realistic Picks + Reclaim Candidates - 99Bitcoins",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1ZQ2c0OHBCVGdVTGdlWlBWWklpc2pNdW4xV1FCSzY0eW1hUktzS0JpWUpNRXQ0VVB1d1kyOEthRmJFNzFXY2NiVTJmcmZSOWloUFJhRFFEZjNmRXZfalNtN1VqRmNtTXVDaE9PZVVFemlZSjQ1?oc=5",
+      "research_topic": "tokenomics"
     }
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T14:40:20.719311+00:00",
+  "last_news_refresh_utc": "2026-10-29T14:57:24.108680+00:00",
   "last_watchlist_ping_utc": "2026-10-29T14:17:58.097815+00:00",
-  "project_scan_cursor": 13,
+  "project_scan_cursor": 25,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
-    "last_run_utc": "2026-10-29T14:06:21.297493+00:00",
+    "last_run_utc": "2026-10-29T14:57:22.267474+00:00",
     "queries_attempted": 2,
     "new_articles": 1,
-    "failures": 1,
+    "failures": 0,
     "last_topics": [
-      "adoption",
-      "adoption"
+      "security",
+      "tokenomics"
     ],
     "query_results": [
       {
-        "topic": "adoption",
+        "topic": "security",
         "results": 0,
         "ok": true
       },
       {
-        "topic": "adoption",
+        "topic": "tokenomics",
         "results": 1,
         "ok": true
       }
     ],
-    "total_evidence": 10,
+    "total_evidence": 11,
     "latest_tvl_change_24h_pct": -1.174,
-    "activity_metrics_refreshed": true,
-    "activity_metrics_count": 2
+    "activity_metrics_refreshed": false,
+    "activity_metrics_count": 0
   },
   "research_observations": [
     {
@@ -664,27 +690,41 @@
       "url": "https://api.llama.fi/overview/fees/Solana",
       "data_quality": "valid",
       "note": "Ecosystem activity context; not a standalone price prediction."
+    },
+    {
+      "id": "4e6f63935b0dece899d71ca8",
+      "title": "Next Crypto to Hit $1 in 2026: 7 Realistic Picks + Reclaim Candidates - 99Bitcoins",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1ZQ2c0OHBCVGdVTGdlWlBWWklpc2pNdW4xV1FCSzY0eW1hUktzS0JpWUpNRXQ0VVB1d1kyOEthRmJFNzFXY2NiVTJmcmZSOWloUFJhRFFEZjNmRXZfalNtN1VqRmNtTXVDaE9PZVVFemlZSjQ1?oc=5",
+      "published_at": "2026-10-26T07:00:00+00:00",
+      "source": "99Bitcoins",
+      "description": "Next Crypto to Hit $1 in 2026: 7 Realistic Picks + Reclaim Candidates &nbsp;&nbsp; 99Bitcoins",
+      "feed_category": "Solana ecosystem",
+      "research_topic": "tokenomics",
+      "research_query": "Solana token unlock vesting emissions inflation supply schedule",
+      "observed_at": "2026-10-29T14:57:22.267474+00:00"
     }
   ],
   "seen_research_ids": [
-    "defillama-solana-dex-volume-498132",
-    "6da0f87d5326c4ed4ab9ff0f",
     "defillama-solana-fees-498132",
     "72a212867d341f762a9caebd",
-    "defillama-solana-dex-volume-498134",
-    "defillama-solana-tvl-1793232000",
-    "defillama-solana-fees-498134",
-    "f86123a7a1f53fc2863ccef2",
     "27a5c8aa52c8ad8b00475135",
-    "77fac538df29ffa61e07e9d1"
-  ],
-  "research_query_cursor": 4,
-  "seen_research_news_ids": [
+    "4e6f63935b0dece899d71ca8",
     "6da0f87d5326c4ed4ab9ff0f",
-    "72a212867d341f762a9caebd",
+    "defillama-solana-fees-498134",
+    "defillama-solana-tvl-1793232000",
+    "77fac538df29ffa61e07e9d1",
+    "defillama-solana-dex-volume-498132",
     "f86123a7a1f53fc2863ccef2",
+    "defillama-solana-dex-volume-498134"
+  ],
+  "research_query_cursor": 6,
+  "seen_research_news_ids": [
     "27a5c8aa52c8ad8b00475135",
-    "77fac538df29ffa61e07e9d1"
+    "72a212867d341f762a9caebd",
+    "4e6f63935b0dece899d71ca8",
+    "6da0f87d5326c4ed4ab9ff0f",
+    "77fac538df29ffa61e07e9d1",
+    "f86123a7a1f53fc2863ccef2"
   ],
   "research_priority_signature": ""
 }
