@@ -104,6 +104,9 @@ class CommandRunnerTests(unittest.TestCase):
             "SOLANA TOP WATCHLIST — NO VALID BUY SETUP",
             "SOLANA WATCHLIST STATUS — MARKET DATA UNAVAILABLE",
             "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED",
+            "SOLANA TOP-RANKED PROJECT — NOT A BUY SIGNAL",
+            "SOLANA TOP-RANKED PROJECT — DATA UNAVAILABLE",
+            "SOLANA SCAN STATUS — NO PROJECT CAN BE RANKED",
         ):
             with patch.object(command_runner, "read_state", return_value={"open_positions": []}), \
                  patch.object(command_runner, "refresh_news_if_due"), \
