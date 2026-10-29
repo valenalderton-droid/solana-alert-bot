@@ -219,9 +219,12 @@ def walk_forward_validation(data, folds=3):
         fold_model.fit(train[FEATURES], train["y"], logistic__sample_weight=weights)
         probs = fold_model.predict_proba(valid[FEATURES])[:, 1]
         preds = (probs >= 0.5).astype(int)
+        train_rate = float(train["y"].mean())
+        baseline_probs = np.full(len(valid), train_rate, dtype=float)
         results.append({
             "balanced_accuracy": float(balanced_accuracy_score(valid["y"], preds)),
             "brier_score": float(brier_score_loss(valid["y"], probs)),
+            "baseline_brier_score": float(brier_score_loss(valid["y"], baseline_probs)),
             "precision": float(precision_score(valid["y"], preds, zero_division=0)),
             "rows": int(len(valid)),
             "start_timestamp": start_time,
@@ -238,11 +241,13 @@ def walk_forward_validation(data, folds=3):
         "folds": len(results),
         "mean_balanced_accuracy": round(float(np.mean([r["balanced_accuracy"] for r in results])), 4),
         "mean_brier_score": round(float(np.mean([r["brier_score"] for r in results])), 4),
+        "mean_baseline_brier_score": round(float(np.mean([r["baseline_brier_score"] for r in results])), 4),
         "mean_precision": round(float(np.mean([r["precision"] for r in results])), 4),
         "fold_details": [
             {**r,
              "balanced_accuracy": round(r["balanced_accuracy"], 4),
              "brier_score": round(r["brier_score"], 4),
+             "baseline_brier_score": round(r["baseline_brier_score"], 4),
              "precision": round(r["precision"], 4)}
             for r in results
         ],
@@ -318,6 +323,13 @@ def _train_single_horizon(candle_sets, horizon=4):
     )
     probabilities = model.predict_proba(test[FEATURES])[:, 1]
     predictions = (probabilities >= 0.5).astype(int)
+    baseline_probabilities = np.full(len(test), float(train["y"].mean()), dtype=float)
+    baseline_brier = float(brier_score_loss(test["y"], baseline_probabilities))
+    model_brier = float(brier_score_loss(test["y"], probabilities))
+    brier_skill = (
+        1.0 - model_brier / baseline_brier
+        if baseline_brier > 1e-12 else 0.0
+    )
 
     metrics = {
         "ready": True,
@@ -329,10 +341,10 @@ def _train_single_horizon(candle_sets, horizon=4):
         "precision": round(float(
             precision_score(test["y"], predictions, zero_division=0)
         ), 4),
-        "brier_score": round(float(
-            brier_score_loss(test["y"], probabilities)
-        ), 4),
-        "evaluation_method": "chronological holdout; training labels purged across test boundary",
+        "brier_score": round(model_brier, 4),
+        "baseline_brier_score": round(baseline_brier, 4),
+        "brier_skill_vs_base_rate": round(float(brier_skill), 4),
+        "evaluation_method": "chronological holdout; training labels purged across test boundary; compared with train-rate baseline",
         "train_positive_rate": round(float(train["y"].mean()), 4),
         "test_positive_rate": round(float(test["y"].mean()), 4),
         "predicted_positive_rate": round(float(np.mean(predictions)), 4),
@@ -347,17 +359,23 @@ def _train_single_horizon(candle_sets, horizon=4):
     wf_folds = int(wf.get("folds", 0) or 0)
     wf_balanced_accuracy = wf.get("mean_balanced_accuracy")
     wf_brier = wf.get("mean_brier_score")
-    holdout_direction_poor = metrics["balanced_accuracy"] < 0.50
-    holdout_brier_poor = metrics["brier_score"] >= 0.25
+    wf_baseline_brier = wf.get("mean_baseline_brier_score")
+    holdout_direction_poor = metrics["balanced_accuracy"] <= 0.51
+    holdout_probability_poor = (
+        metrics["brier_skill_vs_base_rate"] <= 0.01
+    )
     walk_forward_direction_poor = (
-        wf_folds == 0 or wf_balanced_accuracy is None or wf_balanced_accuracy < 0.50
+        wf_folds == 0 or wf_balanced_accuracy is None or wf_balanced_accuracy <= 0.51
     )
-    walk_forward_brier_poor = (
-        wf_folds == 0 or wf_brier is None or wf_brier >= 0.25
+    walk_forward_probability_poor = (
+        wf_folds == 0 or wf_brier is None or wf_baseline_brier is None
+        or wf_brier >= wf_baseline_brier * 0.99
     )
+    # Reject weak models if both independent chronological checks fail either
+    # directional skill or probability skill against a naive base-rate forecast.
     if (
-        holdout_direction_poor and walk_forward_direction_poor and
-        holdout_brier_poor and walk_forward_brier_poor
+        (holdout_direction_poor or holdout_probability_poor) and
+        (walk_forward_direction_poor or walk_forward_probability_poor)
     ):
         metrics["ready"] = False
         metrics["reason"] = (
