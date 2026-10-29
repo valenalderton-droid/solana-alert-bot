@@ -12,6 +12,7 @@ from market import (
     discover_solana_projects, is_allowed_non_meme_project
 )
 from adaptive_policy import derive_policy
+from self_improver import update_self_improvement
 from learner import train_model, latest_features, price_action_ok
 from news_analyzer import fetch_recent_news, analyze_news, format_news_alert
 
@@ -598,6 +599,26 @@ def main():
         base_probability=MIN_PROBABILITY,
         base_cooldown_hours=max(1, int(os.getenv("ALERT_COOLDOWN_HOURS", "6")))
     )
+    # Self-improvement can tune only an allowlisted probability floor after
+    # chronological holdout validation; the user-configured floor and hard
+    # safety gates remain authoritative.
+    try:
+        self_improvement = update_self_improvement(
+            predictions=read_jsonl(PREDICTIONS_FILE),
+            outcomes=read_jsonl(OUTCOMES_FILE),
+            news_observations=state.get("news_observations", []),
+            current_threshold=MIN_PROBABILITY
+        )
+        policy["min_probability"] = max(
+            float(policy["min_probability"]),
+            float(self_improvement["min_probability"])
+        )
+        policy["self_improvement"] = self_improvement
+        print("Self-improvement:", json.dumps(self_improvement, ensure_ascii=False))
+    except Exception as exc:
+        # The bot must fall back to its existing conservative policy if learning fails.
+        print(f"Self-improvement unavailable; using existing policy: {exc}")
+
     print("Adaptive policy:", json.dumps(policy, ensure_ascii=False))
 
     global_context = fetch_global_market_context()
