@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from market import get_best_solana_pair, get_hourly_candles, utc_now
+from market import get_best_solana_pair, get_hourly_candles, discover_solana_candidates, utc_now
 from learner import train_model, latest_features, price_action_ok
 
 ROOT = Path(__file__).resolve().parent
@@ -189,6 +189,14 @@ def main():
     DATA.mkdir(parents=True, exist_ok=True)
 
     config = read_json(PROJECTS_FILE, {"projects": []})
+    # Auto-discover candidate tokens; configured projects are also considered.
+    candidates = list(config.get("projects", []))
+    seen_addresses = {str(p.get("token_address", "")).strip() for p in candidates}
+    for candidate in discover_solana_candidates(limit=int(os.getenv("MAX_DISCOVERY_CANDIDATES", "25"))):
+        if candidate["token_address"] not in seen_addresses:
+            candidates.append(candidate)
+            seen_addresses.add(candidate["token_address"])
+    print(f"Candidate tokens: {len(candidates)} (manual + discovered)")
     state = read_json(STATE_FILE, {
         "last_alerts": {},
         "open_signals": [],
@@ -211,8 +219,9 @@ def main():
     active_projects = []
     market_info = {}
 
-    for project in config.get("projects", []):
-        if not project.get("approved_non_meme", False):
+    for project in candidates:
+        # Manually configured entries must explicitly opt in; discovery entries are filtered in market.py.
+        if project.get("discovered_from") is None and not project.get("approved_non_meme", False):
             continue
 
         address = str(project.get("token_address", "")).strip()
@@ -225,6 +234,9 @@ def main():
                 print(f"No eligible liquid Solana pair: {project.get('name')}")
                 continue
 
+            base_token = pair.get("baseToken") or {}
+            project["name"] = project.get("name") or base_token.get("name") or "Unknown"
+            project["symbol"] = project.get("symbol") or base_token.get("symbol") or ""
             pool_address = pair.get("pairAddress")
             raw = get_hourly_candles(pool_address)
             candles = get_closed_candles(raw)
@@ -277,6 +289,20 @@ def main():
 
     if model is None:
         print("Model is not ready; no BUY alerts will be generated.")
+        # A throttled heartbeat distinguishes a healthy scan from a silent failure.
+        now = datetime.now(timezone.utc).timestamp()
+        last_heartbeat = float(state.get("last_heartbeat_epoch", 0) or 0)
+        if now - last_heartbeat >= 6 * 3600:
+            message = (
+                "SOLANA BOT STATUS\\n"
+                f"Scan completed: {utc_now()}\\n"
+                f"Candidates discovered: {len(candidates)}\\n"
+                f"Eligible projects: {len(active_projects)}\\n"
+                f"Model not ready: {metrics.get('reason', 'unknown reason')}\\n"
+                "No trade signal was generated. This is a status message, not a BUY alert."
+            )
+            if send_telegram(message):
+                state["last_heartbeat_epoch"] = now
         state["last_run_utc"] = utc_now()
         write_json_atomic(STATE_FILE, state)
         return
