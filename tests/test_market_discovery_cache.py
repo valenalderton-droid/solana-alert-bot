@@ -9,7 +9,7 @@ import market
 
 
 class DiscoveryCacheTests(unittest.TestCase):
-    def test_fresh_cache_avoids_repeating_all_symbol_searches(self):
+    def test_fresh_cache_avoids_repeating_discovery_searches(self):
         project = {
             "name": "Jupiter",
             "symbol": "JUP",
@@ -20,7 +20,7 @@ class DiscoveryCacheTests(unittest.TestCase):
             "min_liquidity": 100000.0,
             "min_volume_24h": 50000.0,
             "min_age_days": 30,
-            "max_projects": 20,
+            "max_projects": 500,
         }
         with tempfile.TemporaryDirectory() as directory:
             cache_path = Path(directory) / "discovery_cache.json"
