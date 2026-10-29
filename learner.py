@@ -82,7 +82,9 @@ def build_training_rows(candle_sets):
             # hourly bars or a timeout must not be silently labelled as a loss.
             signal_ts = int(df.iloc[i]["timestamp"])
             future = df.iloc[i + 1:i + 5]
-            if len(future) != 4 or label_end - signal_ts > 4 * 3600:
+            expected_times = [signal_ts + hour * 3600 for hour in range(1, 5)]
+            future_times = [int(value) for value in future["timestamp"].tolist()]
+            if len(future) != 4 or future_times != expected_times:
                 continue
 
             for j in range(i + 1, i + 5):
