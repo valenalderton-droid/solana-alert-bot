@@ -368,7 +368,7 @@ def sync_experience_rule_files(rules, now=None):
             "evidence": rule.get("evidence", {}),
             "updated_at": rule.get("updated_at") or now.isoformat()
         }
-        serialized = json.dumps(payload, ensure_ascii=False, indent=2) + "\\n"
+        serialized = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
         previous = None
         try:
             previous = path.read_text(encoding="utf-8")
@@ -452,7 +452,8 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
             },
             "registry_path": "data/self_improvement.json",
             "experience_rules": registry.get("experience_rules", []),
-            "experience_rule_count": len(registry.get("experience_rules", []))
+            "experience_rule_count": len(registry.get("experience_rules", [])),
+            "rule_file_actions": file_actions
         }
 
     decision = choose_probability_threshold(predictions, outcomes, current_threshold)
@@ -538,5 +539,6 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
         "decision": decision,
         "registry_path": "data/self_improvement.json",
         "experience_rules": registry.get("experience_rules", []),
-        "experience_rule_count": len(registry.get("experience_rules", []))
+        "experience_rule_count": len(registry.get("experience_rules", [])),
+        "rule_file_actions": file_actions
     }
