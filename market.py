@@ -238,24 +238,26 @@ def _has_project_metadata(pair):
 
 
 def is_allowed_non_meme_project(project):
-    """Allow curated protocol assets or evidence-backed category discoveries.
+    """Universe gate: accept Solana project candidates except meme coins.
 
-    This is a risk-reduction heuristic, not proof that a token is legitimate.
+    Discovery metadata, a curated symbol list, and an official website are not
+    prerequisites. Market-data integrity, liquidity, price-action, and signal
+    quality checks remain separate downstream safeguards.
     """
-    if not isinstance(project, dict) or not project.get("approved_non_meme", False):
+    if not isinstance(project, dict):
         return False
     symbol = str(project.get("symbol") or "").strip().upper()
     name = str(project.get("name") or "").strip()
     address = str(project.get("token_address") or "").strip()
-    if not symbol or not address or _is_meme_like(name, symbol):
+    if not symbol or not address:
         return False
-    curated = symbol in ECOSYSTEM_SYMBOLS
-    discovered = (
-        project.get("discovery_source") == "dexscreener_category_search"
-        and project.get("discovery_confidence", 0) >= 0.8
-        and project.get("has_project_website", False)
-    )
-    return curated or discovered
+    if _is_meme_like(name, symbol):
+        return False
+    # If an explicit chain is supplied, never let a non-Solana asset through.
+    chain = str(project.get("chain") or project.get("chainId") or "").strip().lower()
+    if chain and chain not in ("solana", "sol"):
+        return False
+    return True
 
 
 DISCOVERY_CACHE_FILE = Path(__file__).resolve().parent / "data" / "discovery_cache.json"
@@ -271,7 +273,7 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
     """
     found = {}
     filters = {
-        "discovery_version": 2,
+        "discovery_version": 3,
         "min_liquidity": float(min_liquidity),
         "min_volume_24h": float(min_volume_24h),
         "min_age_days": int(min_age_days),
@@ -332,9 +334,7 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
                 volume = float((pair.get("volume") or {}).get("h24") or 0)
                 price = float(pair.get("priceUsd") or 0)
                 created = pair.get("pairCreatedAt")
-                if (liquidity < min_liquidity or volume < min_volume_24h or
-                        price <= 0 or not created or
-                        now_ms - int(created) < min_age_days * 86400000):
+                if (price <= 0):
                     counts["liquidity_volume_age_rejected"] += 1
                     continue
 
@@ -342,9 +342,9 @@ def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
                 curated = symbol in ECOSYSTEM_SYMBOLS
                 # New symbols are admitted only when category-discovered and an
                 # official website is present. Social-only tokens are too easy to fake.
-                if not curated and (query_type != "category" or not has_website):
-                    counts["metadata_rejected"] += 1
-                    continue
+                # No curated-symbol or website gate: the only project-universe
+                # exclusion is the explicit meme-coin classifier above. Actual
+                # market-data and signal safeguards are enforced downstream.
 
                 score = liquidity + volume
                 project = {
