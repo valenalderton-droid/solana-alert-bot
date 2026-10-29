@@ -359,6 +359,13 @@ def format_core_result(result):
         lines.append("هیچ توکنی اکثریت ۵ از ۹ را نگرفت؛ هشدار خرید صادر نشود.")
     lines.append(f"ابزارهای اختصاصی تعریف‌شده: {len(result.get('core_access', {}))}/9 هسته؛ منابع مشترک: {len(result.get('shared_data_sources', []))}")
     lines.append("تعامل: هر هسته به ۸ هستهٔ دیگر بازخورد می‌دهد؛ امتیازها پس از گفت‌وگو بازبینی می‌شوند.")
+    winner_row = next((item for item in result.get("candidates", [])
+                       if item.get("token_address") == result.get("winner")), None)
+    if winner_row:
+        lines.append("خلاصهٔ جلسهٔ برنده:")
+        discussion = winner_row.get("discussion") or {}
+        for memo in discussion.get("memos", {}).values():
+            lines.append(f"  {memo.get('core')}: {memo.get('initial_score', 0):.0f}→{memo.get('revised_score', 0):.0f}؛ حمایت {memo.get('supporting_peers', 0)}، اعتراض {memo.get('objecting_peers', 0)}")
     for candidate in result.get("candidates", [])[:5]:
         lines.append(f"{candidate.get('name')} ({candidate.get('symbol')}): {candidate.get('votes')}/9")
         discussion = candidate.get("discussion") or {}
