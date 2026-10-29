@@ -1,0 +1,12 @@
+
+{
+  "projects": [
+    {
+      "name": "Example DeFi Project",
+      "symbol": "EXAMPLE",
+      "token_address": "REPLACE_WITH_REAL_SOLANA_TOKEN_MINT",
+      "approved_non_meme": false,
+      "category": "DeFi"
+    }
+  ]
+}
