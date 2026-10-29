@@ -113,7 +113,7 @@ def fetch_recent_news(now=None):
 def _active_keyword_hits(text, terms):
     """Ignore a keyword when nearby wording clearly negates or debunks it."""
     negation = re.compile(
-        r"\\b(?:no|not|never|without|denies|denied|rejects|rejected|debunked|false|untrue)\\b"
+        r"\b(?:no|not|never|without|denies|denied|rejects|rejected|debunked|false|untrue)\b"
         r"[^.!?]{0,28}$",
         re.IGNORECASE,
     )
