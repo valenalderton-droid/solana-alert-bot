@@ -174,13 +174,22 @@ def main():
     import main as scanner
 
     messages = []
+    delivered_buys = []
     original_send_telegram = scanner.send_telegram
 
     def capture_buy(message):
         if "SOLANA BUY WATCH" in message:
+            if not requested:
+                # Scheduled runs only monitor exits; never open new paper positions
+                # without an explicit //Pay request.
+                return False
             messages.append(message)
-            # BUY alerts are summarized into one compact reply only on //Pay.
-            return False
+            # Send the compact alert immediately. Return True only after Telegram
+            # confirms delivery so the scanner records only alerts the user received.
+            sent = original_send_telegram(concise_reply([message]))
+            if sent:
+                delivered_buys.append(message)
+            return sent
         # SELL/EXIT alerts must reach Telegram even on scheduled monitoring runs.
         return original_send_telegram(message)
 
@@ -191,17 +200,20 @@ def main():
         print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
         return
 
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
-        return
-    reply = concise_reply(messages)
-    response = requests.post(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        json={"chat_id": chat_id, "text": reply, "disable_web_page_preview": True},
-        timeout=20,
-    )
-    response.raise_for_status()
+    if not messages:
+        token = os.getenv("TELEGRAM_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+        if token and chat_id:
+            response = requests.post(
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "فعلاً ستاپ خرید معتبر پیدا نشد.",
+                    "disable_web_page_preview": True
+                },
+                timeout=20,
+            )
+            response.raise_for_status()
 
 
 if __name__ == "__main__":
