@@ -79,7 +79,7 @@ class LearnerTests(unittest.TestCase):
         self.assertEqual(len(weights), 3)
         self.assertGreater(weights[2], weights[1])
         self.assertGreater(weights[1], weights[0])
-        self.assertGreaterEqual(float(weights[0]), 0.20 / float(np.mean(weights)))
+        self.assertGreaterEqual(float(weights[0]), 0.20 * float(weights[2]))
         self.assertAlmostEqual(float(np.mean(weights)), 1.0, places=6)
 
     def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
