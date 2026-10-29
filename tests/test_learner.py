@@ -138,21 +138,23 @@ class LearnerTests(unittest.TestCase):
         self.assertIn("baseline_brier_score", report["fold_details"][0])
         self.assertIn("method", report)
 
-    def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
+    def test_complete_timeout_is_negative_target_hit_label_not_claimed_trade_loss(self):
         rows = build_training_rows([make_flat_candles()])
-        # The synthetic price range is far too small to hit either the 2%+
-        # stop or configured 10%+ target within four hours. These are timeouts, not losses.
-        self.assertTrue(rows.empty)
+        # A complete flat horizon did not hit the target, so y=0 for the
+        # target-hit objective. This does not assert that the trade lost money.
+        self.assertFalse(rows.empty)
+        self.assertTrue((rows["y"] == 0).all())
 
-    def test_six_percent_move_is_not_a_training_target_when_live_target_is_ten_percent(self):
+    def test_six_percent_move_is_not_a_positive_label_when_live_target_is_ten_percent(self):
         candles = make_flat_candles(160)
         for i in range(60, len(candles), 8):
             base = candles[i]["close"]
             for j in range(i + 1, min(i + 5, len(candles))):
                 candles[j]["high"] = max(candles[j]["high"], base * 1.06)
         rows = build_training_rows([candles], horizon=4)
-        # No stop was hit and 6% is below the live target barrier (10%).
-        self.assertTrue(rows.empty)
+        # Valid horizons remain in the sample, but 6% is below the 10% target.
+        self.assertFalse(rows.empty)
+        self.assertTrue((rows["y"] == 0).all())
 
     def test_training_rows_support_longer_horizons(self):
         candles = make_flat_candles(360)
