@@ -91,7 +91,7 @@ def add_features(candles):
     return df.replace([np.inf, -np.inf], np.nan)
 
 
-def build_training_rows(candle_sets):
+def build_training_rows(candle_sets, horizon=4):
     rows = []
 
     for candles in candle_sets:
@@ -99,8 +99,9 @@ def build_training_rows(candle_sets):
         if df.empty:
             continue
 
-        # The last four candles are needed to label earlier rows.
-        for i in range(25, len(df) - 4):
+        horizon = max(1, int(horizon))
+        # A separate label horizon supports short through multi-day setups.
+        for i in range(25, len(df) - horizon):
             entry = float(df.iloc[i]["close"])
             if entry <= 0:
                 continue
@@ -116,18 +117,18 @@ def build_training_rows(candle_sets):
             target = entry * (1 + target_pct)
             stop = entry * (1 - stop_pct)
             label = None
-            label_end = int(df.iloc[i + 4]["timestamp"])
+            label_end = int(df.iloc[i + horizon]["timestamp"])
 
-            # Match the live evaluator: only use the next four hours. Missing
-            # hourly bars or a timeout must not be silently labelled as a loss.
+            # Require a complete hourly horizon. Missing bars or a timeout
+            # must not be silently labelled as a loss.
             signal_ts = int(df.iloc[i]["timestamp"])
-            future = df.iloc[i + 1:i + 5]
-            expected_times = [signal_ts + hour * 3600 for hour in range(1, 5)]
+            future = df.iloc[i + 1:i + horizon + 1]
+            expected_times = [signal_ts + hour * 3600 for hour in range(1, horizon + 1)]
             future_times = [int(value) for value in future["timestamp"].tolist()]
             if len(future) != 4 or future_times != expected_times:
                 continue
 
-            for j in range(i + 1, i + 5):
+            for j in range(i + 1, i + horizon + 1):
                 candle = df.iloc[j]
                 hit_target = float(candle["high"]) >= target
                 hit_stop = float(candle["low"]) <= stop
@@ -246,15 +247,16 @@ def walk_forward_validation(data, folds=3):
         "method": "expanding chronological windows; labels crossing validation boundary purged"
     }
 
-def train_model(candle_sets):
-    data = build_training_rows(candle_sets)
+def _train_single_horizon(candle_sets, horizon=4):
+    data = build_training_rows(candle_sets, horizon=horizon)
     if data.empty:
         return None, {
             "ready": False,
             "labelled_examples": 0,
             "positive_labels": 0,
             "negative_labels": 0,
-            "reason": "No usable labelled examples; check candle history and feature calculation"
+            "reason": f"No usable labelled examples for {horizon}h horizon; check candle history and feature calculation",
+            "horizon_hours": int(horizon)
         }
 
     positive_labels = int((data["y"] == 1).sum())
@@ -265,7 +267,8 @@ def train_model(candle_sets):
             "labelled_examples": int(len(data)),
             "positive_labels": positive_labels,
             "negative_labels": negative_labels,
-            "reason": f"Not enough labelled examples: {len(data)} (need 250)"
+            "reason": f"Not enough labelled examples for {horizon}h horizon: {len(data)} (need 250)",
+            "horizon_hours": int(horizon)
         }
 
     data = data.sort_values("timestamp").reset_index(drop=True)
@@ -292,7 +295,8 @@ def train_model(candle_sets):
             "test_rows": int(len(test)),
             "train_classes": int(train["y"].nunique()),
             "test_classes": int(test["y"].nunique()),
-            "reason": "Insufficient class diversity or chronological test data"
+            "reason": "Insufficient class diversity or chronological test data",
+            "horizon_hours": int(horizon)
         }
 
     model = Pipeline([
@@ -315,6 +319,7 @@ def train_model(candle_sets):
 
     metrics = {
         "ready": True,
+        "horizon_hours": int(horizon),
         "train_rows": int(len(train)),
         "test_rows": int(len(test)),
         "accuracy": round(float(accuracy_score(test["y"], predictions)), 4),
@@ -350,6 +355,68 @@ def train_model(candle_sets):
     )
 
     return final_model, metrics
+
+
+class MultiHorizonModel:
+    """Weighted probability ensemble across available, independently validated horizons."""
+    def __init__(self, models):
+        self.models = models
+        self.base_weights = {4: 0.35, 12: 0.25, 24: 0.20, 72: 0.15, 168: 0.05}
+        total = sum(self.base_weights.get(h, 0.05) for h, _ in models)
+        self.weights = {
+            h: self.base_weights.get(h, 0.05) / total
+            for h, _ in models
+        }
+
+    def predict_horizon_proba(self, X):
+        return {
+            f"{h}h": float(model.predict_proba(X)[0][1])
+            for h, model in self.models
+        }
+
+    def predict_proba(self, X):
+        probabilities = [
+            self.weights[h] * model.predict_proba(X)[:, 1]
+            for h, model in self.models
+        ]
+        positive = np.sum(np.vstack(probabilities), axis=0)
+        return np.column_stack([1.0 - positive, positive])
+
+
+def train_model(candle_sets):
+    """Train separate 4h, 12h, 24h, 72h and 168h outcome models."""
+    horizons = (4, 12, 24, 72, 168)
+    trained = []
+    horizon_metrics = {}
+    for horizon in horizons:
+        model, metrics = _train_single_horizon(candle_sets, horizon=horizon)
+        horizon_metrics[f"{horizon}h"] = metrics
+        if model is not None and metrics.get("ready"):
+            trained.append((horizon, model))
+
+    if not trained:
+        best = max(
+            horizon_metrics.values(),
+            key=lambda item: int(item.get("labelled_examples", 0))
+        )
+        return None, {
+            **best,
+            "ready": False,
+            "horizons": horizon_metrics,
+            "reason": "No horizon had enough labelled examples and valid chronological evaluation"
+        }
+
+    active = [horizon for horizon, _ in trained]
+    return MultiHorizonModel(trained), {
+        "ready": True,
+        "active_horizons": [f"{h}h" for h in active],
+        "horizons": horizon_metrics,
+        "ensemble": "weighted average of independently validated horizon probabilities",
+        "weights": {
+            f"{h}h": round(weight, 4)
+            for h, weight in MultiHorizonModel(trained).weights.items()
+        }
+    }
 
 
 def latest_features(candles):
