@@ -27,6 +27,10 @@ class NineCoreTests(unittest.TestCase):
         self.assertEqual(result["virtual_capital_total_usd"], 90000)
         self.assertEqual(len(result["core_accounts"]), 9)
         self.assertTrue(all(a["initial_cash_usd"] == 10000 for a in result["core_accounts"].values()))
+        self.assertEqual(len(result["core_access"]), 9)
+        self.assertGreaterEqual(len(result["shared_data_sources"]), 5)
+        self.assertTrue(all(item["tools"] for item in result["core_access"].values()))
+        self.assertTrue(all(item["uses_shared_scan_data"] for item in result["core_access"].values()))
 
     def test_strong_candidate_gets_majority_and_opens_separate_virtual_trades(self):
         state = {}
