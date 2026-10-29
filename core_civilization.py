@@ -5,6 +5,7 @@ It audits invariants, runs periodic elections, keeps a small legislature/court,
 tracks a virtual treasury and market-diversity ecology, and records a public bulletin.
 """
 from datetime import datetime, timezone
+from market_university import update_university, university_summary, format_university_report
 
 ELECTION_EVERY_SCANS = 48
 TERM_LENGTH_SCANS = 336
@@ -246,6 +247,7 @@ def run_civilization_cycle(system, core_specs, timestamp=None):
     _review_court(system, core_specs, civ, timestamp)
     _legislate(civ, timestamp)
     _update_economy_and_academy(system, civ, timestamp)
+    update_university(system, civ, core_specs, timestamp)
     if (civ["president"] is None or
             civ["scan_count"] - int(civ.get("last_election_scan", -ELECTION_EVERY_SCANS)) >= ELECTION_EVERY_SCANS or
             civ["scan_count"] - int(civ.get("last_election_scan", 0)) >= TERM_LENGTH_SCANS):
@@ -260,6 +262,7 @@ def run_civilization_cycle(system, core_specs, timestamp=None):
             "virtual_treasury_usd": round(_num(civ["economy"].get("virtual_treasury_usd")), 2),
             "virtual_tax_revenue_usd": round(_num(civ["economy"].get("tax_revenue_usd")), 2),
             "research_lessons": len(civ["academy"].get("lessons") or []),
+            "university": university_summary(civ),
             "ecology": dict(civ["ecology"]), "bulletin": list(civ["bulletin"][-5:])}
 
 
@@ -308,4 +311,5 @@ def format_civilization_report(report):
     if report.get("ecology", {}).get("warning"):
         lines.append("هشدار محیط: تمرکز بیش از حد روی پروژه‌های تکراری؛ تنوع انتخاب‌ها پایین است.")
     lines.append("نهادها: انتخابات، شورا/قانون‌گذاری، پلیسِ حسابرس، دادگاه، خزانه، محیط‌زیست و آکادمی پژوهش.")
+    lines.append(format_university_report(report.get("university") or {}))
     return "\n".join(lines)
