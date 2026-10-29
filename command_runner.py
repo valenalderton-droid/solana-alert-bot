@@ -72,12 +72,13 @@ def poll_pay(state):
             command = str(message.get("text", "")).strip()
             if not command:
                 continue
-            # Ignore ordinary chat text so the bot does not answer every message.
-            # Only acknowledge the supported command or help with slash commands.
-            if not command.startswith("/"):
+            # Match the configured trigger robustly, regardless of capitalization
+            # or an accidental leading/trailing space. Other ordinary text is ignored.
+            normalized_command = command.strip().casefold()
+            if normalized_command not in {"//pay", "/pay", "pay"} and not command.startswith("/"):
                 continue
             matched_chat_message = True
-            if command == "//Pay":
+            if normalized_command in {"//pay", "/pay", "pay"}:
                 requested = True
                 try:
                     telegram_send(
@@ -365,8 +366,12 @@ def main():
         return False
 
     scanner.send_telegram = capture_buy
+    scan_error = None
     try:
         scanner.main()
+    except Exception as exc:
+        scan_error = exc
+        print(f"Market scan failed: {type(exc).__name__}: {exc}")
     finally:
         # Restore the module function even if the scan raises; otherwise a second
         # invocation in the same process can recursively wrap the Telegram sender.
@@ -376,16 +381,26 @@ def main():
         print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
         return
 
-    # Always provide a final response to an explicit //Pay request.
-    # A missing setup is a valid result, not a silent failure.
+    # Always provide a final response to an explicit trigger, including when
+    # the scanner crashes. Do not report a normal no-setup result after an error.
     if not delivered_buys:
+        if scan_error is not None:
+            final_reply = (
+                "در اجرای اسکن بازار خطا رخ داد و نتیجه قابل اتکا نیست. "
+                "گزارش خطا ثبت شد؛ لطفاً چند دقیقه دیگر دوباره //Pay را بفرست."
+            )
+        else:
+            final_reply = (
+                "اسکن بازار سولانا تمام شد، اما هیچ ستاپ خرید معتبری از فیلترهای فعلی عبور نکرد. "
+                "فعلاً خریدی پیشنهاد نمی‌شود. برای بررسی دوباره، //Pay را بفرست."
+            )
         try:
             telegram_send(
                 os.getenv("TELEGRAM_BOT_TOKEN"),
                 str(os.getenv("TELEGRAM_CHAT_ID", "")).strip(),
-                "اسکن بازار سولانا تمام شد، اما هیچ ستاپ خرید معتبری از فیلترهای فعلی عبور نکرد. این به معنی خرابی ربات نیست؛ فعلاً خریدی پیشنهاد نمی‌شود. برای بررسی دوباره، دقیقاً //Pay را بفرست."
+                final_reply
             )
-            print("Final no-setup response sent for //Pay request.")
+            print("Final scan response sent for trigger.")
         except Exception as reply_exc:
             print(f"Final scan response failed: {reply_exc}")
 
