@@ -14,6 +14,7 @@ from market import (
 from adaptive_policy import derive_policy
 from self_improver import update_self_improvement
 from signal_quality import score_signal
+from strategy_ensemble import evaluate_strategies, rank_candidate
 from learner import train_model, latest_features, price_action_ok
 from news_analyzer import fetch_recent_news, analyze_news, format_news_alert
 
@@ -860,6 +861,7 @@ def main():
         print("BUY generation paused by global market risk filter:", global_context.get("reason"))
         scan_diagnostics["below_probability_threshold"] += len(active_projects)
     else:
+      candidate_alerts = []
       for project in active_projects:
           address = project["token_address"]
           info = market_info.get(address)
@@ -885,11 +887,15 @@ def main():
           if last_alert_ts and candle_ts - last_alert_ts < cooldown_hours * 3600:
               continue
 
+          # Compare multiple strategy families; price action remains one input, not the only one.
+          ensemble = evaluate_strategies(candles)
+          if not ensemble.get("ready") or ensemble.get("score", 0) < 58 or ensemble.get("bullish_strategies", 0) < 2:
+              scan_diagnostics["price_action_rejected"] += 1
+              print(f"Strategy ensemble rejection {project.get('name')}: {json.dumps(ensemble)}")
+              continue
           pa_ok, pa_reason = price_action_ok(candles, row)
           if not pa_ok:
-              scan_diagnostics["price_action_rejected"] += 1
-              print(f"Price-action rejection {project.get('name')}: {pa_reason}")
-              continue
+              pa_reason = "Legacy PA disagrees; ensemble passed. " + str(pa_reason)
 
           probability = float(model.predict_proba(X)[0][1])
           horizon_probabilities = (
@@ -1008,68 +1014,93 @@ def main():
               "liquidity_usd": info["liquidity"],
               "volume_24h_usd": info["volume24h"],
               "price_action": pa_reason,
+              "strategy_ensemble": ensemble,
+              "rank_score": rank_candidate(ensemble, probability, quality["score"]),
               "signal_quality": quality,
               "model_metrics": metrics
           }
 
+          candidate_alerts.append({
+              "prediction": prediction,
+              "info": info,
+              "ensemble": ensemble,
+              "quality": quality,
+              "probability": probability,
+              "entry": entry,
+              "stop": stop,
+              "target": target,
+              "stop_pct": stop_pct,
+              "target_pct": target_pct,
+              "entry_deviation_pct": entry_deviation_pct,
+              "pa_reason": pa_reason,
+              "horizon_probabilities": horizon_probabilities,
+              "compact_metrics": compact_metrics,
+          })
+
+
+      # Alert only the highest-ranked qualified candidate; never force a trade.
+      if candidate_alerts:
+          candidate_alerts.sort(key=lambda item: item["prediction"].get("rank_score", 0), reverse=True)
+          chosen = candidate_alerts[0]
+          prediction = chosen["prediction"]
+          info = chosen["info"]
+          ensemble = chosen["ensemble"]
+          quality = chosen["quality"]
+          probability = chosen["probability"]
+          entry = chosen["entry"]
+          stop = chosen["stop"]
+          target = chosen["target"]
+          stop_pct = chosen["stop_pct"]
+          target_pct = chosen["target_pct"]
+          entry_deviation_pct = chosen["entry_deviation_pct"]
+          pa_reason = chosen["pa_reason"]
+          horizon_probabilities = chosen["horizon_probabilities"]
+          compact_metrics = chosen["compact_metrics"]
           message = (
-              "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE\n\n"
-              f"Project: {prediction['name']} ({prediction['symbol']})\n"
-              f"Entry reference: ${entry:.8g}\n"
-              f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\n"
-              f"Target reference: ${target:.8g} ({target_pct * 100:.2f}%)\n"
-              f"Combined model probability: {probability:.1%}\n"
-              f"Probability by horizon: {json.dumps(horizon_probabilities)}\n"
-              f"Model horizons available: {', '.join(metrics.get('active_horizons', []))}\n"
-              f"Price-action check: {pa_reason}\n"
-              f"Signal quality: {quality['score']}/100 (grade {quality['grade']})\n"
-              f"Quality checks: {', '.join(reason for reason in quality['reasons'] if reason)}\n"
-              f"Spot vs signal-candle deviation: {entry_deviation_pct:.2f}%\n"
-              f"Liquidity: ${info['liquidity']:,.0f}\n"
-              f"24h volume: ${info['volume24h']:,.0f}\n"
-              f"BTC 24h change: {global_context['btc_24h_pct']}%; SOL 24h change: {global_context['sol_24h_pct']}%\n"
-              f"Recent news and possible SOL impact: {json.dumps(recent_news_context, ensure_ascii=False)}\n"
-              f"Evaluation: {json.dumps(compact_metrics)}\n"
-              f"Mint: {address}\n"
-              f"Time (UTC): {utc_now()}\n\n"
-              "This is a research alert, not financial advice. "
-              "Slippage, fees and execution can change results."
+              "SOLANA TOP-RANKED BUY WATCH — NOT AN AUTOMATIC TRADE\\n\\n"
+              f"Ranked #1 of {len(candidate_alerts)} qualified candidates\\n"
+              f"Project: {prediction['name']} ({prediction['symbol']})\\n"
+              f"Entry reference: ${entry:.8g}\\n"
+              f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\\n"
+              f"Target reference: ${target:.8g} ({target_pct * 100:.2f}%)\\n"
+              f"Combined model probability: {probability:.1%}\\n"
+              f"Ensemble rank score: {prediction['rank_score']:.1f}/100\\n"
+              f"Strategy ensemble: {json.dumps(ensemble, ensure_ascii=False)}\\n"
+              f"Probability by horizon: {json.dumps(horizon_probabilities)}\\n"
+              f"Price-action note: {pa_reason}\\n"
+              f"Signal quality: {quality['score']}/100 (grade {quality['grade']})\\n"
+              f"Quality checks: {', '.join(reason for reason in quality['reasons'] if reason)}\\n"
+              f"Spot vs signal-candle deviation: {entry_deviation_pct:.2f}%\\n"
+              f"Liquidity: ${info['liquidity']:,.0f}\\n"
+              f"24h volume: ${info['volume24h']:,.0f}\\n"
+              f"BTC 24h change: {global_context['btc_24h_pct']}%; SOL 24h change: {global_context['sol_24h_pct']}%\\n"
+              f"Recent news and possible SOL impact: {json.dumps(recent_news_context, ensure_ascii=False)}\\n"
+              f"Evaluation: {json.dumps(compact_metrics)}\\n"
+              f"Mint: {prediction['token_address']}\\n"
+              f"Time (UTC): {utc_now()}\\n\\n"
+              "Research alert only. Rank is not a guarantee; fees, slippage and losses can change results."
           )
-
           sent = send_telegram(message)
-          print(f"Signal {signal_id}; telegram_sent={sent}")
-
-          # Only record a new alert after Telegram confirms delivery. If delivery
-          # fails, the same completed candle can be retried on a later run.
+          print(f"Top-ranked candidate {prediction['signal_id']}; rank={prediction['rank_score']:.1f}; telegram_sent={sent}")
           if sent:
               scan_diagnostics["alerts_created"] += 1
               append_jsonl(PREDICTIONS_FILE, prediction)
               state["open_signals"].append({
-                  "signal_id": signal_id,
-                  "token_address": address,
-                  "name": prediction["name"],
-                  "timestamp": candle_ts,
-                  "entry": entry,
-                  "stop": stop,
-                  "target": target
+                  "signal_id": prediction["signal_id"], "token_address": prediction["token_address"],
+                  "name": prediction["name"], "timestamp": prediction["timestamp"],
+                  "entry": entry, "stop": stop, "target": target
               })
-              if not any(p.get("token_address") == address for p in state["open_positions"]):
+              if not any(p.get("token_address") == prediction["token_address"] for p in state["open_positions"]):
                   state["open_positions"].append({
-                      "signal_id": signal_id,
-                      "token_address": address,
-                      "name": prediction["name"],
-                      "symbol": prediction["symbol"],
-                      "timestamp": candle_ts,
-                      "last_checked_ts": candle_ts,
-                      "entry": entry,
-                      "stop": stop,
-                      "target": target
+                      "signal_id": prediction["signal_id"], "token_address": prediction["token_address"],
+                      "name": prediction["name"], "symbol": prediction["symbol"],
+                      "timestamp": prediction["timestamp"], "last_checked_ts": prediction["timestamp"],
+                      "entry": entry, "stop": stop, "target": target
                   })
-              state["last_alerts"][address] = candle_ts
+              state["last_alerts"][prediction["token_address"]] = prediction["timestamp"]
               state["stats"]["signals"] += 1
           else:
-              print(f"Telegram delivery failed; will retry signal next run: {signal_id}")
-
+              print(f"Telegram delivery failed; top candidate will be retried: {prediction['signal_id']}")
     print("Final scan diagnostics:", json.dumps(scan_diagnostics))
     if scan_diagnostics["alerts_created"] == 0:
         print(
