@@ -133,19 +133,20 @@ class CommandRunnerTests(unittest.TestCase):
             # A scheduled run should execute without checking for a Telegram trigger.
             command_runner.main()
 
-    def test_no_setup_report_respects_watchlist_cooldown(self):
+    def test_no_setup_report_is_sent_even_during_watchlist_cooldown(self):
         recent = datetime.now(timezone.utc).isoformat()
         with patch.object(command_runner, "read_state", side_effect=[
                  {"open_positions": []},
                  {"open_positions": [], "last_watchlist_ping_utc": recent}
-             ]), \
-             patch.object(command_runner, "refresh_news_if_due"), \
-             patch.object(command_runner, "run_self_improvement_if_due"), \
-             patch.object(scanner, "main"), \
-             patch.object(scanner, "send_telegram"), \
-             patch.object(command_runner, "telegram_send") as send:
+             ]), \\
+             patch.object(command_runner, "refresh_news_if_due"), \\
+             patch.object(command_runner, "run_self_improvement_if_due"), \\
+             patch.object(scanner, "main"), \\
+             patch.object(scanner, "send_telegram"), \\
+             patch.object(command_runner, "telegram_send", return_value=True) as send:
             command_runner.main()
-        send.assert_not_called()
+        send.assert_called_once()
+        self.assertIn("هیچ ستاپ خرید معتبری", send.call_args.args[2])
 
     def test_recent_cached_candles_are_exit_only_fallback(self):
         now = datetime(2026, 10, 29, 12, 30, tzinfo=timezone.utc)
