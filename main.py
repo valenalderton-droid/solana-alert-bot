@@ -894,7 +894,7 @@ def main():
                   f"4h score={short_horizon:.3f} is below neutral"
               )
               continue
-          if len(horizon_values) >= 3:
+          if len(horizon_values) >= 2:
               horizon_consensus = sum(value >= 0.50 for value in horizon_values.values()) / len(horizon_values)
               if horizon_consensus < 0.60:
                   scan_diagnostics["below_probability_threshold"] += 1
