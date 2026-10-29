@@ -39,7 +39,7 @@ def _usable_outcomes(outcomes):
 
 
 def derive_policy(outcomes, news_observations, base_probability=0.60,
-                  base_cooldown_hours=6, now=None):
+                  base_cooldown_hours=6, now=None, research_observations=None):
     now = now or datetime.now(timezone.utc)
     probability = min(0.75, max(0.55, float(base_probability)))
     cooldown = min(12, max(3, int(base_cooldown_hours)))
@@ -119,6 +119,36 @@ def derive_policy(outcomes, news_observations, base_probability=0.60,
             f"global news in 24h: {recent_global_bearish} bearish, "
             f"{recent_global_bullish} bullish"
         )
+
+    # A sharp ecosystem TVL contraction is a caution signal, not a buy/sell
+    # prediction. It can tighten entries but can never relax the configured floor.
+    tvl_rows = []
+    for row in (research_observations or []):
+        if not isinstance(row, dict) or row.get("metric") != "Solana DeFi TVL":
+            continue
+        observed = _parse_time(row.get("observed_at"))
+        if observed is None or observed < now - timedelta(hours=48) or observed > now + timedelta(minutes=10):
+            continue
+        try:
+            change = float(row.get("change_24h_pct"))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if math.isfinite(change):
+            tvl_rows.append((observed, change))
+    if tvl_rows:
+        tvl_change = max(tvl_rows, key=lambda item: item[0])[1]
+        if tvl_change <= -15:
+            probability = min(0.75, probability + 0.05)
+            cooldown = min(12, cooldown + 2)
+            notes.append(f"DeFiLlama Solana TVL fell {tvl_change:.1f}% over ~24h: strong ecosystem caution")
+        elif tvl_change <= -8:
+            probability = min(0.75, probability + 0.03)
+            cooldown = min(12, cooldown + 1)
+            notes.append(f"DeFiLlama Solana TVL fell {tvl_change:.1f}% over ~24h: moderate ecosystem caution")
+        else:
+            notes.append(f"DeFiLlama Solana TVL 24h change {tvl_change:+.1f}%: no extra TVL risk penalty")
+    else:
+        notes.append("No recent valid Solana TVL research snapshot")
 
     return {
         "min_probability": round(min(0.75, max(0.55, probability)), 3),
