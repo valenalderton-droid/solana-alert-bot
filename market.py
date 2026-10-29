@@ -124,7 +124,7 @@ ECOSYSTEM_SYMBOLS = {
     "HNT", "MOBILE", "RENDER", "SHDW", "NOS", "TNSR", "PRCL", "ZEX",
     "CLOUD", "INF", "JLP", "MPLX", "W", "STEP", "SLND",
     "PORT", "UXD", "C98", "MNGO", "SRM", "FIDA",
-    "HONEY", "IO", "ZEUS", "MET", "CROWN", "BLZE", "LST", "STARS",
+    "HONEY", "IO", "ZEUS", "MET", "BLZE",
     "MSOL", "BSOL", "JITOSOL",
     "BNSOL"
 }
