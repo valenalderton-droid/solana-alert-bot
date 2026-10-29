@@ -311,8 +311,7 @@ def main():
     refresh_news_if_due(state)
     run_self_improvement_if_due(state)
 
-    # Scan automatically every scheduled run; GitHub Actions currently supplies
-    # the shortest supported cron interval (5 minutes).
+    # Scan automatically on every scheduled workflow run (15-minute cron); delivery remains best-effort.
 
     import main as scanner
 
@@ -348,6 +347,9 @@ def main():
             "SOLANA TOP WATCHLIST — NO VALID BUY SETUP",
             "SOLANA WATCHLIST STATUS — MARKET DATA UNAVAILABLE",
             "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED",
+            "SOLANA TOP-RANKED PROJECT — NOT A BUY SIGNAL",
+            "SOLANA TOP-RANKED PROJECT — DATA UNAVAILABLE",
+            "SOLANA SCAN STATUS — NO PROJECT CAN BE RANKED",
         )
         if any(header in str(message) for header in status_headers):
             # Forward scanner-owned status/watchlist reports, including data/model
