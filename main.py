@@ -418,6 +418,7 @@ def main():
         wins = sum(1 for item in recent_outcomes if item.get("result") == "win")
         losses = sum(1 for item in recent_outcomes if item.get("result") == "loss")
         timeouts = sum(1 for item in recent_outcomes if item.get("result") == "timeout")
+        data_gaps = sum(1 for item in recent_outcomes if item.get("result") == "data_gap")
         resolved = wins + losses
         win_rate = (wins / resolved * 100) if resolved else 0.0
         returns = [
@@ -428,12 +429,12 @@ def main():
         digest = (
             "SOLANA BOT — LAST 24H PERFORMANCE\n\n"
             f"BUY-watch alerts recorded in last 24h: {len(recent_predictions)}\n"
-            f"Target/stop outcomes in last 24h: {resolved} (wins: {wins}, losses: {losses}); timeouts: {timeouts}\n"
+            f"Target/stop outcomes in last 24h: {resolved} (wins: {wins}, losses: {losses}); timeouts: {timeouts}; data gaps: {data_gaps}\n"
             f"Target-hit rate among target/stop outcomes: {win_rate:.1f}%\n"
             f"Average return of alerts resolved in last 24h: {avg_return:.2f}%\n"
             f"Projects with usable market data this run: {len(active_projects)}\n"
             f"Time (UTC): {utc_now()}\n\n"
-            "Only resolved paper-tracked alerts are included in win rate and average return. "
+            "Win rate uses target/stop outcomes only; average return includes numeric resolved outcomes. Data gaps are excluded from average return. "
             "This is not a guarantee of future performance."
         )
         if send_telegram(digest):
