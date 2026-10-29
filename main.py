@@ -105,7 +105,7 @@ def translate_telegram(message):
         "Global market context:": "وضعیت کلی بازار:",
         "BTC 24h:": "تغییر ۲۴ ساعته بیت‌کوین:",
         "SOL 24h:": "تغییر ۲۴ ساعته سولانا:",
-        "New BUY alerts paused:": "هشدارهای خرید جدید متوقف شده‌اند:"
+        "New BUY alerts paused:": "هشدارهای خرید جدید متوقف شده‌اند:",
         "Project:": "پروژه:", "Entry reference:": "قیمت مرجع ورود:",
         "Stop reference:": "حد ضرر مرجع:", "Target reference:": "حد سود مرجع:",
         "Model probability:": "احتمال پیش‌بینی مدل:", "Liquidity:": "نقدینگی:",
