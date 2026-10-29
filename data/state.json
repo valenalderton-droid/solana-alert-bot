@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T12:35:07.179232+00:00",
+  "last_run_utc": "2026-10-29T13:10:16.461485+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -43,7 +43,10 @@
     "f7daef4a47fc04daed0da83a",
     "ac540d1e11ea7d2a56866578",
     "a05ed6eb377e3cc6399e3252",
-    "eb51a5c985fe9d27b13809a8"
+    "eb51a5c985fe9d27b13809a8",
+    "f760cd9aac98f5f511794a2a",
+    "9caf6de89e84c9685a3476bb",
+    "f8eac83543fe939d91d05d5f"
   ],
   "news_observations": [
     {
@@ -406,20 +409,56 @@
       "title": "Solana’s faster finality is live. What changes for users? - Crypto News",
       "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOSXE4T1I5NVBCcVRpTjdPaTI3QUJBbmZSX3FveGQ3YzFUNGJQVWFNX2lBZ3ZEY2JOWkdLOU0xT3REdEtzaWJtQnAxbVVDajd1WUUyTVJ5TFpITS1nOU1MUk5UbDdjREl4eUk0UjItTXRwbGV5ZG5RWFJGaERZdFBqRQ?oc=5",
       "research_topic": "protocol"
+    },
+    {
+      "observed_at": "2026-10-29T13:09:17.572201+00:00",
+      "published_at": "2026-10-29T12:13:52+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Introducing Oren, a New AI Trading Terminal on Solana - Coinfomania",
+      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNN1Yzd21uQmpzRmJRckxKX0JDTi10RG1EcGlTamhiQTlLSkJ1Zm83T214LXA4eHJDaUdLQzVCWFc4YXZvT2ZNcW1zcTBucnBuM2hSb3V0RGNhYXJOWjdya2hWODM2V2lQckItaFk0UE85dER3NVZrTF9kWmNiNlF2X3liVQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T13:09:17.572254+00:00",
+      "published_at": "2026-10-29T12:02:02+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana (SOL) Price Prediction: SOL Eyes $108 as Pepeto Buyers Chase 100x to 300x Before the Listing - openPR.com",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQa1k5TGJRWmJzaXJZRzVwUk1DVUg1MjR4Z1paVTZTMjRiVDdxaEszZkM0dGE4YmtPc1FiVktvaFhrRXVZNUtmU0tBM1hJdUZKUm9ObGxZY3c2SlNta3BGTVRac1hIWFV4OUZwS0ptTDJDMkRNVXROZGdTZjEtTjJMMTZ6UVJaYzRBTjMyUG9GTkJud1hweEhZMQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T13:09:17.572299+00:00",
+      "published_at": "2026-10-29T08:11:49+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana price falls below $100 as ETFs lose $24.8M in two days - Crypto News",
+      "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE1sR1V3Sm5ucVVxRDBYeG9DV2RCVkJiNWcwVnItMU1XZ24zYzVXUDFOTjg0YXpQM1hucXBJR0hkcENHTWNrZHRoOW1aTzZ4Z0d3STczZTlNYWVBcDl4RGNBSFFhd19OOWhMVzVYalVRY1ZvTUJJLXJCNQ?oc=5"
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952316,
-  "last_news_refresh_utc": "2026-10-29T12:34:28.448633+00:00",
+  "telegram_update_offset": 806952317,
+  "last_news_refresh_utc": "2026-10-29T13:09:22.967307+00:00",
   "last_watchlist_ping_utc": "2026-10-29T11:19:40.239690+00:00",
-  "project_scan_cursor": 20,
+  "project_scan_cursor": 3,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T12:12:34.745901+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T12:12:34.745901+00:00",
-    "last_run_utc": "2026-10-29T12:12:34.745901+00:00",
+    "last_run_utc": "2026-10-29T13:09:17.572785+00:00",
     "queries_attempted": 2,
-    "new_articles": 4,
-    "failures": 1,
+    "new_articles": 0,
+    "failures": 0,
     "last_topics": [
       "security",
       "protocol"
@@ -432,14 +471,14 @@
       },
       {
         "topic": "protocol",
-        "results": 4,
+        "results": 2,
         "ok": true
       }
     ],
     "total_evidence": 7,
     "latest_tvl_change_24h_pct": -1.296,
-    "activity_metrics_refreshed": true,
-    "activity_metrics_count": 2
+    "activity_metrics_refreshed": false,
+    "activity_metrics_count": 0
   },
   "research_observations": [
     {
@@ -527,19 +566,20 @@
     }
   ],
   "seen_research_ids": [
-    "f86123a7a1f53fc2863ccef2",
-    "77fac538df29ffa61e07e9d1",
-    "defillama-solana-tvl-1793232000",
-    "27a5c8aa52c8ad8b00475135",
-    "6da0f87d5326c4ed4ab9ff0f",
     "defillama-solana-dex-volume-498132",
-    "defillama-solana-fees-498132"
+    "f86123a7a1f53fc2863ccef2",
+    "6da0f87d5326c4ed4ab9ff0f",
+    "defillama-solana-fees-498132",
+    "77fac538df29ffa61e07e9d1",
+    "27a5c8aa52c8ad8b00475135",
+    "defillama-solana-tvl-1793232000"
   ],
   "research_query_cursor": 2,
   "seen_research_news_ids": [
+    "77fac538df29ffa61e07e9d1",
     "27a5c8aa52c8ad8b00475135",
-    "6da0f87d5326c4ed4ab9ff0f",
     "f86123a7a1f53fc2863ccef2",
-    "77fac538df29ffa61e07e9d1"
-  ]
+    "6da0f87d5326c4ed4ab9ff0f"
+  ],
+  "research_priority_signature": ""
 }
