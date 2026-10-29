@@ -141,11 +141,69 @@ def refresh_news_if_due(state, interval_minutes=15):
             seen.append(item["id"])
             seen_set.add(item["id"])
             added += 1
+        # Expand research beyond the fixed RSS feeds. The research engine rotates
+        # public-source queries based on the latest paper outcomes and approved projects.
+        # Its findings remain evidence, not executable trading rules.
+        research_added = 0
+        try:
+            from research_engine import run_research_cycle
+            def read_outcomes_for_research():
+                rows = []
+                try:
+                    with open("data/outcomes.jsonl", "r", encoding="utf-8") as handle:
+                        for line in handle:
+                            try:
+                                rows.append(json.loads(line))
+                            except json.JSONDecodeError:
+                                continue
+                except OSError:
+                    pass
+                return rows
+            try:
+                with open("data/projects.json", "r", encoding="utf-8") as handle:
+                    project_config = json.load(handle)
+            except (OSError, json.JSONDecodeError):
+                project_config = {}
+            research_result = run_research_cycle(
+                state,
+                outcomes=read_outcomes_for_research(),
+                configured_projects=project_config.get("projects", [])
+            )
+            print("Research cycle result:", json.dumps(research_result, ensure_ascii=False))
+            # Bring newly found headlines into the same transparent, source-linked
+            # context stream used by the bounded risk policy; never create a signal.
+            from news_analyzer import analyze_news
+            research_seen = set(state.setdefault("seen_research_news_ids", []))
+            for item in state.get("research_observations", [])[-40:]:
+                if item.get("kind") == "metric" or item.get("id") in research_seen:
+                    continue
+                analyzed = analyze_news(item)
+                observations.append({
+                    "observed_at": item.get("observed_at") or datetime.now(timezone.utc).isoformat(),
+                    "published_at": analyzed.get("published_at"),
+                    "sentiment": analyzed.get("sentiment", "NEUTRAL / UNCLEAR"),
+                    "impact_score": int(analyzed.get("impact_score", 0)),
+                    "relevance": analyzed.get("relevance", "UNCERTAIN"),
+                    "confidence": analyzed.get("confidence", "UNKNOWN"),
+                    "feed_category": analyzed.get("feed_category", "Uncategorized"),
+                    "analysis": analyzed.get("analysis", "")[:900],
+                    "title": analyzed.get("title", "")[:250],
+                    "url": analyzed.get("url", ""),
+                    "research_topic": item.get("research_topic", "")
+                })
+                research_seen.add(item.get("id"))
+                research_added += 1
+            state["seen_research_news_ids"] = list(research_seen)[-1000:]
+            state["news_observations"] = observations[-500:]
+        except Exception as research_exc:
+            # A research outage must never stop the bot or erase market state.
+            print(f"Autonomous research failed safely: {research_exc}")
+
         state["news_observations"] = observations[-500:]
         state["seen_news_ids"] = seen[-500:]
         state["last_news_refresh_utc"] = datetime.now(timezone.utc).isoformat()
         save_state(state)
-        print(f"News-only refresh completed; new headlines analyzed: {added}")
+        print(f"News-only refresh completed; new headlines analyzed: {added}; research headlines added: {research_added}")
     except Exception as exc:
         # News is supplemental; a temporary feed failure must not stop command polling.
         print(f"News-only refresh failed: {exc}")
