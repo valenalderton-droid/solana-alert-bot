@@ -277,6 +277,34 @@ def main():
 
     if model is None:
         print("Model is not ready; no BUY alerts will be generated.")
+
+        # Send a status message on first run and then at most every 6 hours,
+        # so the owner can distinguish "no signal" from a broken Telegram setup.
+        now = datetime.now(timezone.utc)
+        last_status = state.get("last_status_message_utc")
+        send_status = not last_status
+        if last_status:
+            try:
+                previous = datetime.fromisoformat(last_status.replace("Z", "+00:00"))
+                send_status = (now - previous).total_seconds() >= 6 * 3600
+            except (ValueError, TypeError):
+                send_status = True
+
+        if send_status:
+            status_message = (
+                "SOLANA BOT STATUS — RUNNING\n\n"
+                "The bot ran successfully, but the model is not ready yet, "
+                "so no BUY alert was generated.\n"
+                f"Model details: {json.dumps(metrics)}\n"
+                f"Projects with usable market data: {len(active_projects)}\n"
+                f"Time (UTC): {utc_now()}\n\n"
+                "This is a status message, not a trading signal."
+            )
+            sent = send_telegram(status_message)
+            print(f"Status heartbeat sent={sent}")
+            if sent:
+                state["last_status_message_utc"] = utc_now()
+
         state["last_run_utc"] = utc_now()
         write_json_atomic(STATE_FILE, state)
         return
