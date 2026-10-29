@@ -192,11 +192,90 @@ def choose_probability_threshold(predictions, outcomes, current_threshold=0.60):
     }
 
 
+
+def diagnose_failure_modes(predictions, outcomes, min_group_size=3):
+    """Create cautious research priorities from resolved paper-alert errors."""
+    prediction_by_id = {
+        str(row.get("signal_id")): row for row in (predictions or [])
+        if isinstance(row, dict) and row.get("signal_id")
+    }
+    joined, seen = [], set()
+    for outcome in outcomes or []:
+        if not isinstance(outcome, dict) or outcome.get("result") == "data_gap":
+            continue
+        signal_id = str(outcome.get("signal_id", ""))
+        pred = prediction_by_id.get(signal_id)
+        if not signal_id or signal_id in seen or not pred:
+            continue
+        try:
+            ret = float(outcome.get("return_pct"))
+            probability = float(pred.get("probability", 0) or 0)
+            liquidity = float(pred.get("liquidity_usd", 0) or 0)
+            volume = float(pred.get("volume_24h_usd", 0) or 0)
+            deviation = float(pred.get("entry_deviation_pct", 0) or 0)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not all(math.isfinite(v) for v in (ret, probability, liquidity, volume, deviation)):
+            continue
+        seen.add(signal_id)
+        ensemble = pred.get("strategy_ensemble") or {}
+        quality = pred.get("signal_quality") or {}
+        risk_flags = ensemble.get("risk_flags", []) if isinstance(ensemble, dict) else []
+        tags = set()
+        if deviation >= 2.0:
+            tags.add("entry_chase")
+        if liquidity < 250000:
+            tags.add("thin_liquidity")
+        if volume < 250000:
+            tags.add("low_volume")
+        if float(ensemble.get("score", 0) or 0) < 65:
+            tags.add("weak_ensemble")
+        if any("volatil" in str(flag).lower() or "risk" in str(flag).lower()
+               for flag in (risk_flags or [])):
+            tags.add("high_risk_flags")
+        if probability < 0.65:
+            tags.add("lower_probability")
+        if float(quality.get("score", 100) or 0) < 70:
+            tags.add("weak_quality")
+        joined.append({"return_pct": ret - ESTIMATED_ROUND_TRIP_COST_PCT, "tags": tags})
+
+    tag_to_topic = {
+        "entry_chase": "strategy", "thin_liquidity": "liquidity",
+        "low_volume": "liquidity", "weak_ensemble": "strategy",
+        "high_risk_flags": "strategy", "lower_probability": "strategy",
+        "weak_quality": "strategy"
+    }
+    groups = {}
+    for tag, topic in tag_to_topic.items():
+        sample = [row["return_pct"] for row in joined if tag in row["tags"]]
+        if len(sample) < min_group_size:
+            continue
+        mean_return = sum(sample) / len(sample)
+        loss_rate = sum(value < 0 for value in sample) / len(sample)
+        groups[tag] = {
+            "n": len(sample),
+            "mean_net_return_pct": round(mean_return, 4),
+            "negative_return_rate": round(loss_rate, 4),
+            "research_topic": topic,
+            "warning": "association only; not a causal finding"
+        }
+    focus = []
+    for tag, stats in sorted(groups.items(), key=lambda item: (item[1]["mean_net_return_pct"], -item[1]["n"])):
+        if stats["mean_net_return_pct"] < 0 or stats["negative_return_rate"] >= 0.60:
+            if stats["research_topic"] not in focus:
+                focus.append(stats["research_topic"])
+    return {
+        "sample_size": len(joined), "minimum_group_size": int(min_group_size),
+        "groups": groups, "research_focus": focus[:4],
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+
 def update_self_improvement(predictions, outcomes, news_observations=None,
                             current_threshold=0.60, now=None):
     """Update the parameter rule registry and save a concise audit trail."""
     now = now or datetime.now(timezone.utc)
     registry = _read_registry()
+    registry["learning_diagnostics"] = diagnose_failure_modes(predictions, outcomes)
     rules = registry.setdefault("rules", [])
     active = next((rule for rule in rules
                    if rule.get("id") == "validated_probability_floor"), None)
