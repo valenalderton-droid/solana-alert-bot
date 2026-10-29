@@ -845,6 +845,7 @@ def main():
               f"Model probability: {probability:.1%}\n"
               f"Liquidity: ${info['liquidity']:,.0f}\n"
               f"24h volume: ${info['volume24h']:,.0f}\n"
+              f"BTC 24h change: {global_context['btc_24h_pct']}%; SOL 24h change: {global_context['sol_24h_pct']}%\n"
               f"Evaluation: {json.dumps(metrics)}\n"
               f"Mint: {address}\n"
               f"Time (UTC): {utc_now()}\n\n"
