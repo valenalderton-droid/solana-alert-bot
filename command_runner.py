@@ -443,8 +443,16 @@ def main():
                 delivered_messages.append(message)
             return sent
 
-        # Suppress watchlist, no-setup, news, and routine status messages.
-        # The user requested Telegram alerts only for actionable BUY/SELL events.
+        if requested and "SOLANA TOP WATCHLIST — NO VALID BUY SETUP" in str(message):
+            # If no entry qualifies, return exactly one live-data-backed top candidate,
+            # explicitly labelled WATCHLIST (not a buy signal). Never force an entry.
+            sent = original_send_telegram(message)
+            if sent:
+                delivered_messages.append(message)
+                print("Single fallback watchlist candidate delivered; explicitly not a buy signal.")
+            return sent
+
+        # Suppress stale/no-data status, news, and routine messages.
         print("Non-trade Telegram message suppressed.")
         return False
 
