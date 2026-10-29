@@ -412,6 +412,16 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
     # longer meets the evidence criteria is automatically retired.
     registry["experience_rules"] = build_experience_rules(registry["learning_diagnostics"])
     file_actions = sync_experience_rule_files(registry["experience_rules"], now=now)
+    audit = registry.setdefault("file_editor_audit", [])
+    audit.append({
+        "at": now.isoformat(),
+        "created": list(file_actions.get("created", [])),
+        "edited": list(file_actions.get("edited", [])),
+        "deleted": list(file_actions.get("deleted", [])),
+        "unchanged": list(file_actions.get("unchanged", [])),
+        "rejected": list(file_actions.get("rejected", [])),
+    })
+    registry["file_editor_audit"] = audit[-100:]
     rules = registry.setdefault("rules", [])
     active = next((rule for rule in rules
                    if rule.get("id") == "validated_probability_floor"), None)
