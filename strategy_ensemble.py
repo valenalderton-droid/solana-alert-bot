@@ -167,10 +167,28 @@ def evaluate_strategies(candles):
         "risk_control": 0.07,
     }
     score = sum(scores[k] * weights[k] for k in scores)
-    bullish = sum(scores[k] >= 60 for k in (
+    directional_keys = (
         "trend_following", "breakout", "momentum", "mean_reversion",
         "volume_flow", "market_structure", "candle_rejection"
-    ))
+    )
+    bullish = sum(scores[k] >= 60 for k in directional_keys)
+    directional_scores = [scores[k] for k in directional_keys]
+    consensus_strength = round(bullish / len(directional_keys), 3)
+    dispersion = math.sqrt(
+        sum((value - sum(directional_scores) / len(directional_scores)) ** 2
+            for value in directional_scores) / len(directional_scores)
+    )
+    # Label market regime explicitly. Regime is descriptive, not a prediction.
+    if atr_pct >= 5:
+        market_regime = "high_volatility"
+    elif close > ema20 > ema50 and ema20 > ema20_prev:
+        market_regime = "uptrend"
+    elif close < ema20 < ema50 and ema20 < ema20_prev:
+        market_regime = "downtrend"
+    elif abs(zscore) >= 1.8:
+        market_regime = "stretched_range"
+    else:
+        market_regime = "mixed_range"
     risk_flags = []
     if atr_pct > 5:
         risk_flags.append("extreme_volatility")
@@ -184,10 +202,17 @@ def evaluate_strategies(candles):
         risk_flags.append("below_ema50")
     if volume_ratio < 0.5:
         risk_flags.append("weak_recent_volume")
+    if dispersion >= 25:
+        risk_flags.append("strategy_disagreement")
+    if bullish <= 2:
+        risk_flags.append("weak_directional_consensus")
 
     return {
         "ready": True, "score": round(score, 1),
         "bullish_strategies": bullish, "strategies": scores,
+        "market_regime": market_regime,
+        "consensus_strength": consensus_strength,
+        "strategy_dispersion": round(dispersion, 2),
         "risk_flags": risk_flags,
         "metrics": {
             "rsi14": round(rsi, 2),
@@ -222,4 +247,13 @@ def rank_candidate(ensemble, model_probability, quality_score, liquidity_usd=0,
     chase_penalty = min(10.0, deviation * 2.0)
     risk_flags = (ensemble or {}).get("risk_flags", [])
     risk_penalty = min(12.0, len(risk_flags) * 1.5)
-    return round(_clamp(base + market_bonus - chase_penalty - risk_penalty), 2)
+    # Penalize disagreement between independent strategy families; do not
+    # mislabel an ensemble score as a calibrated probability.
+    dispersion = max(0.0, float((ensemble or {}).get("strategy_dispersion", 0) or 0))
+    disagreement_penalty = min(8.0, max(0.0, dispersion - 15.0) * 0.25)
+    consensus = max(0.0, min(1.0, float((ensemble or {}).get("consensus_strength", 0.5) or 0.0)))
+    weak_consensus_penalty = max(0.0, 0.5 - consensus) * 8.0
+    return round(_clamp(
+        base + market_bonus - chase_penalty - risk_penalty
+        - disagreement_penalty - weak_consensus_penalty
+    ), 2)
