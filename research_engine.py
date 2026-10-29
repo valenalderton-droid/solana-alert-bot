@@ -11,7 +11,7 @@ import os
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 
 import requests
 
@@ -208,6 +208,47 @@ def assess_research_evidence(title, description="", source="", published=None, n
     }
 
 
+def corroborate_evidence(items):
+    """Mark similar headlines covered by distinct publisher domains; not proof."""
+    import re
+    rows = [row for row in (items or []) if isinstance(row, dict) and row.get("url")]
+    token_sets = [
+        set(re.findall(r"[a-z0-9]{3,}", str(row.get("title", "")).lower()))
+        for row in rows
+    ]
+    for index, row in enumerate(rows):
+        base = token_sets[index]
+        domains = set()
+        if len(base) >= 3:
+            for other_index, other in enumerate(rows):
+                if not token_sets[other_index]:
+                    continue
+                union = base | token_sets[other_index]
+                similarity = len(base & token_sets[other_index]) / max(1, len(union))
+                if similarity < 0.35:
+                    continue
+                try:
+                    host = (urlparse(str(other.get("url", ""))).hostname or "").lower()
+                    if host.startswith("www."):
+                        host = host[4:]
+                    if host and host != "news.google.com":
+                        domains.add(host)
+                except (TypeError, ValueError):
+                    continue
+        row["corroborating_publisher_count"] = len(domains)
+        row["corroborated"] = len(domains) >= 2
+        if len(domains) >= 2:
+            row["evidence_quality_score"] = min(
+                100, int(row.get("evidence_quality_score", 0) or 0) + min(15, (len(domains) - 1) * 5)
+            )
+        row["corroboration_note"] = (
+            "Similar headlines found across multiple publisher domains; verify independent reporting."
+            if len(domains) >= 2 else
+            "No independent publisher corroboration found in this research batch."
+        )
+    return rows
+
+
 def search_public_rss(query, category, topic, now=None):
     """Search one public news query and return only dated, source-linked records."""
     now = now or datetime.now(timezone.utc)
@@ -376,6 +417,8 @@ def run_research_cycle(state, outcomes=None, configured_projects=None, now=None)
             failures += 1
             query_results.append({"topic": topic, "ok": False, "error": str(exc)[:180]})
             print(f"Research search failed ({topic}): {exc}")
+
+    corroborate_evidence(new_articles)
 
     metric_due = True
     last_metric = status.get("last_tvl_refresh_utc")
