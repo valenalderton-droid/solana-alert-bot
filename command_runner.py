@@ -70,6 +70,17 @@ def telegram_send(token, chat_id, text):
                     continue
                 raise RuntimeError(f"Telegram sendMessage failed ({error_code}): {message}")
             return True
+        except requests.HTTPError as exc:
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            if status is not None and status != 429 and status < 500:
+                raise RuntimeError(
+                    f"Telegram rejected the message with HTTP {status}; "
+                    "check the bot token, chat ID, and bot permissions."
+                ) from exc
+            last_error = exc
+            if attempt >= 2:
+                raise RuntimeError(f"Telegram HTTP request failed after 3 attempts: {exc}") from exc
+            time.sleep(1 + attempt)
         except requests.RequestException as exc:
             last_error = exc
             if attempt >= 2:
