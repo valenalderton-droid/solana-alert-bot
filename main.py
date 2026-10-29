@@ -299,22 +299,22 @@ def monitor_open_positions(state, market_info):
         if exit_reason:
             pnl_pct = (float(exit_price) / entry - 1) * 100
             data_warning = ""
-        if info.get("data_is_cached"):
-            data_warning = (
-                "Data warning: this exit check uses cached hourly candles; "
-                f"latest candle age: {info.get('candle_age_hours', 'unknown')} "
-                "hours. Verify the current quote before acting.\n"
-            )
-        message = (
-                "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE\n\n"
-                f"Project: {position.get('name', 'Unknown')} ({position.get('symbol', '')})\n"
-                f"Entry reference: ${entry:.8g}\n"
-                f"Exit reference: ${float(exit_price):.8g}\n"
-                f"Estimated return before fees/slippage: {pnl_pct:+.2f}%\n"
-                f"Reason: {exit_reason}\n"
-                f"Mint: {address}\n"
+            if info.get("data_is_cached"):
+                data_warning = (
+                    "Data warning: this exit check uses cached hourly candles; "
+                    f"latest candle age: {info.get('candle_age_hours', 'unknown')} "
+                    "hours. Verify the current quote before acting.\\n"
+                )
+            message = (
+                "SOLANA SELL / EXIT ALERT — NO AUTOMATIC TRADE\\n\\n"
+                f"Project: {position.get('name', 'Unknown')} ({position.get('symbol', '')})\\n"
+                f"Entry reference: ${entry:.8g}\\n"
+                f"Exit reference: ${float(exit_price):.8g}\\n"
+                f"Estimated return before fees/slippage: {pnl_pct:+.2f}%\\n"
+                f"Reason: {exit_reason}\\n"
+                f"Mint: {address}\\n"
                 f"{data_warning}"
-                f"Time (UTC): {utc_now()}\n\n"
+                f"Time (UTC): {utc_now()}\\n\\n"
                 "This is an exit alert only; the bot does not place trades."
             )
             sent = send_telegram(message)
