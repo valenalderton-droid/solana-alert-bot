@@ -150,6 +150,44 @@ def derive_policy(outcomes, news_observations, base_probability=0.60,
     else:
         notes.append("No recent valid Solana TVL research snapshot")
 
+    # Require a fresh, explicitly numeric DeFiLlama percentage change.
+    # These are ecosystem-wide risk guards, not directional price forecasts.
+    metric_rows = {}
+    for row in (research_observations or []):
+        if not isinstance(row, dict) or row.get("kind") != "metric":
+            continue
+        observed = _parse_time(row.get("observed_at"))
+        if observed is None or observed < now - timedelta(hours=30) or observed > now + timedelta(minutes=10):
+            continue
+        metric_name = str(row.get("metric", ""))
+        try:
+            change = float(row.get("change_24h_pct"))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if not math.isfinite(change) or not -100 <= change <= 10000:
+            continue
+        current = metric_rows.get(metric_name)
+        if current is None or observed > current[0]:
+            metric_rows[metric_name] = (observed, change)
+
+    dex = metric_rows.get("Solana DEX volume")
+    perps = metric_rows.get("Solana perpetuals volume")
+    if dex and dex[1] <= -25:
+        probability = min(0.75, probability + 0.03)
+        cooldown = min(12, cooldown + 1)
+        notes.append(f"DeFiLlama Solana DEX volume change {dex[1]:.1f}%: reduced activity, stricter entries")
+    if perps and perps[1] <= -30:
+        probability = min(0.75, probability + 0.02)
+        cooldown = min(12, cooldown + 1)
+        notes.append(f"DeFiLlama Solana perpetuals volume change {perps[1]:.1f}%: derivatives activity is weakening")
+    fees = metric_rows.get("Solana fees")
+    if fees and fees[1] <= -25:
+        probability = min(0.75, probability + 0.02)
+        cooldown = min(12, cooldown + 1)
+        notes.append(f"DeFiLlama Solana fees change {fees[1]:.1f}%: ecosystem usage may be weakening")
+    if not any(name in metric_rows for name in ("Solana DEX volume", "Solana perpetuals volume", "Solana fees")):
+        notes.append("No fresh numeric DEX/perpetuals/fees change data; no risk adjustment from these metrics")
+
     return {
         "min_probability": round(min(0.75, max(0.55, probability)), 3),
         "cooldown_hours": int(min(12, max(3, cooldown))),
