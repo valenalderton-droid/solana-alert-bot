@@ -479,6 +479,86 @@ def resolve_old_signals(state, store):
     state["open_signals"] = still_pending
 
 
+def send_watchlist_fallback(active_projects, market_info, state, reason, configured_projects=None):
+    """Send a clearly non-buy top-watchlist ping when no valid BUY setup exists."""
+    now = datetime.now(timezone.utc)
+    cooldown_minutes = max(5, int(os.getenv("NO_SETUP_PING_COOLDOWN_MINUTES", "60")))
+    last_ping = state.get("last_watchlist_ping_utc")
+    if last_ping:
+        try:
+            parsed = datetime.fromisoformat(str(last_ping).replace("Z", "+00:00"))
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            if (now - parsed.astimezone(timezone.utc)).total_seconds() < cooldown_minutes * 60:
+                print("No-setup watchlist ping skipped: cooldown active.")
+                return False
+        except (ValueError, TypeError):
+            pass
+
+    projects = list(active_projects or [])
+    if not projects:
+        projects = list(configured_projects or [])
+
+    ranked = []
+    for project in projects:
+        address = str(project.get("token_address", "")).strip()
+        info = market_info.get(address) if address else None
+        if info and info.get("candles"):
+            ensemble = evaluate_strategies(info["candles"])
+            liquidity = float(info.get("liquidity") or 0)
+            volume = float(info.get("volume24h") or 0)
+            # Ranking only selects a watchlist candidate; it never converts it into a buy signal.
+            score = float(ensemble.get("score") or 0)
+            score += min(8, math.log10(1 + liquidity / 10000) * 2)
+            score += min(5, math.log10(1 + volume / 10000))
+            score -= min(15, len(ensemble.get("risk_flags", [])) * 2)
+            ranked.append((score, project, info, ensemble))
+        else:
+            ranked.append((0.0, project, None, None))
+
+    if ranked:
+        ranked.sort(key=lambda item: item[0], reverse=True)
+        _, project, info, ensemble = ranked[0]
+        address = str(project.get("token_address", "")).strip()
+        if info:
+            message = (
+                "SOLANA TOP WATCHLIST — NO VALID BUY SETUP\n\n"
+                "This is NOT a buy signal. The bot found no candidate that passed all entry rules.\n"
+                f"Top watchlist project: {project.get('name', 'Unknown')} ({project.get('symbol', '')})\n"
+                f"Current reference price: ${float(info.get('price') or 0):.8g}\n"
+                f"Liquidity: ${float(info.get('liquidity') or 0):,.0f}\n"
+                f"24h volume: ${float(info.get('volume24h') or 0):,.0f}\n"
+                f"Ensemble score: {ensemble.get('score', 0)}/100 (not win probability)\n"
+                f"Strategy scores: {json.dumps(ensemble.get('strategies', {}), ensure_ascii=False)}\n"
+                f"Risk flags: {', '.join(ensemble.get('risk_flags', [])) or 'none detected'}\n"
+                f"Why no valid BUY: {reason}\n"
+                f"Mint: {address}\nTime (UTC): {utc_now()}\n\n"
+                "Watchlist ranking is not a recommendation to buy. Wait for a confirmed setup."
+            )
+        else:
+            message = (
+                "SOLANA WATCHLIST STATUS — MARKET DATA UNAVAILABLE\n\n"
+                "This is NOT a buy signal; no reliable live quote/candles were available.\n"
+                f"Project to monitor: {project.get('name', 'Unknown')} ({project.get('symbol', '')})\n"
+                f"Mint: {address or 'unavailable'}\n"
+                f"Reason: {reason}\nTime (UTC): {utc_now()}\n\n"
+                "Do not enter without current price, liquidity and a verified setup."
+            )
+    else:
+        message = (
+            "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED\n\n"
+            "No approved non-meme projects with usable data/configuration were found. "
+            "The bot will not invent a token or fabricate a price.\n"
+            f"Reason: {reason}\nTime (UTC): {utc_now()}"
+        )
+
+    sent = send_telegram(message)
+    print(f"Fallback watchlist ping sent={sent}; cooldown={cooldown_minutes}m")
+    if sent:
+        state["last_watchlist_ping_utc"] = now.isoformat()
+    return sent
+
+
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
 
@@ -847,12 +927,15 @@ def main():
 
     if model is None:
         print("Model is not ready; no BUY alerts will be generated.")
-
+        send_watchlist_fallback(
+            active_projects, market_info, state,
+            reason="ML model is not ready or lacks enough historical training data",
+            configured_projects=config.get("projects", [])
+        )
         print(
-            "Model not ready; status is log-only. "
+            "Model not ready. "
             f"Metrics={json.dumps(metrics)}; usable_projects={len(active_projects)}"
         )
-
         state["last_run_utc"] = utc_now()
         write_json_atomic(STATE_FILE, state)
         return
@@ -1107,6 +1190,17 @@ def main():
               state["stats"]["signals"] += 1
           else:
               print(f"Telegram delivery failed; top candidate will be retried: {prediction['signal_id']}")
+    if scan_diagnostics["alerts_created"] == 0:
+        reason = (
+            "global market/news risk filter paused entries"
+            if global_context.get("risk_off", True)
+            else "no candidate passed every entry filter this run"
+        )
+        send_watchlist_fallback(
+            active_projects, market_info, state,
+            reason=reason,
+            configured_projects=config.get("projects", [])
+        )
     print("Final scan diagnostics:", json.dumps(scan_diagnostics))
     if scan_diagnostics["alerts_created"] == 0:
         print(
