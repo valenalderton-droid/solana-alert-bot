@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T09:54:50.482523+00:00",
+  "last_run_utc": "2026-10-29T10:00:32.973983+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -23,7 +23,12 @@
     "d91d2d979bbabb6b628dba72",
     "0f23f622f6a4cfb697501120",
     "6e8cfc00053f0499f5c27e31",
-    "63cec0b0e9e07d732a52d042"
+    "63cec0b0e9e07d732a52d042",
+    "381bfc6a7d4ddf19b6fc6fe9",
+    "507d90a8f3f9a96a578b7d6e",
+    "6ec30d52b9822edbd372b38c",
+    "14a94b80222a89472c572bce",
+    "bce4e8201ac92858f17b85fc"
   ],
   "news_observations": [
     {
@@ -115,6 +120,57 @@
       "relevance": "DIRECT — SOL market / regulation",
       "title": "Solana Price Prediction: Can SOL Get Back Above $110 in November? - 24/7 Wall St.",
       "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOWFY2UkxmenR3OXF5dnMzV3cydWN3YjNOWHR2SWlab0F0Qm9CekFRcnRUazdZcUpnRXlTREdUUDg4Y3haRzRoMTU5WWZaUzNJZGc4dlZLUHVVa01PRXdPTzJndGxzcXNCaEN2OHJ5MVYwYURBOVk5Wm5DempqWnpFUFVWZXI0bmZmWlEyQVVLRTliS3R5RGZKQ0YxUV9DZF82QlpOS0ZsUnpIQzJPRGVuQVV2aWsyZkthWjFXRUtR?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:00:11.668765+00:00",
+      "published_at": "2026-10-29T08:59:10+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "title": "Why is Bitcoin price down today despite spot Bitcoin ETF inflows? - Crypto News",
+      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE92c3FUeTc1NGhVMzBSNl9hb1Q5a3BKVjE5ME85OFhuaGFNSkcxeDAtV2VUZHVIQlhCWEVOWFRkVnlBTTlQSlV2clBsUWZIU1hHRjhKMXJuUVBZZDlpcjlXaHh5U0lTNVZabzJtTEZxeEk3VzFvNE9V?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:00:11.668847+00:00",
+      "published_at": "2026-10-29T02:01:44+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "title": "Fed Holds Rates at 3.75%-4.00% but Leaves Room for Another Hike, Stoking Bitcoin Downside Risks - bloomingbit",
+      "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBCMFR2b3lGYjhIdkFKUWIyUFpuZ1JzVXN3MVJ1M2VaMFUwQXNIRTEtdjctWVZPeW5rSkwySFY5WUJNeXlQb1lqQW9ZYjUzYi1QSUgyRA?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:00:11.668896+00:00",
+      "published_at": "2026-10-29T01:43:05+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "title": "Bitcoin Tops $81,000 as Crypto Market Gains Amid Volatility After Fed Holds Rates Steady - TradingKey",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPamVJT25NQkZpQzdXQUdJcVBBVVNLUzVDbFJ5WnVTRTdNUTdOM09hZlU2OGFrT0hhZ0lydElKLU5hZ3RLck0zMVVPMHJ5SjJtWkNaLXVKb3Z4QVI1U29QX3d5cXpta1hySUpfYmg1X0Q4d3F0TndQMUpGX21pQUxYR1dtU1dfN1IwVWlKVmsxdHNKOHB4Sm0zREQ4QVdWX3pSQlBhT014MFFPc2JHR3haZ1ZmeTFZZw?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:00:11.668935+00:00",
+      "published_at": "2026-10-28T21:00:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "feed_category": "SOL market",
+      "title": "Solana Captures 37% Of Blockchain Revenue Share In October - TronWeekly",
+      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTFA5YUVpWm9LN0Z2M28xcE5HdXJOV0g3QkNkMWM5cXhKRi1ZZEVvcno4V3RNRFdmTi1NWVltYWltdTc4OWJUTVlZbzhWT2ZOSjJ0VkZqUHFsZVlsbGZkSE9IMUFGWEc1TU8zNXhzb0lyeGhhRGdkeFpJ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:00:11.668973+00:00",
+      "published_at": "2026-10-28T18:58:54+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "feed_category": "Macro / global markets",
+      "title": "Fed Holds Interest Rates at 3.75% - 4.00%: What it Means for Bitcoin and Crypto Markets - Altcoin Buzz",
+      "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNR29xMUxnMUtQSnZVNk5LVjYzYlBWamdidWhFRndqbkhIRjNDLTZfT1l0QVJScUljMW9hREVBMFgtbTVuYXN0WXlSM1JLQnJKWDhaVTA0R2dET1ZMM05KbzhmS0JNVjBqMmdsdzRhb1RLbGdZZjRfdmpjN1RPU0ZMYXVueUpqUnVjbldndA?oc=5"
     }
-  ]
+  ],
+  "open_positions": []
 }
