@@ -6,6 +6,7 @@ tracks a virtual treasury and market-diversity ecology, and records a public bul
 """
 from datetime import datetime, timezone
 from market_university import update_university, university_summary, format_university_report
+from metropolis_simulation import update_metropolis, metropolis_summary, format_metropolis_report
 
 ELECTION_EVERY_SCANS = 48
 TERM_LENGTH_SCANS = 336
@@ -248,6 +249,7 @@ def run_civilization_cycle(system, core_specs, timestamp=None):
     _legislate(civ, timestamp)
     _update_economy_and_academy(system, civ, timestamp)
     update_university(system, civ, core_specs, timestamp)
+    update_metropolis(system, civ, core_specs, timestamp)
     if (civ["president"] is None or
             civ["scan_count"] - int(civ.get("last_election_scan", -ELECTION_EVERY_SCANS)) >= ELECTION_EVERY_SCANS or
             civ["scan_count"] - int(civ.get("last_election_scan", 0)) >= TERM_LENGTH_SCANS):
@@ -263,6 +265,7 @@ def run_civilization_cycle(system, core_specs, timestamp=None):
             "virtual_tax_revenue_usd": round(_num(civ["economy"].get("tax_revenue_usd")), 2),
             "research_lessons": len(civ["academy"].get("lessons") or []),
             "university": university_summary(civ),
+            "metropolis": metropolis_summary(civ),
             "ecology": dict(civ["ecology"]), "bulletin": list(civ["bulletin"][-5:])}
 
 
@@ -312,4 +315,5 @@ def format_civilization_report(report):
         lines.append("هشدار محیط: تمرکز بیش از حد روی پروژه‌های تکراری؛ تنوع انتخاب‌ها پایین است.")
     lines.append("نهادها: انتخابات، شورا/قانون‌گذاری، پلیسِ حسابرس، دادگاه، خزانه، محیط‌زیست و آکادمی پژوهش.")
     lines.append(format_university_report(report.get("university") or {}))
+    lines.append(format_metropolis_report(report.get("metropolis") or {}))
     return "\n".join(lines)
