@@ -375,27 +375,8 @@ def main():
         # invocation in the same process can recursively wrap the Telegram sender.
         scanner.send_telegram = original_send_telegram
 
-    # The scanner owns the no-setup/watchlist cooldown. Do not bypass it with
-    # a generic message every five-minute cycle when that cooldown suppresses a ping.
-    # Scanner exceptions are still reported immediately.
-    cooldown_active = False
-    if scan_error is None and not delivered_messages:
-        latest_state = read_state()
-        last_ping = latest_state.get("last_watchlist_ping_utc")
-        if last_ping:
-            try:
-                parsed_ping = datetime.fromisoformat(str(last_ping).replace("Z", "+00:00"))
-                if parsed_ping.tzinfo is None:
-                    parsed_ping = parsed_ping.replace(tzinfo=timezone.utc)
-                age_seconds = (datetime.now(timezone.utc) - parsed_ping.astimezone(timezone.utc)).total_seconds()
-                cooldown_minutes = max(5, int(os.getenv("NO_SETUP_PING_COOLDOWN_MINUTES", "60")))
-                cooldown_active = 0 <= age_seconds < cooldown_minutes * 60
-            except (ValueError, TypeError, OverflowError):
-                cooldown_active = False
-        if cooldown_active:
-            print("No-setup report suppressed; watchlist cooldown is active.")
-            return
-
+    # The scanner may suppress its own repetitive watchlist alert for an hour,
+    # but each scheduled run must still produce a Telegram heartbeat.
     # Always send an error report after a failed scan. A normal no-setup report
     # is sent only when the scanner did not already send a watchlist/status message.
     if not delivered_messages:
@@ -410,14 +391,17 @@ def main():
                 "فعلاً خریدی پیشنهاد نمی‌شود؛ در نوبت بعدی دوباره بررسی می‌کنم."
             )
         try:
-            telegram_send(
+            sent = telegram_send(
                 os.getenv("TELEGRAM_BOT_TOKEN"),
                 str(os.getenv("TELEGRAM_CHAT_ID", "")).strip(),
                 final_reply
             )
-            print("Final automatic scan report sent.")
+            if sent:
+                print("Final automatic scan report delivered to Telegram.")
+            else:
+                print("ERROR: final automatic scan report was not delivered to Telegram.")
         except Exception as reply_exc:
-            print(f"Final scan response failed: {reply_exc}")
+            print(f"ERROR: final scan response failed: {reply_exc}")
 
 
 
