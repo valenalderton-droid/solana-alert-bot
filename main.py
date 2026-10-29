@@ -1015,7 +1015,12 @@ def main():
               "volume_24h_usd": info["volume24h"],
               "price_action": pa_reason,
               "strategy_ensemble": ensemble,
-              "rank_score": rank_candidate(ensemble, probability, quality["score"]),
+              "rank_score": rank_candidate(
+                  ensemble, probability, quality["score"],
+                  liquidity_usd=info["liquidity"],
+                  volume_24h_usd=info["volume24h"],
+                  entry_deviation_pct=entry_deviation_pct
+              ),
               "signal_quality": quality,
               "model_metrics": metrics
           }
@@ -1066,6 +1071,7 @@ def main():
               f"Combined model probability: {probability:.1%}\n"
               f"Ensemble rank score: {prediction['rank_score']:.1f}/100\n"
               f"Strategy ensemble: {json.dumps(ensemble, ensure_ascii=False)}\n"
+              f"Risk flags: {', '.join(ensemble.get('risk_flags', [])) or 'none detected'}\n"
               f"Probability by horizon: {json.dumps(horizon_probabilities)}\n"
               f"Price-action note: {pa_reason}\n"
               f"Signal quality: {quality['score']}/100 (grade {quality['grade']})\n"
