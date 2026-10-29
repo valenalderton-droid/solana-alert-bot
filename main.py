@@ -631,7 +631,7 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
                 has_valid_stop = 0 < stop < price
                 risk_pct = (price - stop) / price * 100 if has_valid_stop else 0.0
                 # Always show the valid current quote even if stop/target cannot be found.
-                target = find_resistance_target(candles, price, 0.0)
+                target = find_resistance_target(candles, price, 0.10)
                 target_reward_pct = ((target / price) - 1.0) * 100 if target else 0.0
                 reward_risk = target_reward_pct / risk_pct if target and risk_pct > 0 else 0.0
                 stop_line = (
@@ -1355,7 +1355,7 @@ def main():
               continue
 
           stop = entry * (1 - stop_pct)
-          minimum_target_pct = max(TARGET_PCT, 3 * atr_pct, 2.0 * stop_pct)
+          minimum_target_pct = max(0.10, TARGET_PCT, 3 * atr_pct, 2.0 * stop_pct)
           target = find_resistance_target(candles, entry, minimum_target_pct)
           if target is None:
               scan_diagnostics.setdefault("no_valid_resistance_target", 0)
