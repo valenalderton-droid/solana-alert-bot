@@ -7,8 +7,8 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T09:47:23.404335+00:00",
-  "last_status_message_utc": "2026-10-29T03:39:02.533088+00:00",
+  "last_run_utc": "2026-10-29T09:54:50.482523+00:00",
+  "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
     "80dc80f108e24c577158c3d4",
@@ -22,7 +22,8 @@
     "2a673060f36599245a60b423",
     "d91d2d979bbabb6b628dba72",
     "0f23f622f6a4cfb697501120",
-    "6e8cfc00053f0499f5c27e31"
+    "6e8cfc00053f0499f5c27e31",
+    "63cec0b0e9e07d732a52d042"
   ],
   "news_observations": [
     {
@@ -105,6 +106,15 @@
       "relevance": "DIRECT — SOL market / regulation",
       "title": "Solana (SOL): Is a Market Rebound Coming? Key Trends Every Trader Should Watch - Binance",
       "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1McUdTWXN0SDZoSEJFUVdvdm9tYWh5Z0llTmtGdXZKVlZyX0xUcWlFdGw1NDRaZkx3dXhCWndPTFd0aGRMYkYzM21FN0tQejBEZC1wZ3JTVnZZeUFHRk10d0Z4Szh3WXlz?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:54:27.489979+00:00",
+      "published_at": "2026-10-28T00:23:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana Price Prediction: Can SOL Get Back Above $110 in November? - 24/7 Wall St.",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOWFY2UkxmenR3OXF5dnMzV3cydWN3YjNOWHR2SWlab0F0Qm9CekFRcnRUazdZcUpnRXlTREdUUDg4Y3haRzRoMTU5WWZaUzNJZGc4dlZLUHVVa01PRXdPTzJndGxzcXNCaEN2OHJ5MVYwYURBOVk5Wm5DempqWnpFUFVWZXI0bmZmWlEyQVVLRTliS3R5RGZKQ0YxUV9DZF82QlpOS0ZsUnpIQzJPRGVuQVV2aWsyZkthWjFXRUtR?oc=5"
     }
   ]
 }
