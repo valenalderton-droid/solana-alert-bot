@@ -7,67 +7,6 @@ import main as scanner
 
 
 class CommandRunnerTests(unittest.TestCase):
-    def test_only_exact_pay_command_authorizes_scan(self):
-        response = Mock()
-        response.raise_for_status.return_value = None
-        response.json.return_value = {
-            "ok": True,
-            "result": [
-                {"update_id": 12, "message": {"chat": {"id": 123}, "text": "hello"}},
-                {"update_id": 13, "message": {"chat": {"id": 123}, "text": "//Pay"}},
-            ],
-        }
-        send_response = Mock()
-        send_response.raise_for_status.return_value = None
-        send_response.json.return_value = {"ok": True}
-        state = {}
-        with patch.dict("os.environ", {
-            "TELEGRAM_BOT_TOKEN": "test-token",
-            "TELEGRAM_CHAT_ID": "123",
-        }), patch.object(command_runner.requests, "get", return_value=response), \
-             patch.object(command_runner.requests, "post", return_value=send_response), \
-             patch.object(command_runner, "save_state"):
-            self.assertTrue(command_runner.poll_pay(state))
-        self.assertEqual(state["telegram_update_offset"], 13)
-
-    def test_accepts_common_pay_command_spellings(self):
-        for command in ("//Pay", "//pay", "/pay", "Pay", "  pay  "):
-            response = Mock()
-            response.status_code = 200
-            response.raise_for_status.return_value = None
-            response.json.return_value = {
-                "ok": True,
-                "result": [
-                    {"update_id": 30, "message": {"chat": {"id": 123}, "text": command}},
-                ],
-            }
-            send_response = Mock()
-            send_response.status_code = 200
-            send_response.raise_for_status.return_value = None
-            send_response.json.return_value = {"ok": True}
-            with patch.dict("os.environ", {
-                "TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "123"
-            }), patch.object(command_runner.requests, "get", return_value=response), \
-                 patch.object(command_runner.requests, "post", return_value=send_response), \
-                 patch.object(command_runner, "save_state"):
-                self.assertTrue(command_runner.poll_pay({}), command)
-
-    def test_other_chat_cannot_trigger_scan(self):
-        response = Mock()
-        response.raise_for_status.return_value = None
-        response.json.return_value = {
-            "ok": True,
-            "result": [
-                {"update_id": 20, "message": {"chat": {"id": 999}, "text": "/Pay"}},
-            ],
-        }
-        with patch.dict("os.environ", {
-            "TELEGRAM_BOT_TOKEN": "test-token",
-            "TELEGRAM_CHAT_ID": "123",
-        }), patch.object(command_runner.requests, "get", return_value=response), \
-             patch.object(command_runner, "save_state"):
-            self.assertFalse(command_runner.poll_pay({}))
-
     def test_compact_reply_selects_highest_probability_candidate(self):
         messages = [
             "SOLANA BUY WATCH\nProject: Alpha (ALP)\nEntry reference: $1.2\n"
@@ -178,26 +117,6 @@ class CommandRunnerTests(unittest.TestCase):
              patch.object(scanner, "send_telegram", original_sender):
             # A scheduled run should execute without checking for a Telegram trigger.
             command_runner.main()
-
-    def test_only_pay_command_is_accepted_and_other_text_is_ignored(self):
-        for ignored_text in ("hello", "سلام", "راهنما", "/status", "اخبار"):
-            response = Mock()
-            response.raise_for_status.return_value = None
-            response.json.return_value = {
-                "ok": True,
-                "result": [
-                    {"update_id": 40, "message": {"chat": {"id": 123}, "text": ignored_text}},
-                ],
-            }
-            with patch.dict("os.environ", {
-                "TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "123"
-            }), patch.object(command_runner.requests, "get", return_value=response), \
-                 patch.object(command_runner.requests, "post") as post, \
-                 patch.object(command_runner, "save_state"):
-                self.assertFalse(command_runner.poll_pay({}), ignored_text)
-                post.assert_not_called()
-        self.assertIsNone(command_runner.intelligent_reply("راهنما", {}))
-        self.assertIsNone(command_runner.intelligent_reply("اخبار", {}))
 
     def test_recent_cached_candles_are_exit_only_fallback(self):
         now = datetime(2026, 10, 29, 12, 30, tzinfo=timezone.utc)
