@@ -32,6 +32,27 @@ class AdaptivePolicyTests(unittest.TestCase):
         self.assertEqual(result["min_probability"], 0.63)
         self.assertEqual(result["direct_bearish_news_24h"], 2)
 
+    def test_global_bearish_news_temporarily_raises_threshold(self):
+        now = datetime.now(timezone.utc)
+        news = [
+            {
+                "observed_at": (now - timedelta(hours=2)).isoformat(),
+                "sentiment": "BEARISH",
+                "feed_category": "Macro / global markets",
+                "relevance": "UNCERTAIN"
+            },
+            {
+                "observed_at": (now - timedelta(hours=1)).isoformat(),
+                "sentiment": "BEARISH",
+                "feed_category": "Geopolitics / global risk",
+                "relevance": "UNCERTAIN"
+            }
+        ]
+        result = derive_policy([], news, base_probability=0.60, now=now)
+        self.assertEqual(result["global_bearish_news_24h"], 2)
+        self.assertEqual(result["min_probability"], 0.64)
+        self.assertEqual(result["cooldown_hours"], 7)
+
     def test_non_target_outcomes_do_not_count(self):
         outcomes = [{"result": "timeout"} for _ in range(20)]
         result = derive_policy(outcomes, [], base_probability=0.60)
