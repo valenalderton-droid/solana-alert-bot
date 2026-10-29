@@ -491,7 +491,7 @@ def main():
         min_liquidity=MIN_LIQUIDITY,
         min_volume_24h=float(os.getenv("MIN_VOLUME_24H_USD", "50000")),
         min_age_days=int(os.getenv("MIN_POOL_AGE_DAYS", "30")),
-        max_projects=int(os.getenv("MAX_DISCOVERED_PROJECTS", "20"))
+        max_projects=int(os.getenv("MAX_DISCOVERED_PROJECTS", "100"))
     )
     combined = {}
     for project in discovered_projects:
