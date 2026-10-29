@@ -45,7 +45,7 @@ jobs:
           MIN_LIQUIDITY_USD: "100000"
           MIN_PROBABILITY: "0.60"
           MAX_STOP_PCT: "0.05"
-          TARGET_PCT: "0.04"
+          TARGET_PCT: "0.10"
           ALERT_COOLDOWN_HOURS: "6"
         run: python command_runner.py
       - name: Save persistent history
