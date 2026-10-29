@@ -28,7 +28,7 @@ OUTCOMES_FILE = DATA / "outcomes.jsonl"
 MIN_LIQUIDITY = float(os.getenv("MIN_LIQUIDITY_USD", "100000"))
 MIN_PROBABILITY = float(os.getenv("MIN_PROBABILITY", "0.60"))
 MAX_STOP_PCT = float(os.getenv("MAX_STOP_PCT", "0.05"))
-TARGET_PCT = float(os.getenv("TARGET_PCT", "0.04"))
+TARGET_PCT = float(os.getenv("TARGET_PCT", "0.10"))
 MAX_CANDLE_HISTORY = 1500
 
 
@@ -414,7 +414,7 @@ def resolve_old_signals(state, store):
 
         entry_price = float(signal["entry"])
         stop_price = float(signal.get("stop", entry_price * 0.98))
-        target_price = float(signal.get("target", entry_price * 1.04))
+        target_price = float(signal.get("target", entry_price * 1.10))
         if entry_price <= 0:
             continue
 
