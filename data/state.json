@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T09:40:32.062044+00:00",
+  "last_run_utc": "2026-10-29T09:42:12.365966+00:00",
   "last_status_message_utc": "2026-10-29T03:39:02.533088+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -16,7 +16,10 @@
     "edfd910460c9a3bda039d1c8",
     "cd94a19df52c4be557de94c7",
     "440e7118ef1d11a3831a9d97",
-    "fbbe9ed1c230c6c1ded02e2a"
+    "fbbe9ed1c230c6c1ded02e2a",
+    "4efdb5d3ef64c29afb9d0399",
+    "a136058668c86838b9f7d0b9",
+    "2a673060f36599245a60b423"
   ],
   "news_observations": [
     {
@@ -45,6 +48,33 @@
       "relevance": "DIRECT — SOL market / regulation",
       "title": "Solana Handles 38% of Spot DEX Trading. So Why Does SOL Keep Falling? - 24/7 Wall St.",
       "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQdlRtczBucWZFSzdIU25QOC01LWYyRTdMV3ByZWM3TVVwQ1FBcWJaMkVKRFJLZ3RyTVc5ZEoyTUtSVklLNHhtTGJiTUl4ZFJqSzVGbEtnS2REaFBXVEEta1cyVWZaRG1sQzN2eXdHVGhhaC00MVZ1T21JQzY5SDRNYl9DX2NXbG1kdEl2eEprZzFwczJmWnAtQnVtM1BjOFhMWkgtMzdvOTlrVDFweWVjN0VSeVNmcEh3cGxPMjE0VWIzbDg?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:41:46.312306+00:00",
+      "published_at": "2026-10-29T02:26:07+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana (SOLUSD) Price Forecast & Predictions for 2026, 2027, 2028–2030, 2040 and Beyond - LiteFinance",
+      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQY3NwRVZEazFMTWI1Xy1lTEpmWDRBNk55QXhxMk9JbjAxazFCOFJOT3pod0pjbmRUcWVHXy10MEFfOTVzcEdTbHRCenpKcXZYcWRnbEF1cEJwZ1RZbHFjS3YyM25HWUFWSDdCZjVpZXNfOXVlSlFwUlBUZ2xmdzhURw?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:41:46.946520+00:00",
+      "published_at": "2026-10-28T12:43:15+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana Rises 1.17% to $101.65 Ahead of Fed's Wednesday Decision - www.tokenpost.com",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBMak5MRXl3M1ZFQndwUnhiWWhJcV9mNVh4N0ZmS2RZTUhrQVFfcXVUUlJJMGk3em1Fc1d5bG5vc1V1em5jZDRQcmo1eUVOenBjLWk2UWdTNWdrdw?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T09:41:47.375791+00:00",
+      "published_at": "2026-10-28T08:42:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "title": "Solana ETFs Post Their Worst Day Since December While SOL Holds Above $100 - BeInCrypto",
+      "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTFB3bFBDUWJNakJESmN4QnBIOGZBc1ltbDJULWRPOWRXbXZ2R2JLc29GTExBRTN2NFpDVmFJd2ViMUVzckhmQm1STTFYUElxU0s0TzlNYTBwVW05MFM3VEtPd1k3LTM0dFlQenZ6SllfQld1amc?oc=5"
     }
   ]
 }
