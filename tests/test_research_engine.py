@@ -1,10 +1,28 @@
 import unittest
 from datetime import datetime, timezone
-from research_engine import build_research_plan, _performance_topics, fetch_solana_tvl_snapshot, fetch_solana_activity_metrics
+from research_engine import build_research_plan, _performance_topics, fetch_solana_tvl_snapshot, fetch_solana_activity_metrics, assess_research_evidence
 from unittest.mock import patch
 
 
 class ResearchEngineTests(unittest.TestCase):
+    def test_research_evidence_marks_mixed_keywords_without_claiming_verified_impact(self):
+        now = datetime(2026, 10, 29, tzinfo=timezone.utc)
+        result = assess_research_evidence(
+            "Solana integration announced after exploit concerns",
+            source="Example Publisher", published=now, now=now
+        )
+        self.assertEqual(result["keyword_tone"], "mixed")
+        self.assertIn("exploit", result["risk_keywords"])
+        self.assertIn("integration", result["positive_keywords"])
+        self.assertGreaterEqual(result["evidence_quality_score"], 70)
+        self.assertIn("Keyword triage only", result["assessment_note"])
+
+    def test_research_evidence_is_cautious_with_unclassified_headlines(self):
+        result = assess_research_evidence("A vague market update")
+        self.assertEqual(result["keyword_tone"], "unclassified")
+        self.assertEqual(result["risk_keywords"], [])
+        self.assertEqual(result["positive_keywords"], [])
+
     def test_plan_rotates_queries_and_uses_project_context(self):
         state = {}
         projects = [{"name": "Jupiter", "symbol": "JUP", "approved_non_meme": True}]
