@@ -25,6 +25,8 @@ STATE_FILE = DATA / "state.json"
 CANDLES_FILE = DATA / "candles.jsonl"
 PREDICTIONS_FILE = DATA / "predictions.jsonl"
 OUTCOMES_FILE = DATA / "outcomes.jsonl"
+PAPER_PREDICTIONS_FILE = DATA / "paper_predictions.jsonl"
+PAPER_OUTCOMES_FILE = DATA / "paper_outcomes.jsonl"
 
 MIN_LIQUIDITY = float(os.getenv("MIN_LIQUIDITY_USD", "100000"))
 MIN_PROBABILITY = float(os.getenv("MIN_PROBABILITY", "0.60"))
@@ -430,11 +432,12 @@ def select_projects_for_scan(projects, cursor=0, max_projects=5, always_include_
     return selected, (start + count) % len(projects)
 
 
-def resolve_old_signals(state, store):
-    pending = state.get("open_signals", [])
+def resolve_old_signals(state, store, signal_key="open_signals", outcomes_path=OUTCOMES_FILE, count_live_stats=True):
+    """Resolve four-hour paper observations, keeping live and shadow ledgers separate."""
+    pending = state.setdefault(signal_key, [])
     still_pending = []
     known_outcomes = {
-        row.get("signal_id") for row in read_jsonl(OUTCOMES_FILE)
+        row.get("signal_id") for row in read_jsonl(outcomes_path)
     }
 
     for signal in pending:
@@ -464,7 +467,7 @@ def resolve_old_signals(state, store):
             if latest_ts < signal_time + 8 * 3600:
                 still_pending.append(signal)
                 continue
-            append_jsonl(OUTCOMES_FILE, {
+            append_jsonl(outcomes_path, {
                 "signal_id": signal_id,
                 "token_address": address,
                 "name": signal.get("name", "Unknown"),
@@ -472,9 +475,11 @@ def resolve_old_signals(state, store):
                 "result": "data_gap",
                 "return_pct": None,
                 "resolved_at": utc_now(),
-                "method": "missing_hourly_candles"
+                "method": "missing_hourly_candles",
+                "source": signal.get("source", "live_alert" if count_live_stats else "paper_watchlist")
             })
-            state["stats"]["resolved"] += 1
+            if count_live_stats:
+                state["stats"]["resolved"] += 1
             continue
         future = [future_by_time[ts] for ts in expected_times]
 
@@ -531,17 +536,19 @@ def resolve_old_signals(state, store):
             ),
             "exit_timestamp": int(exit_candle["timestamp"]),
             "resolved_at": utc_now(),
-            "method": exit_method
+            "method": exit_method,
+            "source": signal.get("source", "live_alert" if count_live_stats else "paper_watchlist")
         }
-        append_jsonl(OUTCOMES_FILE, outcome)
+        append_jsonl(outcomes_path, outcome)
 
-        state["stats"]["resolved"] += 1
-        if outcome["result"] == "win":
-            state["stats"]["wins"] += 1
-        elif outcome["result"] == "loss":
-            state["stats"]["losses"] += 1
+        if count_live_stats:
+            state["stats"]["resolved"] += 1
+            if outcome["result"] == "win":
+                state["stats"]["wins"] += 1
+            elif outcome["result"] == "loss":
+                state["stats"]["losses"] += 1
 
-    state["open_signals"] = still_pending
+    state[signal_key] = still_pending
 
 
 def send_watchlist_fallback(active_projects, market_info, state, reason, configured_projects=None):
@@ -627,6 +634,59 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
             "پس از برگشت داده/فهرست معتبر، اسکن بعدی دوباره تلاش می‌کند."
         )
 
+    # Shadow-track the selected project independently of Telegram delivery.
+    # This is a paper observation, not a BUY signal and never opens a real position.
+    if ranked:
+        paper_score, paper_project, paper_info, paper_ensemble, paper_candles = ranked[0]
+        paper_address = str(paper_project.get("token_address", "")).strip()
+        if paper_address and paper_info and paper_candles:
+            ordered = sorted(paper_candles, key=lambda candle: int(candle.get("timestamp", 0)))
+            last = ordered[-1]
+            try:
+                paper_ts = int(last["timestamp"])
+                paper_entry = float(last.get("close") or 0)
+                recent_lows = [float(item.get("low") or 0) for item in ordered[-20:]
+                               if float(item.get("low") or 0) > 0]
+                paper_stop = min(recent_lows) if recent_lows else 0.0
+            except (TypeError, ValueError, KeyError, OverflowError):
+                paper_ts, paper_entry, paper_stop = 0, 0.0, 0.0
+            paper_signal_id = f"{paper_address}:{paper_ts}:PAPER_TOP"
+            existing_ids = {str(item.get("signal_id")) for item in state.get("paper_open_signals", [])}
+            if paper_ts > 0 and paper_entry > 0 and 0 < paper_stop < paper_entry and paper_signal_id not in existing_ids:
+                # One sample per token per completed hourly candle; repeated 15m scans do not duplicate it.
+                paper_target = paper_entry + 2 * (paper_entry - paper_stop)
+                paper_prediction = {
+                    "signal_id": paper_signal_id,
+                    "source": "paper_watchlist",
+                    "timestamp": paper_ts,
+                    "created_at": now.isoformat(),
+                    "token_address": paper_address,
+                    "name": paper_project.get("name", "Unknown"),
+                    "symbol": paper_project.get("symbol", ""),
+                    "entry": paper_entry,
+                    "stop": paper_stop,
+                    "target": paper_target,
+                    "rank_score": round(float(paper_score), 3),
+                    "strategy_score": float((paper_ensemble or {}).get("score") or 0),
+                    "liquidity_usd": float(paper_info.get("liquidity") or 0),
+                    "volume_24h_usd": float(paper_info.get("volume24h") or 0),
+                    "risk_flags": list((paper_ensemble or {}).get("risk_flags", [])),
+                    "model_probability": None,
+                    "note": "Shadow observation only; no calibrated model probability and no real trade."
+                }
+                append_jsonl(PAPER_PREDICTIONS_FILE, paper_prediction)
+                state.setdefault("paper_open_signals", []).append({
+                    "signal_id": paper_signal_id,
+                    "source": "paper_watchlist",
+                    "token_address": paper_address,
+                    "name": paper_project.get("name", "Unknown"),
+                    "timestamp": paper_ts,
+                    "entry": paper_entry,
+                    "stop": paper_stop,
+                    "target": paper_target
+                })
+                print(f"Paper observation recorded independently of Telegram: {paper_signal_id}")
+
     sent = send_telegram(message)
     print(f"Per-scan top-ranked project report sent={sent}; no cooldown applied.")
     if sent:
@@ -685,6 +745,7 @@ def main():
 
     state.setdefault("last_alerts", {})
     state.setdefault("open_signals", [])
+    state.setdefault("paper_open_signals", [])
     state.setdefault("open_positions", [])
     state.setdefault("stats", {
         "signals": 0, "resolved": 0, "wins": 0, "losses": 0
@@ -993,6 +1054,10 @@ def main():
     # Resolve paper-performance labels, then monitor real-time exit conditions
     # for every BUY alert that was successfully delivered.
     resolve_old_signals(state, store)
+    resolve_old_signals(
+        state, store, signal_key="paper_open_signals",
+        outcomes_path=PAPER_OUTCOMES_FILE, count_live_stats=False
+    )
     monitor_open_positions(state, market_info)
 
     # Send a compact performance digest at most once every 24 hours.
