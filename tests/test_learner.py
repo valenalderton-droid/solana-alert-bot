@@ -112,10 +112,10 @@ class LearnerTests(unittest.TestCase):
         self.assertTrue(rows.empty)
 
     def test_training_rows_include_binary_labels_only(self):
-        candles = make_flat_candles()
+        candles = make_flat_candles(320)
         # Introduce clear future target hits for some samples, while keeping
         # candle OHLC internally valid.
-        for i in range(35, len(candles), 8):
+        for i in range(200, len(candles), 8):
             base = candles[i]["close"]
             for j in range(i + 1, min(i + 5, len(candles))):
                 candles[j]["high"] = max(candles[j]["high"], base * 1.06)
