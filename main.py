@@ -35,6 +35,46 @@ TARGET_PCT = float(os.getenv("TARGET_PCT", "0.10"))
 MAX_CANDLE_HISTORY = 1500
 
 
+def find_resistance_target(candles, entry, minimum_target_pct, max_target_pct=0.30):
+    """Return a conservative target just below the nearest confirmed swing high.
+
+    Uses only completed candles supplied by the caller. Returns None when no
+    resistance can support the required reward/risk or the target is too far.
+    """
+    try:
+        entry = float(entry)
+        minimum_target_pct = float(minimum_target_pct)
+        max_target_pct = float(max_target_pct)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not math.isfinite(entry) or entry <= 0 or minimum_target_pct < 0:
+        return None
+    if len(candles or []) < 5:
+        return None
+
+    minimum_price = entry * (1.0 + minimum_target_pct)
+    maximum_price = entry * (1.0 + max_target_pct)
+    highs = []
+    for candle in (candles or [])[-100:]:
+        try:
+            high = float(candle.get("high") or 0)
+        except (TypeError, ValueError, OverflowError):
+            high = 0.0
+        highs.append(high if math.isfinite(high) and high > 0 else 0.0)
+
+    # A confirmed local swing high must have two candles on either side.
+    targets = []
+    for i in range(2, len(highs) - 2):
+        high = highs[i]
+        if high <= 0 or high <= entry:
+            continue
+        if high >= max(highs[i - 2:i] + highs[i + 1:i + 3]):
+            target = high * 0.995  # place target just before resistance
+            if minimum_price <= target <= maximum_price:
+                targets.append(target)
+    return min(targets) if targets else None
+
+
 def read_json(path, default):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -589,15 +629,19 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
             stop = min(recent_lows) if recent_lows else 0.0
             if price > 0 and 0 < stop < price:
                 risk_pct = (price - stop) / price * 100
-                target = price + 2 * (price - stop)
+                target = find_resistance_target(candles, price, 2.0 * risk_pct / 100)
                 exit_lines = (
                     f"قیمت مرجع فعلی: ${price:.8g}\n"
-                    f"حد خروج/ابطال زیر کف اخیر: ${stop:.8g} ({risk_pct:.2f}% پایین‌تر)\n"
-                    f"هدف مرجع با نسبت سود به ریسک ۲:۱: ${target:.8g}\n"
+                    f"حد خروج/ابطال زیر کف ۲۰ کندل اخیر: ${stop:.8g} ({risk_pct:.2f}% پایین‌تر)\n"
+                    + (
+                        f"هدف مرجع: ${target:.8g} (زیر مقاومت تکنیکال؛ نسبت سود به ریسک حداقل ۲:۱)\n"
+                        if target is not None else
+                        "هدف مرجع: تعیین نشد؛ مقاومت معتبر در فاصله مناسب برای نسبت سود به ریسک ۲:۱ پیدا نشد.\n"
+                    )
                 )
                 exit_warning = (
-                    "قیمت لحظه‌ای با آخرین کندل بسته‌شده حداکثر ۳٪ اختلاف دارد. "
-                    "این سطوح تضمین اجرای معامله در همان قیمت نیستند.\n"
+                    "این گزارش پروژهٔ برتر سیگنال خرید نیست. هدف فقط در صورت وجود مقاومت مشخص و "
+                    "فاصله کافی نسبت به حد ضرر اعلام می‌شود؛ قیمت اجرا تضمین نمی‌شود.\n"
                 )
             else:
                 deviation = info.get("price_deviation_pct")
@@ -1298,16 +1342,23 @@ def main():
               continue
 
           stop_pct = min(MAX_STOP_PCT, max(0.02, 1.5 * atr_pct))
-          # Preserve a minimum 2:1 gross reward/risk before fees and slippage.
-          # If the volatility-based target is farther away, keep that distance.
-          target_pct = max(TARGET_PCT, 3 * atr_pct, 2.0 * stop_pct)
-
           # Require a stop distance no greater than the configured cap.
           if stop_pct > MAX_STOP_PCT:
               continue
 
           stop = entry * (1 - stop_pct)
-          target = entry * (1 + target_pct)
+          minimum_target_pct = max(TARGET_PCT, 3 * atr_pct, 2.0 * stop_pct)
+          target = find_resistance_target(candles, entry, minimum_target_pct)
+          if target is None:
+              scan_diagnostics.setdefault("no_valid_resistance_target", 0)
+              scan_diagnostics["no_valid_resistance_target"] += 1
+              print(
+                  f"Entry skipped for {project.get('name')}: no confirmed resistance "
+                  f"supports required target >= {minimum_target_pct * 100:.2f}% "
+                  "within 30% and reward/risk constraints"
+              )
+              continue
+          target_pct = target / entry - 1.0
 
           quality = score_signal(
               row=row,
