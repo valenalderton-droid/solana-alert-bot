@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T10:05:44.222608+00:00",
+  "last_run_utc": "2026-10-29T10:07:55.885490+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -30,7 +30,8 @@
     "14a94b80222a89472c572bce",
     "bce4e8201ac92858f17b85fc",
     "5d5e180c08d71c301ec69854",
-    "7d0a4f1de338d355a5bbca4b"
+    "7d0a4f1de338d355a5bbca4b",
+    "32489316876ca071d62343f4"
   ],
   "news_observations": [
     {
@@ -192,6 +193,17 @@
       "feed_category": "Macro / global markets",
       "title": "Bitcoin Price Tops USD 80K as ETF Flows Rise Before Fed Vote - Analytics Insight",
       "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQTVpXVDdqODc5LTd4RWpPWTQ5LVV5QTlsR1p2eEJ6akFuelNaeXlNLW9tb1V6YmtOUG1NOEZ0ekFDeGk4aEJjTGtGWVlWMmFzeXFHS0ZvUkR3SWdiLVJjeG9qSXFSbkNvLXhXcUk4Y1hrWlNlN0JsYkpJVzltZGRGX1dSaUU1M0ZLaGZXWFN3dUxHa3ZLU255dDhsMTFXVmPSAawBQVVfeXFMTnB5eVVkSGtTbnpmSkFRd2FmZXZrcVpZcjVISmhWa1E3cjJLbkQwXzhVblpueFZSV3N1bXpWUE5JT0tSZ2hRZG1udFY4NUp4YVBLNmVrcEFkQWRUZ1FXVFd6cFlGYWtpZVlHSnlhbHFzejVvNWtidTJ6a0RuZ1QtZm5nazJ6aHVDRGdBMExLNUVSMlpJclJEQ2xxOGpZNE1wVy1pb2xUQ1c0MUNWeQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:07:30.984299+00:00",
+      "published_at": "2026-10-28T13:30:30+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana (SOL) Climbs 3% Amid Fed Decision Anticipation - NameCoinNews",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1OVkxzZzlDQ0d3UEdzTTRLYWZXTmF2WjdDUHlLemN4c053MUI0bXpKa2pfaXZzQ29xVUd0MWN6aE5tTEI1ZXRqaUlCVFNEc05kdFFDQWRHcV9KNzFreDQ5Z1dFS3hWSHdlZ01aanZkMm1hcE1Nc0xKUUFuRjRGQQ?oc=5"
     }
   ],
   "open_positions": []
