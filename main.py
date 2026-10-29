@@ -7,7 +7,11 @@ from datetime import datetime, timezone
 
 import requests
 
-from market import get_best_solana_pair, get_hourly_candles, utc_now, discover_solana_projects
+from market import (
+    get_best_solana_pair, get_hourly_candles, utc_now,
+    discover_solana_projects, is_allowed_non_meme_project
+)
+from adaptive_policy import derive_policy
 from learner import train_model, latest_features, price_action_ok
 from news_analyzer import fetch_recent_news, analyze_news, format_news_alert
 
@@ -266,11 +270,18 @@ def main():
         address = str(project.get("token_address", "")).strip()
         if address:
             combined[address] = project
-    config["projects"] = list(combined.values())
+    # Hard safety boundary: configured projects cannot bypass the non-meme allowlist.
+    candidates = list(combined.values())
+    config["projects"] = [
+        project for project in candidates
+        if is_allowed_non_meme_project(project)
+    ]
+    rejected = len(candidates) - len(config["projects"])
     print(
         f"Project list: {len(configured_projects)} configured + "
         f"{len(discovered_projects)} discovered; "
-        f"{len(config['projects'])} unique candidates."
+        f"{len(config['projects'])} approved Solana utility/protocol candidates; "
+        f"{rejected} rejected by non-meme allowlist."
     )
 
     state = read_json(STATE_FILE, {
@@ -300,6 +311,17 @@ def main():
         if item["id"] in seen_news_set:
             continue
         analyzed = analyze_news(item)
+        observations = state.setdefault("news_observations", [])
+        observations.append({
+            "observed_at": utc_now(),
+            "published_at": analyzed.get("published_at"),
+            "sentiment": analyzed.get("sentiment", "NEUTRAL / UNCLEAR"),
+            "impact_score": int(analyzed.get("impact_score", 0)),
+            "relevance": analyzed.get("relevance", "UNCERTAIN"),
+            "title": analyzed.get("title", "")[:250],
+            "url": analyzed.get("url", "")
+        })
+        state["news_observations"] = observations[-500:]
         print(
             "News analysis:",
             json.dumps({
@@ -317,6 +339,15 @@ def main():
             break
     # Bound the state file while retaining enough history for deduplication.
     state["seen_news_ids"] = seen_news[-500:]
+
+    # Adaptive policy learns cautiously from resolved paper outcomes and recent news.
+    policy = derive_policy(
+        outcomes=read_jsonl(OUTCOMES_FILE),
+        news_observations=state.get("news_observations", []),
+        base_probability=MIN_PROBABILITY,
+        base_cooldown_hours=max(1, int(os.getenv("ALERT_COOLDOWN_HOURS", "6")))
+    )
+    print("Adaptive policy:", json.dumps(policy, ensure_ascii=False))
 
     store = load_candle_store()
     active_projects = []
@@ -338,7 +369,7 @@ def main():
 
     for project in config.get("projects", []):
         scan_diagnostics["projects_seen"] += 1
-        if not project.get("approved_non_meme", False):
+        if not is_allowed_non_meme_project(project):
             scan_diagnostics["not_approved_or_missing_address"] += 1
             continue
 
@@ -530,7 +561,7 @@ def main():
         signal_id = f"{address}:{candle_ts}:BUY_WATCH"
 
         last_alert_ts = int(state["last_alerts"].get(address, 0) or 0)
-        cooldown_hours = max(1, int(os.getenv("ALERT_COOLDOWN_HOURS", "6")))
+        cooldown_hours = policy["cooldown_hours"]
         if last_alert_ts and candle_ts - last_alert_ts < cooldown_hours * 3600:
             continue
 
@@ -541,11 +572,11 @@ def main():
             continue
 
         probability = float(model.predict_proba(X)[0][1])
-        if probability < MIN_PROBABILITY:
+        if probability < policy["min_probability"]:
             scan_diagnostics["below_probability_threshold"] += 1
             print(
                 f"Probability rejection {project.get('name')}: "
-                f"{probability:.3f} < {MIN_PROBABILITY:.3f}"
+                f"{probability:.3f} < adaptive {policy['min_probability']:.3f}"
             )
             continue
 
