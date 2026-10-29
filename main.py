@@ -73,65 +73,6 @@ def append_jsonl(path, row):
         file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def translate_telegram(message):
-    """Translate fixed English Telegram labels and status text into Persian."""
-    replacements = {
-        "SOLANA BOT — LAST 24H PERFORMANCE": "گزارش عملکرد ربات سولانا — ۲۴ ساعت گذشته",
-        "BUY-watch alerts recorded in last 24h:": "تعداد هشدارهای بررسی خرید در ۲۴ ساعت گذشته:",
-        "Target/stop outcomes in last 24h:": "نتایج بررسی حد سود/ضرر در ۲۴ ساعت گذشته:",
-        "wins:": "موفق:", "losses:": "ناموفق:", "timeouts:": "پایان زمان:", "data gaps:": "کمبود داده:",
-        "Target-hit rate among target/stop outcomes:": "درصد رسیدن به حد سود:",
-        "Average return of alerts resolved in last 24h:": "میانگین بازده نتایج بررسی‌شده در ۲۴ ساعت گذشته:",
-        "Projects with usable market data this run:": "تعداد پروژه‌های دارای داده معتبر در این اجرا:",
-        "Projects with usable market data:": "پروژه‌های دارای داده معتبر:",
-        "Time (UTC):": "زمان (UTC):",
-        "Win rate uses target/stop outcomes only; average return includes numeric resolved outcomes. Data gaps are excluded from average return. ": "درصد موفقیت فقط بر اساس برخورد به حد سود یا ضرر است؛ میانگین بازده شامل نتایج عددی است و کمبود داده محاسبه نمی‌شود. ",
-        "This is not a guarantee of future performance.": "عملکرد گذشته تضمین‌کننده نتیجه آینده نیست.",
-        "SOLANA BOT STATUS — RUNNING": "وضعیت ربات سولانا — فعال است",
-        "The bot ran successfully, but the model is not ready yet, so no BUY alert was generated.": "ربات با موفقیت اجرا شد، اما مدل هنوز آماده نیست؛ بنابراین هشدار خریدی صادر نشد.",
-        "Model details:": "جزئیات مدل:",
-        "This is a status message, not a trading signal.": "این پیام فقط گزارش وضعیت است و سیگنال معاملاتی نیست.",
-        "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE": "هشدار بررسی خرید سولانا — خرید خودکار انجام نمی‌شود",
-        "Project:": "پروژه:", "Entry reference:": "قیمت مرجع ورود:",
-        "Stop reference:": "حد ضرر مرجع:", "Target reference:": "حد سود مرجع:",
-        "Model probability:": "احتمال پیش‌بینی مدل:", "Liquidity:": "نقدینگی:",
-        "24h volume:": "حجم معاملات ۲۴ ساعته:", "Evaluation:": "ارزیابی مدل:",
-        "Mint:": "آدرس توکن:",
-        "This is a research alert, not financial advice. ": "این هشدار صرفاً برای بررسی است و توصیه مالی نیست. ",
-        "Slippage, fees and execution can change results.": "لغزش قیمت، کارمزد و نحوه اجرا می‌توانند نتیجه را تغییر دهند.",
-        "SOLANA NEWS IMPACT — RESEARCH, NOT A TRADE SIGNAL": "تحلیل خبر سولانا — برای بررسی، نه سیگنال معامله",
-        "Headline:": "عنوان خبر:", "Source:": "منبع:", "Published (UTC):": "زمان انتشار (UTC):",
-        "Meaning:": "مفهوم خبر:", "Possible SOL impact:": "تأثیر احتمالی بر سولانا:",
-        "Direction:": "جهت احتمالی:", "Relevance:": "میزان ارتباط:",
-        "Expected horizon:": "بازه اثر احتمالی:", "Confidence:": "میزان اطمینان:",
-        "Why classified this way:": "دلیل این دسته‌بندی:", "Original link:": "پیوند منبع اصلی:",
-        "Do not trade on a headline alone. Confirm the original report and check SOL price, volume, BTC direction and whether the news is already priced in.": "فقط بر اساس تیتر خبر معامله نکن. خبر اصلی را بررسی کن و قیمت و حجم سولانا، جهت بیت‌کوین و احتمال پیش‌خور شدن خبر را بسنج.",
-        "A serious security, availability, legal or solvency risk may undermine confidence.": "ریسک جدی امنیتی، اختلال شبکه، حقوقی یا ناتوانی در پرداخت بدهی می‌تواند اعتماد بازار را کاهش دهد.",
-        "The headline suggests a risk, delay, selling pressure or a negative catalyst.": "تیتر خبر به ریسک، تأخیر، فشار فروش یا عامل منفی اشاره دارد.",
-        "If confirmed and material, this could improve access, demand or confidence.": "اگر خبر تأیید شود و اهمیت واقعی داشته باشد، ممکن است دسترسی، تقاضا یا اعتماد را افزایش دهد.",
-        "This may support adoption, liquidity or sentiment, but implementation and scale matter.": "این خبر ممکن است به پذیرش، نقدینگی یا احساسات بازار کمک کند؛ اجرای واقعی و مقیاس آن مهم است.",
-        "The headline alone does not provide a clear directional catalyst.": "تیتر به‌تنهایی عامل روشن و قابل اتکایی برای جهت قیمت نشان نمی‌دهد.",
-        "Potentially relevant to SOL itself; verify official status and actual network impact.": "ممکن است مستقیماً به خود SOL مربوط باشد؛ وضعیت رسمی و اثر واقعی بر شبکه را بررسی کن.",
-        "Could affect SOL demand, access or investor expectations if the report is accurate.": "اگر گزارش دقیق باشد، ممکن است بر تقاضا برای SOL، دسترسی یا انتظارات سرمایه‌گذاران اثر بگذارد.",
-        "The first-order impact may be limited to that project; broader SOL impact depends on contagion, TVL and liquidity.": "اثر اولیه ممکن است محدود به همان پروژه باشد؛ اثر گسترده‌تر بر SOL به سرایت اثر، ارزش کل قفل‌شده و نقدینگی بستگی دارد.",
-        "Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.": "فرض نکن این خبر حتماً قیمت SOL را جابه‌جا می‌کند؛ بیت‌کوین، احساسات کلی بازار و قیمت/حجم خود SOL را مقایسه کن.",
-        "LOW — unconfirmed wording": "کم — خبر با عبارت‌های تأییدنشده بیان شده",
-        "MEDIUM — aggregator headline; open original source": "متوسط — تیتر از گردآورنده خبر است؛ منبع اصلی را باز کن",
-        "MEDIUM — headline classification only": "متوسط — دسته‌بندی فقط بر اساس تیتر خبر است",
-        "hours to days; often priced in quickly": "چند ساعت تا چند روز؛ اثر خبر گاهی سریع در قیمت لحاظ می‌شود",
-        "immediate to days; risk can persist if confirmed": "از فوری تا چند روز؛ در صورت تأیید، ریسک ممکن است ادامه یابد",
-        "no reliable horizon until the facts and price reaction are checked": "تا بررسی واقعیت‌ها و واکنش قیمت، بازه قابل اتکایی مشخص نیست",
-        "NEUTRAL / UNCLEAR": "خنثی / نامشخص", "BULLISH": "مثبت", "BEARISH": "منفی",
-        "DIRECT — Solana network / protocol": "مستقیم — شبکه یا پروتکل سولانا",
-        "DIRECT — SOL market / regulation": "مستقیم — بازار SOL یا مقررات",
-        "INDIRECT — one Solana ecosystem project": "غیرمستقیم — یک پروژه از اکوسیستم سولانا",
-        "UNCERTAIN — broader crypto or weak Solana link": "نامشخص — بازار کلی رمزارز یا ارتباط ضعیف با سولانا",
-        "This is a headline-based heuristic, not full-article verification.": "این ارزیابی بر اساس تیتر و قواعد ساده است، نه بررسی کامل متن خبر.",
-    }
-    for english, persian in replacements.items():
-        message = message.replace(english, persian)
-    return message
-
 def send_telegram(message):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
@@ -146,7 +87,7 @@ def send_telegram(message):
             url,
             json={
                 "chat_id": chat_id,
-                "text": translate_telegram(message),
+                "text": message,
                 "disable_web_page_preview": True
             },
             timeout=20
