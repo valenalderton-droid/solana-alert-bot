@@ -48,6 +48,23 @@ class MetropolisSimulationTests(unittest.TestCase):
         self.assertEqual(len(city["history"]), 1)
         self.assertTrue(all(0 <= s["satisfaction"] <= 100 for s in city["services"].values()))
 
+    def test_research_experiment_uses_chronological_holdout_and_never_auto_promotes(self):
+        system, civ = make_system(), {}
+        for spec in CORE_SPECS:
+            system["cores"][spec["id"]]["portfolio"]["closed_trades"] = [
+                {"pnl_usd": (1.0 if i % 3 else -0.5), "token_address": f"mint{i}"}
+                for i in range(30)
+            ]
+        for i in range(1, 97):
+            update_metropolis(system, civ, CORE_SPECS, f"t{i}")
+        experiments = civ["metropolis"]["research"]["experiments"]
+        self.assertGreaterEqual(len(experiments), 1)
+        first = experiments[0]
+        self.assertEqual(first["status"], "evidence_ready_for_review")
+        self.assertEqual(first["result"]["holdout_observations"], 20)
+        self.assertFalse(first["promoted_to_champion"])
+        self.assertIn("manual review required", civ["metropolis"]["research"]["findings"][0]["decision"])
+
     def test_closed_trades_affect_resident_wellbeing_only_once_per_new_count(self):
         system, civ = make_system(), {}
         update_metropolis(system, civ, CORE_SPECS, "t1")
