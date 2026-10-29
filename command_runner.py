@@ -288,12 +288,16 @@ def concise_reply(messages):
 def main():
     state = read_state()
     requested = poll_pay(state)
+    # Research and evidence-gated learning run on every scheduled cycle,
+    # including when positions are open or the user requests a scan. Each has
+    # its own cooldown; neither is allowed to bypass trading safety filters.
+    refresh_news_if_due(state)
+    run_self_improvement_if_due(state)
+
     # Keep checking exit conditions on scheduled runs while a paper position is
     # open. BUY messages are still suppressed unless the user explicitly sends //Pay.
     open_positions = state.get("open_positions", [])
     if not requested and not open_positions:
-        refresh_news_if_due(state)
-        run_self_improvement_if_due(state)
         print("No //Pay request and no open positions; market scan skipped.")
         return
 
