@@ -12,7 +12,7 @@ class CommandRunnerTests(unittest.TestCase):
             "ok": True,
             "result": [
                 {"update_id": 12, "message": {"chat": {"id": 123}, "text": "hello"}},
-                {"update_id": 13, "message": {"chat": {"id": 123}, "text": "/Pay"}},
+                {"update_id": 13, "message": {"chat": {"id": 123}, "text": "//Pay"}},
             ],
         }
         state = {}
@@ -23,6 +23,23 @@ class CommandRunnerTests(unittest.TestCase):
              patch.object(command_runner, "save_state"):
             self.assertTrue(command_runner.poll_pay(state))
         self.assertEqual(state["telegram_update_offset"], 13)
+
+    def test_rejects_other_command_spellings(self):
+        for command in ("/Pay", "//pay", "/pay", "Pay", "//Pay@SomeBot"):
+            response = Mock()
+            response.raise_for_status.return_value = None
+            response.json.return_value = {
+                "ok": True,
+                "result": [
+                    {"update_id": 30, "message": {"chat": {"id": 123}, "text": command}},
+                ],
+            }
+            with patch.dict("os.environ", {
+                "TELEGRAM_BOT_TOKEN": "test-token",
+                "TELEGRAM_CHAT_ID": "123",
+            }), patch.object(command_runner.requests, "get", return_value=response), \\
+                 patch.object(command_runner, "save_state"):
+                self.assertFalse(command_runner.poll_pay({}), command)
 
     def test_other_chat_cannot_trigger_scan(self):
         response = Mock()
