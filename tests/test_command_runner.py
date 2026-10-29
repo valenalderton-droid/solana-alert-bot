@@ -109,10 +109,10 @@ class CommandRunnerTests(unittest.TestCase):
 
     def test_automatic_mode_does_not_poll_for_pay_commands(self):
         original_sender = scanner.send_telegram
-        with patch.object(command_runner, "read_state", return_value={"open_positions": []}), \\
-             patch.object(command_runner, "refresh_news_if_due"), \\
-             patch.object(command_runner, "run_self_improvement_if_due"), \\
-             patch.object(scanner, "main"), \\
+        with patch.object(command_runner, "read_state", return_value={"open_positions": []}), \
+             patch.object(command_runner, "refresh_news_if_due"), \
+             patch.object(command_runner, "run_self_improvement_if_due"), \
+             patch.object(scanner, "main"), \
              patch.object(scanner, "send_telegram", original_sender):
             # A scheduled run should execute without checking for a Telegram trigger.
             command_runner.main()
