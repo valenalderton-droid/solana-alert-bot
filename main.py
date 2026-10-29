@@ -319,6 +319,41 @@ def main():
     # Resolve older observations before adding new ones.
     resolve_old_signals(state, store)
 
+    # Send a compact performance digest at most once every 24 hours.
+    now = datetime.now(timezone.utc)
+    last_report = state.get("last_stats_report_utc")
+    report_due = not last_report
+    if last_report:
+        try:
+            previous_report = datetime.fromisoformat(last_report.replace("Z", "+00:00"))
+            report_due = (now - previous_report).total_seconds() >= 24 * 3600
+        except (ValueError, TypeError):
+            report_due = True
+
+    if report_due:
+        outcomes = read_jsonl(OUTCOMES_FILE)
+        returns = [
+            float(item["return_pct"]) for item in outcomes
+            if isinstance(item.get("return_pct"), (int, float))
+        ]
+        wins = sum(1 for item in outcomes if item.get("result") == "win")
+        losses = sum(1 for item in outcomes if item.get("result") == "loss")
+        resolved = wins + losses
+        win_rate = (wins / resolved * 100) if resolved else 0.0
+        avg_return = (sum(returns) / len(returns)) if returns else 0.0
+        digest = (
+            "SOLANA BOT — 24H PERFORMANCE LOG\\n\\n"
+            f"BUY-watch alerts recorded: {state['stats'].get('signals', 0)}\\n"
+            f"Resolved alerts: {resolved} (wins: {wins}, losses: {losses})\\n"
+            f"Historical win rate: {win_rate:.1f}%\\n"
+            f"Average recorded return: {avg_return:.2f}%\\n"
+            f"Projects with usable market data this run: {len(active_projects)}\\n"
+            f"Time (UTC): {utc_now()}\\n\\n"
+            "Paper-tracking statistics only; not a guarantee of future performance."
+        )
+        if send_telegram(digest):
+            state["last_stats_report_utc"] = utc_now()
+
     candle_sets = [
         sorted(store[p["token_address"]].values(),
                key=lambda c: c["timestamp"])
