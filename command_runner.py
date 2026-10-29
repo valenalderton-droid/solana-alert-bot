@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import re
 import requests
@@ -93,8 +94,8 @@ def concise_reply(messages):
             )
             liq = float(liquidity.group(1).replace(",", "")) if liquidity else 100000.0
             vol = float(volume.group(1).replace(",", "")) if volume else 50000.0
-            liquidity_bonus = min(4.0, max(0.0, 2.0 * __import__("math").log10(max(liq, 1) / 100000.0 + 1)))
-            volume_bonus = min(3.0, max(0.0, 1.5 * __import__("math").log10(max(vol, 1) / 50000.0 + 1)))
+            liquidity_bonus = min(4.0, max(0.0, 2.0 * math.log10(max(liq, 1) / 100000.0 + 1)))
+            volume_bonus = min(3.0, max(0.0, 1.5 * math.log10(max(vol, 1) / 50000.0 + 1)))
             rank_score = model_score + 8.0 * consensus + liquidity_bonus + volume_bonus
             candidates.append((
                 rank_score, model_score, project.group(1).strip(), entry.group(1),
