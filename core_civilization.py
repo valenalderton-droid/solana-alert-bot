@@ -78,7 +78,7 @@ def _audit_cores(system, core_specs, civ, timestamp):
         if len(core.get("decisions") or []) > 200:
             findings.append("decision_log_limit_exceeded")
         for finding in findings:
-            incident = {"at": timestamp, "core_id": core_id, "finding": finding, "severity": "critical"}
+            incident = {"at": timestamp, "scan": civ["scan_count"], "core_id": core_id, "finding": finding, "severity": "critical"}
             police.setdefault("incidents", []).append(incident)
             strikes = police.setdefault("strikes", {})
             strikes[core_id] = int(strikes.get(core_id, 0)) + 1
