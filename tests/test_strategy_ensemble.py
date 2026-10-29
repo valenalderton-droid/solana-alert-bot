@@ -39,6 +39,12 @@ class StrategyEnsembleTests(unittest.TestCase):
         self.assertLessEqual(result["score"], 100)
         self.assertIn("risk_flags", result)
         self.assertIn("atr_pct", result["metrics"])
+        self.assertIn(result["market_regime"], {
+            "high_volatility", "uptrend", "downtrend", "stretched_range", "mixed_range"
+        })
+        self.assertGreaterEqual(result["consensus_strength"], 0)
+        self.assertLessEqual(result["consensus_strength"], 1)
+        self.assertGreaterEqual(result["strategy_dispersion"], 0)
 
     def test_invalid_candle_is_rejected(self):
         candles = make_candles()
@@ -52,6 +58,18 @@ class StrategyEnsembleTests(unittest.TestCase):
         self.assertGreaterEqual(normal, 0)
         self.assertLessEqual(normal, 100)
         self.assertLess(chased, normal)
+
+    def test_rank_penalizes_strategy_disagreement(self):
+        base = {
+            "score": 75,
+            "risk_flags": [],
+            "consensus_strength": 0.8,
+            "strategy_dispersion": 10
+        }
+        conflicted = dict(base, consensus_strength=0.2, strategy_dispersion=35)
+        ordinary_rank = rank_candidate(base, 0.7, 80, 150000, 200000, 0.2)
+        conflicted_rank = rank_candidate(conflicted, 0.7, 80, 150000, 200000, 0.2)
+        self.assertLess(conflicted_rank, ordinary_rank)
 
     def test_rank_candidate_is_bounded(self):
         result = evaluate_strategies(make_candles())
