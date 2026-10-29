@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T11:46:22.178495+00:00",
+  "last_run_utc": "2026-10-29T12:13:48.912214+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -42,7 +42,8 @@
     "4083e47ec658f0dff5cf98dd",
     "f7daef4a47fc04daed0da83a",
     "ac540d1e11ea7d2a56866578",
-    "a05ed6eb377e3cc6399e3252"
+    "a05ed6eb377e3cc6399e3252",
+    "eb51a5c985fe9d27b13809a8"
   ],
   "news_observations": [
     {
@@ -341,11 +342,204 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Solana Could Surpass XRP in Market Cap by the End of 2027. Here's a Realistic Timeline for How It Happens. - Yahoo Finance",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxObVRzbDNMel8ydVhsb0VQMVl0dWpMSkJHQnJpOFZkZnFhSzFMSUlrSFowZUVSdWdUTWxISWN2bEE3c0hBd0FMS0ZfWVE4T2Q0TmNsSlJyb3ZXc3NSQ1NpU2R5dU9UOHlnRTB2S3RCNG9ReGRCQjlGQldna09yLWl3dDdlb2c5Z3pPakZSUzRBcUFkMU5GWF9LVmlsSF8?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T12:12:34.745418+00:00",
+      "published_at": "2026-10-29T12:00:59+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Toly draws a line in the sand as Bulktrade expands beyond Solana - Crypto Briefing",
+      "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9LYjkwS2xOa1dpb1JXdjdaWVAtd2hGWUZDZ1l1NU93OEoyVFFvdjY0RnlyWjFWWTNEUGlmYTJnc2xrZWRqVF90cDEyeHh1UV9EVkFTNWNxNGY3dWp0QzFDU2RMMHRuWHRMTkJhdjhzSXRBTUYxdXc?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T12:12:34.745901+00:00",
+      "published_at": "2026-10-28T18:00:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — Solana network / protocol",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Potentially relevant to SOL itself; verify official status and actual network impact.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — Solana network / protocol\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana Ships New Validator and SDK Releases After Alpenglow Upgrade - TradingView",
+      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPa2pmYV9KcmV6N2VFRi16blYwandocmIwZGJSeF9aTE55SzRYbXVYSVdvNmtVU3p0d1pFeEI0Y3BVNkp4LWRaQ2tEeHNvcjZ3dHh2MVJDWTYtYUFEQ0I3V0RFOXRtWWcxbmFGMkJCLTVWdnUtdVhXeE9vM1pzbG54TjhEeV96YWpqYi00MTE1MlFCT1U2Yy15aXJjUVFYRWNnd0twOEthanY3LVNBaldqbnNZbE9wZC1LNmpKNUMyQXh4Qkk?oc=5",
+      "research_topic": "protocol"
+    },
+    {
+      "observed_at": "2026-10-29T12:12:34.745901+00:00",
+      "published_at": "2026-10-28T17:00:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana Alpenglow Goes Live, Targeting 150-Millisecond Finality - TradingView",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOajM5TmVxcG94eEJDYUczYkRkbFFyX21maXJVRWJUUjFiYkhpaWw4SnlsOFhhekZkQ1NBUmVPbkVma0xmN2VNMmtPX09GVGJUUVFkelZyenZLX1RuU0F1enRHbWJjXzdhU3ZHZTdOZ3BPSjM1NFg2dWVELTdOWDZFbjBMX3RKSlpYdlJYV2R0WlVVRGFlNS1XYmxzSXUzSF8xLUpMZWg3ZVdkZzZQaEtuQTR2WlI4QTJMZUxF?oc=5",
+      "research_topic": "protocol"
+    },
+    {
+      "observed_at": "2026-10-29T12:12:34.745901+00:00",
+      "published_at": "2026-10-27T17:28:37+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — Solana network / protocol",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Potentially relevant to SOL itself; verify official status and actual network impact.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — Solana network / protocol\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Anza CEO Brennan Watt on Shipping Alpenglow's 150ms Finality, Rotor Networking, and Location-Aware Validators - https://genfinity.io/",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQaWR3c2RtX0pMc3lyVTVlNHBXMFR3NHFCbnpQcWhUbUczOG9XM0Z6aTIxRUo2REttVk95ekZoeEV2R0RpOEktakJ6Sk9vQUo4MUNLQ0xjc1JCRDBvWHFiaVBFTDFXSVhjWnN6OEZrdFNOeVJrLXlnM3ZVZS1RcGRxbHJyVHRINHV0UVRV?oc=5",
+      "research_topic": "protocol"
+    },
+    {
+      "observed_at": "2026-10-29T12:12:34.745901+00:00",
+      "published_at": "2026-10-27T09:36:18+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana’s faster finality is live. What changes for users? - Crypto News",
+      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOSXE4T1I5NVBCcVRpTjdPaTI3QUJBbmZSX3FveGQ3YzFUNGJQVWFNX2lBZ3ZEY2JOWkdLOU0xT3REdEtzaWJtQnAxbVVDajd1WUUyTVJ5TFpITS1nOU1MUk5UbDdjREl4eUk0UjItTXRwbGV5ZG5RWFJGaERZdFBqRQ?oc=5",
+      "research_topic": "protocol"
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952313,
-  "last_news_refresh_utc": "2026-10-29T11:45:13.124492+00:00",
+  "telegram_update_offset": 806952314,
+  "last_news_refresh_utc": "2026-10-29T12:12:41.796444+00:00",
   "last_watchlist_ping_utc": "2026-10-29T11:19:40.239690+00:00",
-  "project_scan_cursor": 5
+  "project_scan_cursor": 10,
+  "research_status": {
+    "last_tvl_refresh_utc": "2026-10-29T12:12:34.745901+00:00",
+    "last_activity_metrics_refresh_utc": "2026-10-29T12:12:34.745901+00:00",
+    "last_run_utc": "2026-10-29T12:12:34.745901+00:00",
+    "queries_attempted": 2,
+    "new_articles": 4,
+    "failures": 1,
+    "last_topics": [
+      "security",
+      "protocol"
+    ],
+    "query_results": [
+      {
+        "topic": "security",
+        "results": 0,
+        "ok": true
+      },
+      {
+        "topic": "protocol",
+        "results": 4,
+        "ok": true
+      }
+    ],
+    "total_evidence": 7,
+    "latest_tvl_change_24h_pct": -1.296,
+    "activity_metrics_refreshed": true,
+    "activity_metrics_count": 2
+  },
+  "research_observations": [
+    {
+      "id": "6da0f87d5326c4ed4ab9ff0f",
+      "title": "Solana Ships New Validator and SDK Releases After Alpenglow Upgrade - TradingView",
+      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPa2pmYV9KcmV6N2VFRi16blYwandocmIwZGJSeF9aTE55SzRYbXVYSVdvNmtVU3p0d1pFeEI0Y3BVNkp4LWRaQ2tEeHNvcjZ3dHh2MVJDWTYtYUFEQ0I3V0RFOXRtWWcxbmFGMkJCLTVWdnUtdVhXeE9vM1pzbG54TjhEeV96YWpqYi00MTE1MlFCT1U2Yy15aXJjUVFYRWNnd0twOEthanY3LVNBaldqbnNZbE9wZC1LNmpKNUMyQXh4Qkk?oc=5",
+      "published_at": "2026-10-28T18:00:00+00:00",
+      "source": "TradingView",
+      "description": "Solana Ships New Validator and SDK Releases After Alpenglow Upgrade &nbsp;&nbsp; TradingView",
+      "feed_category": "Solana ecosystem",
+      "research_topic": "protocol",
+      "research_query": "Solana protocol release upgrade mainnet validator client performance",
+      "observed_at": "2026-10-29T12:12:34.745901+00:00"
+    },
+    {
+      "id": "f86123a7a1f53fc2863ccef2",
+      "title": "Solana Alpenglow Goes Live, Targeting 150-Millisecond Finality - TradingView",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOajM5TmVxcG94eEJDYUczYkRkbFFyX21maXJVRWJUUjFiYkhpaWw4SnlsOFhhekZkQ1NBUmVPbkVma0xmN2VNMmtPX09GVGJUUVFkelZyenZLX1RuU0F1enRHbWJjXzdhU3ZHZTdOZ3BPSjM1NFg2dWVELTdOWDZFbjBMX3RKSlpYdlJYV2R0WlVVRGFlNS1XYmxzSXUzSF8xLUpMZWg3ZVdkZzZQaEtuQTR2WlI4QTJMZUxF?oc=5",
+      "published_at": "2026-10-28T17:00:00+00:00",
+      "source": "TradingView",
+      "description": "Solana Alpenglow Goes Live, Targeting 150-Millisecond Finality &nbsp;&nbsp; TradingView",
+      "feed_category": "Solana ecosystem",
+      "research_topic": "protocol",
+      "research_query": "Solana protocol release upgrade mainnet validator client performance",
+      "observed_at": "2026-10-29T12:12:34.745901+00:00"
+    },
+    {
+      "id": "77fac538df29ffa61e07e9d1",
+      "title": "Anza CEO Brennan Watt on Shipping Alpenglow's 150ms Finality, Rotor Networking, and Location-Aware Validators - https://genfinity.io/",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQaWR3c2RtX0pMc3lyVTVlNHBXMFR3NHFCbnpQcWhUbUczOG9XM0Z6aTIxRUo2REttVk95ekZoeEV2R0RpOEktakJ6Sk9vQUo4MUNLQ0xjc1JCRDBvWHFiaVBFTDFXSVhjWnN6OEZrdFNOeVJrLXlnM3ZVZS1RcGRxbHJyVHRINHV0UVRV?oc=5",
+      "published_at": "2026-10-27T17:28:37+00:00",
+      "source": "https://genfinity.io/",
+      "description": "Anza CEO Brennan Watt on Shipping Alpenglow's 150ms Finality, Rotor Networking, and Location-Aware Validators &nbsp;&nbsp; https://genfinity.io/",
+      "feed_category": "Solana ecosystem",
+      "research_topic": "protocol",
+      "research_query": "Solana protocol release upgrade mainnet validator client performance",
+      "observed_at": "2026-10-29T12:12:34.745901+00:00"
+    },
+    {
+      "id": "27a5c8aa52c8ad8b00475135",
+      "title": "Solana’s faster finality is live. What changes for users? - Crypto News",
+      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOSXE4T1I5NVBCcVRpTjdPaTI3QUJBbmZSX3FveGQ3YzFUNGJQVWFNX2lBZ3ZEY2JOWkdLOU0xT3REdEtzaWJtQnAxbVVDajd1WUUyTVJ5TFpITS1nOU1MUk5UbDdjREl4eUk0UjItTXRwbGV5ZG5RWFJGaERZdFBqRQ?oc=5",
+      "published_at": "2026-10-27T09:36:18+00:00",
+      "source": "Crypto News",
+      "description": "Solana’s faster finality is live. What changes for users? &nbsp;&nbsp; Crypto News",
+      "feed_category": "Solana ecosystem",
+      "research_topic": "protocol",
+      "research_query": "Solana protocol release upgrade mainnet validator client performance",
+      "observed_at": "2026-10-29T12:12:34.745901+00:00"
+    },
+    {
+      "id": "defillama-solana-tvl-1793232000",
+      "kind": "metric",
+      "metric": "Solana DeFi TVL",
+      "value_usd": 5619533798.0,
+      "change_24h_pct": -1.296,
+      "observed_at": "2026-10-29T12:12:34.745901+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/v2/historicalChainTvl/Solana",
+      "note": "TVL is ecosystem context, not a direct SOL price prediction."
+    },
+    {
+      "id": "defillama-solana-dex-volume-498132",
+      "kind": "metric",
+      "metric": "Solana DEX volume",
+      "value_usd": 1733397982.06,
+      "change_24h_pct": 9.5,
+      "observed_at": "2026-10-29T12:12:34.745901+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/dexs/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
+    },
+    {
+      "id": "defillama-solana-fees-498132",
+      "kind": "metric",
+      "metric": "Solana fees",
+      "value_usd": 10346775.24,
+      "change_24h_pct": -7.86,
+      "observed_at": "2026-10-29T12:12:34.745901+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/fees/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
+    }
+  ],
+  "seen_research_ids": [
+    "f86123a7a1f53fc2863ccef2",
+    "77fac538df29ffa61e07e9d1",
+    "defillama-solana-tvl-1793232000",
+    "27a5c8aa52c8ad8b00475135",
+    "6da0f87d5326c4ed4ab9ff0f",
+    "defillama-solana-dex-volume-498132",
+    "defillama-solana-fees-498132"
+  ],
+  "research_query_cursor": 2,
+  "seen_research_news_ids": [
+    "27a5c8aa52c8ad8b00475135",
+    "6da0f87d5326c4ed4ab9ff0f",
+    "f86123a7a1f53fc2863ccef2",
+    "77fac538df29ffa61e07e9d1"
+  ]
 }
