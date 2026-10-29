@@ -103,6 +103,7 @@ def translate_telegram(message):
         "STOP (both levels touched; conservative)": "حد ضرر (هر دو سطح در یک کندل لمس شدند؛ فرض محافظه‌کارانه)",
         "This is an exit alert only; the bot does not place trades.": "این فقط هشدار خروج است و ربات معامله انجام نمی‌دهد.",
         "Global market context:": "وضعیت کلی بازار:",
+        "Recent news and possible SOL impact:": "اخبار تازه و تأثیر احتمالی بر سولانا:",
         "BTC 24h change:": "تغییر ۲۴ ساعته بیت‌کوین:",
         "SOL 24h change:": "تغییر ۲۴ ساعته سولانا:",
         "BUY generation paused by global market risk filter:": "تولید هشدار خرید به‌دلیل ریسک کلی بازار متوقف شد:",
