@@ -162,6 +162,32 @@ class SelfImproverTests(unittest.TestCase):
                 self.assertFalse((Path(temp) / "main.py.json").exists())
 
 
+    def test_managed_editor_rejects_out_of_bounds_rule_edits(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(self_improver, "RULE_FILES_DIR", Path(temp)):
+                result = self_improver.sync_experience_rule_files([{
+                    "id": "avoid_entry_chase", "enabled": True,
+                    "field": "entry_deviation_pct", "operator": "gte",
+                    "value": 999999, "reason": "invalid threshold",
+                    "evidence": {"samples": 99}
+                }])
+                self.assertEqual(result["active"], [])
+                self.assertEqual(len(result["rejected"]), 1)
+                self.assertFalse((Path(temp) / "avoid_entry_chase.json").exists())
+
+    def test_managed_editor_rejects_path_traversal_and_wrong_schema(self):
+        from managed_file_editor import ManagedFileEditor
+        with tempfile.TemporaryDirectory() as temp:
+            editor = ManagedFileEditor(Path(temp))
+            with self.assertRaises(ValueError):
+                editor.read("../main.py")
+            with self.assertRaises(ValueError):
+                editor.write({
+                    "id": "avoid_entry_chase", "enabled": True,
+                    "field": "project_allowlist", "operator": "gte",
+                    "value": 2.0, "evidence": {}
+                })
+
     def test_unchanged_rule_is_not_rewritten(self):
         with tempfile.TemporaryDirectory() as temp:
             with patch.object(self_improver, "RULE_FILES_DIR", Path(temp)):
