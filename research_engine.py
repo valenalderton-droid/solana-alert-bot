@@ -161,6 +161,53 @@ def build_research_plan(state, outcomes=None, configured_projects=None):
     return ([project_query] if project_query else []) + general
 
 
+RISK_TERMS = (
+    "exploit", "hack", "outage", "vulnerability", "lawsuit", "unlock",
+    "sell-off", "selling pressure", "liquidation", "ban", "sanctions",
+    "war escalation", "market crash", "risk-off", "rug pull", "drained"
+)
+POSITIVE_TERMS = (
+    "integration", "partnership", "mainnet upgrade", "etf approved",
+    "record inflows", "funding round", "adoption", "launches on solana",
+    "revenue growth", "all-time high users", "ceasefire", "de-escalation"
+)
+
+
+def assess_research_evidence(title, description="", source="", published=None, now=None):
+    """Attach transparent triage hints; never treat keyword tone as verified fact."""
+    now = now or datetime.now(timezone.utc)
+    text = " ".join((title or "", description or "")).lower()
+    risk = sorted({term for term in RISK_TERMS if term in text})
+    positive = sorted({term for term in POSITIVE_TERMS if term in text})
+    if risk and positive:
+        tone = "mixed"
+    elif risk:
+        tone = "risk_keywords"
+    elif positive:
+        tone = "positive_keywords"
+    else:
+        tone = "unclassified"
+    score = 35
+    if title and len(title.strip()) >= 20:
+        score += 15
+    if source and source.strip() and source.strip().lower() != "google news rss":
+        score += 15
+    if (title or "").lower().find("solana") >= 0 or any(
+        word in text for word in ("sol ", "solana", "jupiter", "kamino", "raydium", "jito")
+    ):
+        score += 15
+    if published:
+        age_hours = max(0.0, (now - published).total_seconds() / 3600)
+        score += max(0, 20 - int(age_hours / 6))
+    return {
+        "evidence_quality_score": min(100, score),
+        "keyword_tone": tone,
+        "risk_keywords": risk[:6],
+        "positive_keywords": positive[:6],
+        "assessment_note": "Keyword triage only; verify article context and primary source before drawing conclusions."
+    }
+
+
 def search_public_rss(query, category, topic, now=None):
     """Search one public news query and return only dated, source-linked records."""
     now = now or datetime.now(timezone.utc)
@@ -179,19 +226,27 @@ def search_public_rss(query, category, topic, now=None):
         source_node = item.find("source")
         source = _clean(source_node.text if source_node is not None else "")
         description = _clean(item.findtext("description"))
+        publisher = source or "Google News RSS"
+        assessment = assess_research_evidence(title, description, publisher, published, now)
         found.append({
             "id": _article_id(link, title),
             "title": title[:350],
             "url": link,
             "published_at": published.isoformat(),
-            "source": source or "Google News RSS",
+            "source": publisher,
             "description": description[:500],
             "feed_category": category,
             "research_topic": topic,
             "research_query": query[:250],
             "observed_at": now.isoformat(),
+            **assessment,
         })
-    return sorted(found, key=lambda row: row["published_at"], reverse=True)[:MAX_ARTICLES_PER_QUERY]
+    # Prefer relevant, recent evidence over merely recent low-context headlines.
+    return sorted(
+        found,
+        key=lambda row: (row.get("evidence_quality_score", 0), row["published_at"]),
+        reverse=True
+    )[:MAX_ARTICLES_PER_QUERY]
 
 
 def fetch_solana_tvl_snapshot(now=None):
