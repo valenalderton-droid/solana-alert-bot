@@ -226,10 +226,14 @@ class CommandRunnerTests(unittest.TestCase):
              patch.object(command_runner, "poll_pay", return_value=True), \
              patch.object(command_runner, "refresh_news_if_due"), \
              patch.object(command_runner, "run_self_improvement_if_due"), \
-             patch.object(scanner, "main", side_effect=RuntimeError("test failure")):
-            with self.assertRaises(RuntimeError):
-                command_runner.main()
+             patch.object(scanner, "main", side_effect=RuntimeError("test failure")), \
+             patch.object(command_runner, "telegram_send") as send:
+            # The runner should catch a scanner crash, restore the Telegram sender,
+            # and attempt to return an explicit failure reply rather than crash silently.
+            command_runner.main()
         self.assertIs(scanner.send_telegram, original_sender)
+        send.assert_called_once()
+        self.assertIn("خطا", send.call_args.args[2])
 
 
 if __name__ == "__main__":
