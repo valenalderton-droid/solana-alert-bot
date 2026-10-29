@@ -74,6 +74,38 @@ class SelfImproverTests(unittest.TestCase):
         self.assertEqual(result["groups"]["thin_liquidity"]["warning"],
                          "association only; not a causal finding")
 
+
+    def test_experience_rules_require_repeated_negative_evidence(self):
+        diagnostics = {"groups": {
+            "entry_chase": {"n": 12, "mean_net_return_pct": -1.2,
+                            "negative_return_rate": 0.75}
+        }}
+        rules = self_improver.build_experience_rules(diagnostics)
+        self.assertEqual(len(rules), 1)
+        self.assertEqual(rules[0]["id"], "avoid_entry_chase")
+        result = self_improver.evaluate_experience_rules(
+            {"entry_deviation_pct": 2.4}, rules
+        )
+        self.assertTrue(result["blocked"])
+        self.assertEqual(result["rule_id"], "avoid_entry_chase")
+
+    def test_experience_rules_do_not_activate_on_small_or_mixed_samples(self):
+        diagnostics = {"groups": {
+            "thin_liquidity": {"n": 5, "mean_net_return_pct": -2.0,
+                               "negative_return_rate": 0.9},
+            "low_volume": {"n": 20, "mean_net_return_pct": 0.2,
+                           "negative_return_rate": 0.8}
+        }}
+        self.assertEqual(self_improver.build_experience_rules(diagnostics), [])
+
+    def test_experience_rule_evaluator_ignores_invalid_features(self):
+        rule = {"id": "test", "enabled": True, "field": "probability",
+                "operator": "lt", "value": 0.65}
+        result = self_improver.evaluate_experience_rules(
+            {"probability": "unknown"}, [rule]
+        )
+        self.assertFalse(result["blocked"])
+
     def test_diagnostics_ignore_data_gaps_and_duplicate_outcomes(self):
         prediction = [{
             "signal_id": "same", "probability": 0.9,
