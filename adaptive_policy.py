@@ -90,6 +90,11 @@ def derive_policy(outcomes, news_observations, base_probability=0.60,
         relevance = str(row.get("relevance", ""))
         category = str(row.get("feed_category", ""))
         sentiment = str(row.get("sentiment", ""))
+        confidence = str(row.get("confidence", "")).upper()
+        # Unconfirmed/rumor headlines remain visible in the news log, but do
+        # not independently trigger automated risk-off policy changes.
+        if confidence.startswith("LOW"):
+            continue
         if sentiment == "BEARISH" and relevance.startswith("DIRECT"):
             recent_direct_bearish += 1
         if category in global_categories:
