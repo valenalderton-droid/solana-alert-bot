@@ -17,7 +17,7 @@ class DiscoveryCacheTests(unittest.TestCase):
             "approved_non_meme": True,
         }
         filters = {
-            "discovery_version": 2,
+            "discovery_version": 3,
             "min_liquidity": 100000.0,
             "min_volume_24h": 50000.0,
             "min_age_days": 30,
