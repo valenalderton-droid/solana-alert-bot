@@ -27,15 +27,31 @@ class StrategyEnsembleTests(unittest.TestCase):
         result = evaluate_strategies(make_candles(20))
         self.assertFalse(result["ready"])
 
-    def test_scores_multiple_strategy_families(self):
+    def test_scores_expanded_strategy_families(self):
         result = evaluate_strategies(make_candles())
         self.assertTrue(result["ready"])
         self.assertEqual(
             set(result["strategies"]),
-            {"trend_following", "breakout", "momentum", "mean_reversion", "volume_flow"},
+            {"trend_following", "breakout", "momentum", "mean_reversion",
+             "volume_flow", "market_structure", "candle_rejection", "risk_control"},
         )
         self.assertGreaterEqual(result["score"], 0)
         self.assertLessEqual(result["score"], 100)
+        self.assertIn("risk_flags", result)
+        self.assertIn("atr_pct", result["metrics"])
+
+    def test_invalid_candle_is_rejected(self):
+        candles = make_candles()
+        candles[-1]["high"] = candles[-1]["low"] - 1
+        self.assertFalse(evaluate_strategies(candles)["ready"])
+
+    def test_rank_penalizes_chasing_and_risk(self):
+        ensemble = evaluate_strategies(make_candles())
+        normal = rank_candidate(ensemble, 0.7, 80, 150000, 200000, 0.2)
+        chased = rank_candidate(ensemble, 0.7, 80, 150000, 200000, 3.0)
+        self.assertGreaterEqual(normal, 0)
+        self.assertLessEqual(normal, 100)
+        self.assertLess(chased, normal)
 
     def test_rank_candidate_is_bounded(self):
         result = evaluate_strategies(make_candles())
