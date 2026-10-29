@@ -1,0 +1,122 @@
+import json
+import os
+import re
+import requests
+
+STATE_FILE = "data/state.json"
+
+
+def read_state():
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def save_state(state):
+    os.makedirs("data", exist_ok=True)
+    temp = STATE_FILE + ".tmp"
+    with open(temp, "w", encoding="utf-8") as handle:
+        json.dump(state, handle, ensure_ascii=False, indent=2)
+    os.replace(temp, STATE_FILE)
+
+
+def poll_pay(state):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = str(os.getenv("TELEGRAM_CHAT_ID", "")).strip()
+    if not token or not chat_id:
+        print("Telegram secrets missing; no command processed.")
+        return False
+
+    offset = int(state.get("telegram_update_offset", 0) or 0)
+    try:
+        response = requests.get(
+            f"https://api.telegram.org/bot{token}/getUpdates",
+            params={"offset": offset + 1, "timeout": 0, "allowed_updates": json.dumps(["message"])},
+            timeout=10,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if not payload.get("ok"):
+            return False
+
+        requested = False
+        for update in payload.get("result", []):
+            state["telegram_update_offset"] = max(
+                int(state.get("telegram_update_offset", 0) or 0),
+                int(update.get("update_id", 0)),
+            )
+            message = update.get("message") or {}
+            chat = message.get("chat") or {}
+            if str(chat.get("id", "")) != chat_id:
+                continue
+            command = str(message.get("text", "")).strip()
+            if re.fullmatch(r"/{1,2}pay(?:@\w+)?", command, flags=re.IGNORECASE):
+                requested = True
+        save_state(state)
+        return requested
+    except (requests.RequestException, ValueError, TypeError) as exc:
+        print(f"Telegram command polling failed: {exc}")
+        return False
+
+
+def concise_reply(messages):
+    candidates = []
+    for message in messages:
+        project = re.search(r"^Project: (.+)$", message, re.MULTILINE)
+        entry = re.search(r"^Entry reference: \$([0-9.eE+-]+)", message, re.MULTILINE)
+        stop = re.search(r"^Stop reference: \$([0-9.eE+-]+)", message, re.MULTILINE)
+        target = re.search(r"^Target reference: \$([0-9.eE+-]+)", message, re.MULTILINE)
+        probability = re.search(r"^Combined model probability: ([0-9.]+)%?$", message, re.MULTILINE)
+        mint = re.search(r"^Mint: (.+)$", message, re.MULTILINE)
+        if not all((project, entry, stop, target, probability, mint)):
+            continue
+        try:
+            candidates.append((
+                float(probability.group(1).rstrip("%")),
+                project.group(1).strip(), entry.group(1), target.group(1),
+                stop.group(1), mint.group(1).strip()
+            ))
+        except ValueError:
+            continue
+
+    if not candidates:
+        return "NO_SETUP"
+    _, project, entry, target, stop, mint = max(candidates, key=lambda row: row[0])
+    return f"{project} | خرید: ${entry} | فروش: ${target} | حدضرر: ${stop} | {mint}"
+
+
+def main():
+    state = read_state()
+    if not poll_pay(state):
+        print("No /Pay request; scan skipped and no Telegram message sent.")
+        return
+
+    import main as scanner
+
+    messages = []
+    def capture_buy(message):
+        if "SOLANA BUY WATCH" in message:
+            messages.append(message)
+        # Return False so verbose alerts are never considered delivered.
+        return False
+
+    scanner.send_telegram = capture_buy
+    scanner.main()
+
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return
+    reply = concise_reply(messages)
+    response = requests.post(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        json={"chat_id": chat_id, "text": reply, "disable_web_page_preview": True},
+        timeout=20,
+    )
+    response.raise_for_status()
+
+
+if __name__ == "__main__":
+    main()
