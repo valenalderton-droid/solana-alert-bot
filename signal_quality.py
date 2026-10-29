@@ -61,11 +61,11 @@ def score_signal(row, candles, liquidity_usd, volume_24h_usd,
     current_close = number("close", 0)
     prior_high = max(highs) if highs else 0
     is_breakout = prior_high > 0 and current_close > prior_high
-    award(is_breakout, 8, "Closed above the prior 20-candle high", "No confirmed 20-candle breakout")
+    award(is_breakout, 6, "Closed above the prior 20-candle high", "No confirmed 20-candle breakout")
     liq = float(liquidity_usd or 0)
     vol = float(volume_24h_usd or 0)
-    award(liq >= 250000, 8, "Liquidity is robust for this filter", "Liquidity is only near the minimum")
-    award(liq > 0 and vol / liq >= 0.5, 4, "24h volume/liquidity ratio is active", "Volume/liquidity activity is low")
+    award(liq >= 250000, 4, "Liquidity is robust for this filter", "Liquidity is only near the minimum")
+    award(liq > 0 and vol / liq >= 0.5, 3, "24h volume/liquidity ratio is active", "Volume/liquidity activity is low")
 
     btc_change = global_context.get("btc_24h_pct")
     sol_change = global_context.get("sol_24h_pct")
@@ -75,13 +75,13 @@ def score_signal(row, candles, liquidity_usd, volume_24h_usd,
         market_aligned = math.isfinite(btc_change) and math.isfinite(sol_change) and btc_change > -3 and sol_change > -4
     except (TypeError, ValueError, OverflowError):
         market_aligned = False
-    award(market_aligned, 4, "BTC/SOL short-term backdrop is not sharply risk-off", "BTC/SOL backdrop is weak or unavailable")
+    award(market_aligned, 3, "BTC/SOL short-term backdrop is not sharply risk-off", "BTC/SOL backdrop is weak or unavailable")
 
     rr_ok = (
         isinstance(stop_pct, (int, float)) and isinstance(target_pct, (int, float))
         and stop_pct > 0 and target_pct / stop_pct >= 2.0
     )
-    award(rr_ok, 5, "Gross reward/risk is at least 2:1", "Reward/risk below 2:1")
+    award(rr_ok, 3, "Gross reward/risk is at least 2:1", "Reward/risk below 2:1")
 
     score = min(100, max(0, score))
     passed = score >= MIN_SIGNAL_QUALITY
