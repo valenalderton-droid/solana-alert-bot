@@ -523,20 +523,6 @@ def main():
             "model_metrics": metrics
         }
 
-        scan_diagnostics["alerts_created"] += 1
-        append_jsonl(PREDICTIONS_FILE, prediction)
-        state["open_signals"].append({
-            "signal_id": signal_id,
-            "token_address": address,
-            "name": prediction["name"],
-            "timestamp": candle_ts,
-            "entry": entry,
-            "stop": stop,
-            "target": target
-        })
-        state["last_alerts"][address] = candle_ts
-        state["stats"]["signals"] += 1
-
         message = (
             "SOLANA BUY WATCH — NOT AN AUTOMATIC TRADE\n\n"
             f"Project: {prediction['name']} ({prediction['symbol']})\n"
@@ -555,6 +541,25 @@ def main():
 
         sent = send_telegram(message)
         print(f"Signal {signal_id}; telegram_sent={sent}")
+
+        # Only record a new alert after Telegram confirms delivery. If delivery
+        # fails, the same completed candle can be retried on a later run.
+        if sent:
+            scan_diagnostics["alerts_created"] += 1
+            append_jsonl(PREDICTIONS_FILE, prediction)
+            state["open_signals"].append({
+                "signal_id": signal_id,
+                "token_address": address,
+                "name": prediction["name"],
+                "timestamp": candle_ts,
+                "entry": entry,
+                "stop": stop,
+                "target": target
+            })
+            state["last_alerts"][address] = candle_ts
+            state["stats"]["signals"] += 1
+        else:
+            print(f"Telegram delivery failed; will retry signal next run: {signal_id}")
 
     print("Final scan diagnostics:", json.dumps(scan_diagnostics))
     if scan_diagnostics["alerts_created"] == 0:
