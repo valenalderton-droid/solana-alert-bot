@@ -285,6 +285,12 @@ def concise_reply(messages):
     return f"{project} | خرید: ${entry} | فروش: ${target} | حدضرر: ${stop} | {mint}"
 
 
+def is_buy_alert(message):
+    """Recognize both the legacy and ranked BUY alert titles."""
+    text = str(message or "").upper()
+    return "BUY WATCH" in text and "NOT AN AUTOMATIC TRADE" in text
+
+
 def main():
     state = read_state()
     requested = poll_pay(state)
@@ -305,23 +311,29 @@ def main():
 
     messages = []
     delivered_buys = []
+    delivered_messages = []
     original_send_telegram = scanner.send_telegram
 
     def capture_buy(message):
-        if "SOLANA BUY WATCH" in message:
+        if is_buy_alert(message):
             if not requested:
                 # Scheduled runs only monitor exits; never open new paper positions
                 # without an explicit //Pay request.
                 return False
-            messages.append(message)
             # Send the compact alert immediately. Return True only after Telegram
             # confirms delivery so the scanner records only alerts the user received.
             sent = original_send_telegram(concise_reply([message]))
             if sent:
+                messages.append(message)
                 delivered_buys.append(message)
+                delivered_messages.append(message)
             return sent
-        # SELL/EXIT alerts must reach Telegram even on scheduled monitoring runs.
-        return original_send_telegram(message)
+        # SELL/EXIT and explicit status messages pass through. Track delivery so
+        # the caller does not send a second, contradictory "no setup" message.
+        sent = original_send_telegram(message)
+        if sent:
+            delivered_messages.append(message)
+        return sent
 
     scanner.send_telegram = capture_buy
     scanner.main()
@@ -330,7 +342,7 @@ def main():
         print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
         return
 
-    if not messages:
+    if not messages and not delivered_messages:
         token = os.getenv("TELEGRAM_BOT_TOKEN")
         chat_id = os.getenv("TELEGRAM_CHAT_ID")
         if token and chat_id:
