@@ -88,6 +88,11 @@ def _audit_cores(system, core_specs, civ, timestamp):
                     int(police["suspended_until"].get(core_id, 0)), until)
                 incident["action"] = "temporary_suspension"
                 incident["suspended_until_scan"] = until
+                civ["court"].setdefault("appeals", []).append({
+                    "core_id": core_id, "filed_scan": civ["scan_count"],
+                    "reason": "automatic appeal against temporary suspension",
+                    "status": "pending", "evidence_finding": finding,
+                })
     police["incidents"] = police.get("incidents", [])[-200:]
 
 
@@ -116,6 +121,12 @@ def _review_court(system, core_specs, civ, timestamp):
             decision = "reinstated_after_review"
         court.setdefault("decisions", []).append(
             {"at": timestamp, "core_id": core_id, "decision": decision})
+        pending = next((a for a in reversed(court.get("appeals", []))
+                        if a.get("core_id") == core_id and a.get("status") == "pending"), None)
+        if pending:
+            pending["status"] = "accepted" if decision == "reinstated_after_review" else "deferred"
+            pending["decision_at"] = timestamp
+            pending["decision"] = decision
     court["decisions"] = court.get("decisions", [])[-100:]
 
 
@@ -181,6 +192,38 @@ def _legislate(civ, timestamp):
         civ["bulletin"].append({"at": timestamp, "type": "law", "message": "Initial core constitution and laws published."})
 
 
+def _update_economy_and_academy(system, civ, timestamp):
+    """Account for new closed paper trades once; the treasury is virtual, never real money."""
+    economy = civ["economy"]
+    seen = economy.setdefault("seen_closed_counts", {})
+    academy = civ["academy"]
+    stats = academy.setdefault("resolved_trade_stats", {
+        "trades": 0, "wins": 0, "losses": 0, "net_pnl_usd": 0.0,
+    })
+    for core_id, core in (system.get("cores") or {}).items():
+        trades = ((core or {}).get("portfolio") or {}).get("closed_trades") or []
+        start = min(int(seen.get(core_id, 0) or 0), len(trades))
+        for trade in trades[start:]:
+            if not isinstance(trade, dict) or not isinstance(trade.get("pnl_usd"), (int, float)):
+                continue
+            pnl = _num(trade.get("pnl_usd"))
+            tax = max(0.0, pnl) * 0.01
+            economy["virtual_treasury_usd"] = round(_num(economy.get("virtual_treasury_usd")) + tax, 4)
+            economy["tax_revenue_usd"] = round(_num(economy.get("tax_revenue_usd")) + tax, 4)
+            stats["trades"] += 1
+            stats["wins" if pnl > 0 else "losses"] += 1
+            stats["net_pnl_usd"] = round(_num(stats.get("net_pnl_usd")) + pnl, 4)
+            academy.setdefault("lessons", []).append({
+                "at": timestamp, "core_id": core_id,
+                "outcome": "win" if pnl > 0 else "loss" if pnl < 0 else "breakeven",
+                "pnl_usd": round(pnl, 4), "token_address": trade.get("token_address"),
+                "exit_reason": trade.get("exit_reason"),
+                "note": "Resolved paper-trade evidence; not a standalone prediction rule.",
+            })
+        seen[core_id] = len(trades)
+    academy["lessons"] = academy.get("lessons", [])[-200:]
+
+
 def run_civilization_cycle(system, core_specs, timestamp=None):
     """Advance civic institutions once per bot scan and return a concise report."""
     timestamp = timestamp or datetime.now(timezone.utc).isoformat()
@@ -189,6 +232,7 @@ def run_civilization_cycle(system, core_specs, timestamp=None):
     _audit_cores(system, core_specs, civ, timestamp)
     _review_court(system, core_specs, civ, timestamp)
     _legislate(civ, timestamp)
+    _update_economy_and_academy(system, civ, timestamp)
     if (civ["president"] is None or
             civ["scan_count"] - int(civ.get("last_election_scan", -ELECTION_EVERY_SCANS)) >= ELECTION_EVERY_SCANS or
             civ["scan_count"] - int(civ.get("last_election_scan", 0)) >= TERM_LENGTH_SCANS):
@@ -201,6 +245,8 @@ def run_civilization_cycle(system, core_specs, timestamp=None):
                                 if not is_core_eligible(system, cid)],
             "court_decisions": len(civ["court"].get("decisions") or []),
             "virtual_treasury_usd": round(_num(civ["economy"].get("virtual_treasury_usd")), 2),
+            "virtual_tax_revenue_usd": round(_num(civ["economy"].get("tax_revenue_usd")), 2),
+            "research_lessons": len(civ["academy"].get("lessons") or []),
             "ecology": dict(civ["ecology"]), "bulletin": list(civ["bulletin"][-5:])}
 
 
@@ -243,7 +289,8 @@ def format_civilization_report(report):
              "شورای منتخب: " + (", ".join(report.get("council") or []) or "تعیین‌نشده"),
              f"پلیس/بازرسی: {report.get('police_incidents', 0)} رخداد ثبت‌شده | تعلیق فعال: {', '.join(report.get('suspended_cores') or []) or 'ندارد'}",
              f"دادگاه: {report.get('court_decisions', 0)} تصمیم ثبت‌شده | قوانین: {len(report.get('laws') or [])}",
-             f"خزانهٔ مجازی: ${_num(report.get('virtual_treasury_usd')):,.2f}",
+             f"خزانهٔ مجازی: ${_num(report.get('virtual_treasury_usd')):,.2f} (مالیات شبیه‌سازی‌شده: ${_num(report.get('virtual_tax_revenue_usd')):,.2f})",
+             f"آکادمی: {report.get('research_lessons', 0)} نتیجهٔ معاملهٔ مجازی برای مطالعه ثبت شده",
              f"تنوع پروژه‌های منتخب: {report.get('ecology', {}).get('diversity_ratio', 1.0):.0%}"]
     if report.get("ecology", {}).get("warning"):
         lines.append("هشدار محیط: تمرکز بیش از حد روی پروژه‌های تکراری؛ تنوع انتخاب‌ها پایین است.")
