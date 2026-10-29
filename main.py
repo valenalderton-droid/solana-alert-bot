@@ -75,6 +75,157 @@ def find_resistance_target(candles, entry, minimum_target_pct, max_target_pct=0.
     return min(targets) if targets else None
 
 
+def build_comprehensive_analysis(candles, price, ensemble=None, quality=None,
+                                horizon_probabilities=None, global_context=None,
+                                news_context=None, liquidity=0, volume24h=0,
+                                entry=None, stop=None, target=None):
+    """Build a compact, evidence-based technical/fundamental-context report.
+
+    Candles are hourly. The report explicitly labels unavailable data and does
+    not convert strategy scores into win probabilities.
+    """
+    ensemble = ensemble or {}
+    quality = quality or {}
+    horizon_probabilities = horizon_probabilities or {}
+    global_context = global_context or {}
+    news_context = news_context or []
+    try:
+        candles = sorted(
+            [c for c in (candles or []) if isinstance(c, dict)],
+            key=lambda c: int(c.get("timestamp", 0))
+        )
+    except (TypeError, ValueError, OverflowError):
+        candles = []
+
+    def num(value, default=None):
+        try:
+            value = float(value)
+            return value if math.isfinite(value) else default
+        except (TypeError, ValueError, OverflowError):
+            return default
+
+    def pct_change(old, new):
+        return (new / old - 1.0) * 100 if old and new and old > 0 else None
+
+    def fmt_pct(value):
+        return "ناموجود" if value is None else f"{value:+.2f}%"
+
+    lines = ["\n\n━━ تحلیل جامع بازار و پرایس اکشن ━━"]
+    price = num(price, 0) or 0
+    lines.append(f"قیمت مرجع: ${price:.8g}" if price > 0 else "قیمت مرجع: نامعتبر")
+    lines.append(f"نقدینگی استخر: ${num(liquidity, 0):,.0f} | حجم ۲۴ساعته: ${num(volume24h, 0):,.0f}")
+    if liquidity and num(liquidity, 0) > 0:
+        lines.append(f"نسبت حجم ۲۴ساعته به نقدینگی: {num(volume24h, 0) / num(liquidity, 1) * 100:.1f}%")
+
+    closes, highs, lows, volumes = [], [], [], []
+    for c in candles:
+        close, high, low = num(c.get("close")), num(c.get("high")), num(c.get("low"))
+        if close and high and low and close > 0 and high >= low > 0:
+            closes.append(close)
+            highs.append(high)
+            lows.append(low)
+            volumes.append(max(0.0, num(c.get("volume"), 0) or 0))
+    if len(closes) >= 2:
+        lines.append(f"داده نمودار: {len(closes)} کندل ساعتی معتبر")
+        for label, span in (("۱ساعت", 1), ("۴ساعت", 4), ("۲۴ساعت", 24), ("۷۲ساعت", 72), ("۷روز", 168)):
+            if len(closes) > span:
+                lines.append(f"بازده {label}: {fmt_pct(pct_change(closes[-span-1], closes[-1]))}")
+        last = closes[-1]
+        for span, label in ((24, "۲۴ساعت"), (72, "۷۲ساعت"), (168, "۷روز")):
+            if len(lows) >= min(span, len(lows)):
+                subset_lows, subset_highs = lows[-span:], highs[-span:]
+                support, resistance = min(subset_lows), max(subset_highs)
+                lines.append(
+                    f"سطوح {label}: حمایت تقریبی ${support:.8g} ({pct_change(last, support):+.2f}%)؛ "
+                    f"مقاومت تقریبی ${resistance:.8g} ({pct_change(last, resistance):+.2f}%)"
+                )
+        if len(closes) >= 50:
+            ema20 = sum(closes[-20:]) / 20
+            ema50 = sum(closes[-50:]) / 50
+            if len(closes) >= 70:
+                # Approximate EMA using a stable seed and recursive smoothing.
+                def ema(values, period):
+                    value = sum(values[:period]) / period
+                    alpha = 2 / (period + 1)
+                    for item in values[period:]:
+                        value = alpha * item + (1-alpha) * value
+                    return value
+                ema20, ema50 = ema(closes[-100:], 20), ema(closes[-100:], 50)
+            trend = "صعودی" if last > ema20 > ema50 else "نزولی" if last < ema20 < ema50 else "مختلط/خنثی"
+            lines.append(f"رژیم روند با EMA20/50: {trend}؛ EMA20 ${ema20:.8g}؛ EMA50 ${ema50:.8g}")
+        else:
+            lines.append("رژیم روند EMA20/50: تاریخچه کافی نیست")
+        if len(closes) >= 15:
+            tr = []
+            for i in range(max(1, len(closes)-14), len(closes)):
+                tr.append(max(highs[i]-lows[i], abs(highs[i]-closes[i-1]), abs(lows[i]-closes[i-1])) / closes[i])
+            atr_pct = sum(tr) / len(tr) * 100 if tr else None
+            gains, losses = [], []
+            for i in range(max(1, len(closes)-14), len(closes)):
+                delta = closes[i] - closes[i-1]
+                gains.append(max(0, delta) / closes[i-1])
+                losses.append(max(0, -delta) / closes[i-1])
+            avg_gain = sum(gains) / max(1, len(gains))
+            avg_loss = sum(losses) / max(1, len(losses))
+            rsi = 100 if avg_loss == 0 and avg_gain > 0 else 50 if avg_gain == avg_loss == 0 else 100 - 100/(1+avg_gain/avg_loss)
+            lines.append(f"نوسان ATR تقریبی ۱۴ کندل: {fmt_pct(atr_pct)}؛ RSI14 تقریبی: {rsi:.1f}/100")
+        if len(volumes) >= 30:
+            recent_avg = sum(volumes[-6:]) / 6
+            baseline = sum(volumes[-30:-6]) / 24
+            ratio = recent_avg / baseline if baseline > 0 else None
+            lines.append(f"حجم ۶ کندل اخیر نسبت به میانگین ۲۴ کندل قبل: {ratio:.2f}x" if ratio is not None else "مقایسه حجم: حجم پایه صفر/ناموجود")
+        else:
+            lines.append("مقایسه حجم: تاریخچه حجمی کافی نیست")
+    else:
+        lines.append("تحلیل تکنیکال چندبازه‌ای: کندل معتبر کافی نیست")
+
+    strategies = ensemble.get("strategies") or {}
+    if strategies:
+        lines.append("امتیاز استراتژی‌ها (از ۱۰۰، نه احتمال برد): " + " | ".join(
+            f"{key}={num(value, 0):.0f}" for key, value in strategies.items()
+        ))
+    lines.append(
+        f"اجماع استراتژی: {num(ensemble.get('score'), 0):.1f}/100؛ "
+        f"استراتژی‌های صعودی: {ensemble.get('bullish_strategies', 'ناموجود')}؛ "
+        f"پرچم‌های ریسک: {', '.join(ensemble.get('risk_flags') or []) or 'مورد مشخصی شناسایی نشد'}"
+    )
+    lines.append(
+        f"کیفیت سیگنال: {quality.get('score', 'ناموجود')}/100 ({quality.get('grade', 'نامشخص')})؛ "
+        f"قبولی فیلتر: {'بله' if quality.get('passed') else 'خیر/نامشخص'}"
+    )
+    if horizon_probabilities:
+        lines.append("برآورد مدل برحسب افق: " + " | ".join(
+            f"{k}={num(v, 0)*100:.1f}%" for k, v in horizon_probabilities.items()
+            if num(v) is not None
+        ))
+        lines.append("توجه: برآورد مدل تضمین یا احتمال کالیبره‌شده سود نیست.")
+    if entry and stop and target:
+        risk_pct = (entry-stop)/entry*100 if entry > stop > 0 else None
+        reward_pct = (target-entry)/entry*100 if target > entry > 0 else None
+        rr = reward_pct/risk_pct if reward_pct is not None and risk_pct and risk_pct > 0 else None
+        lines.append(
+            f"طرح معامله: ورود ${entry:.8g}؛ ابطال/حدضرر ${stop:.8g}؛ هدف ${target:.8g}؛ "
+            f"ریسک {fmt_pct(-risk_pct if risk_pct is not None else None)}؛ پاداش {fmt_pct(reward_pct)}؛ "
+            f"نسبت پاداش/ریسک {f'{rr:.2f}:1' if rr is not None else 'نامشخص'}"
+        )
+    btc, sol = global_context.get("btc_24h_pct"), global_context.get("sol_24h_pct")
+    lines.append(f"زمینه بازار: BTC ۲۴ساعت {fmt_pct(num(btc))}؛ SOL ۲۴ساعت {fmt_pct(num(sol))}؛ ریسک‌گریزی بازار: {'فعال' if global_context.get('risk_off') else 'فعال تشخیص داده نشد/نامعلوم'}")
+    if news_context:
+        lines.append("اخبار مرتبط اخیر (تیترمحور؛ نیازمند تأیید منبع اصلی):")
+        for item in news_context[:3]:
+            if not isinstance(item, dict):
+                continue
+            title = str(item.get("title") or "بدون عنوان")[:130]
+            sentiment = str(item.get("sentiment") or "نامشخص")
+            relevance = str(item.get("relevance") or "نامشخص")
+            url = str(item.get("url") or "")
+            lines.append(f"• [{sentiment}; {relevance}] {title}" + (f" — {url}" if url else ""))
+    else:
+        lines.append("اخبار مرتبط: مورد تازه‌ای در داده‌های نگهداری‌شده موجود نیست؛ این به معنی نبود خبر منفی نیست.")
+    lines.append("محدودیت‌ها: سطوح از داده‌های تاریخی محاسبه شده‌اند؛ عمق دفتر سفارش، لغزش، کارمزد و اجرای واقعی ممکن است متفاوت باشد.")
+    return "\n".join(lines)
+
+
 def read_json(path, default):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -671,6 +822,11 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
                 f"نقدینگی: ${float(info.get('liquidity') or 0):,.0f}\n"
                 f"حجم ۲۴ ساعته: ${float(info.get('volume24h') or 0):,.0f}\n"
                 + exit_lines
+                + build_comprehensive_analysis(
+                    candles=candles, price=price, ensemble=ensemble,
+                    global_context={}, liquidity=info.get("liquidity", 0),
+                    volume24h=info.get("volume24h", 0)
+                ) + "\n"
                 + f"وضعیت ورود: ستاپ خرید از تمام فیلترها عبور نکرد؛ علت: {reason}\n"
                 + f"ریسک‌ها: {', '.join(ensemble.get('risk_flags', [])) or 'ریسک مشخصی در این بررسی شناسایی نشد'}\n"
                 + f"آدرس توکن: {address}\nزمان (UTC): {utc_now()}\n\n"
@@ -1505,6 +1661,14 @@ def main():
               f"BTC 24h change: {global_context['btc_24h_pct']}%; SOL 24h change: {global_context['sol_24h_pct']}%\n"
               f"Recent news and possible SOL impact: {json.dumps(recent_news_context, ensure_ascii=False)}\n"
               f"Evaluation: {json.dumps(compact_metrics)}\n"
+              + build_comprehensive_analysis(
+                  candles=info.get("candles", []), price=entry,
+                  ensemble=ensemble, quality=quality,
+                  horizon_probabilities=horizon_probabilities,
+                  global_context=global_context, news_context=recent_news_context,
+                  liquidity=info.get("liquidity", 0), volume24h=info.get("volume24h", 0),
+                  entry=entry, stop=stop, target=target
+              ) + "\n"
               f"Mint: {prediction['token_address']}\n"
               f"Time (UTC): {utc_now()}\n\n"
               "Research alert only. Rank is not a guarantee; fees, slippage and losses can change results."
