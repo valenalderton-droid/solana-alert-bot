@@ -162,10 +162,12 @@ def build_training_rows(candle_sets, horizon=4):
                     label = 1
                     break
 
-            # If neither level was reached within the horizon, it is a timeout,
-            # not a negative example. Exclude it from this binary target-hit model.
+            # The model estimates whether the target is reached before the stop
+            # within this horizon. A complete, valid timeout is therefore y=0
+            # (target not reached), not a claim that the trade lost money.
+            # Missing/irregular candles were excluded above, before labelling.
             if label is None:
-                continue
+                label = 0
 
             values = df.iloc[i][FEATURES]
             if values.isna().any():
