@@ -1,4 +1,5 @@
 import tempfile
+import json
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -119,6 +120,46 @@ class SelfImproverTests(unittest.TestCase):
         result = self_improver.diagnose_failure_modes(prediction, outcomes)
         self.assertEqual(result["sample_size"], 1)
         self.assertEqual(result["groups"], {})
+
+    def test_rule_file_lifecycle_creates_edits_and_deletes_only_managed_rules(self):
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp) / "experience_rules"
+            with patch.object(self_improver, "RULE_FILES_DIR", directory):
+                rule = {
+                    "id": "avoid_entry_chase", "enabled": True,
+                    "status": "experience_derived", "field": "entry_deviation_pct",
+                    "operator": "gte", "value": 2.0,
+                    "reason": "Repeated losses after chasing",
+                    "evidence": {"samples": 12, "mean_net_return_pct": -1.2,
+                                 "negative_return_rate": 0.75}
+                }
+                first = self_improver.sync_experience_rule_files([rule])
+                path = directory / "avoid_entry_chase.json"
+                self.assertEqual(first["created"], ["avoid_entry_chase.json"])
+                self.assertTrue(path.exists())
+
+                edited_rule = dict(rule, value=2.5, evidence={"samples": 15})
+                second = self_improver.sync_experience_rule_files([edited_rule])
+                self.assertEqual(second["edited"], ["avoid_entry_chase.json"])
+                self.assertEqual(json.loads(path.read_text(encoding="utf-8"))["value"], 2.5)
+
+                # An unrelated file must never be removed by rule cleanup.
+                unrelated = directory / "keep-me.json"
+                unrelated.write_text("{}", encoding="utf-8")
+                third = self_improver.sync_experience_rule_files([])
+                self.assertEqual(third["deleted"], ["avoid_entry_chase.json"])
+                self.assertFalse(path.exists())
+                self.assertTrue(unrelated.exists())
+
+    def test_rule_file_manager_rejects_unallowlisted_ids(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(self_improver, "RULE_FILES_DIR", Path(temp)):
+                result = self_improver.sync_experience_rule_files([{
+                    "id": "../main.py", "enabled": True, "field": "x",
+                    "operator": "lt", "value": 1
+                }])
+                self.assertEqual(result["active"], [])
+                self.assertFalse((Path(temp) / "main.py.json").exists())
 
 
 if __name__ == "__main__":
