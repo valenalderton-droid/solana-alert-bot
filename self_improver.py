@@ -336,71 +336,46 @@ def build_experience_rules(diagnostics, minimum_samples=12,
 
 
 def sync_experience_rule_files(rules, now=None):
-    """Create/update/delete only bot-owned JSON rule files from validated rule objects.
+    """Manage only validated allowlisted rule JSON files via the safe file editor."""
+    from managed_file_editor import ManagedFileEditor
 
-    File names are restricted to the hard-coded rule allowlist. This function
-    never edits Python source, workflow files, credentials, or project filters.
-    """
     now = now or datetime.now(timezone.utc)
-    allowed_ids = set(EXPERIENCE_RULE_DEFINITIONS)
+    editor = ManagedFileEditor(RULE_FILES_DIR)
     active = {}
+    rejected = []
     for rule in rules or []:
-        if not isinstance(rule, dict):
+        if not isinstance(rule, dict) or rule.get("enabled") is not True:
             continue
-        rule_id = str(rule.get("id", ""))
-        if rule_id in allowed_ids and rule.get("enabled") is True:
-            active[rule_id] = rule
-
-    RULE_FILES_DIR.mkdir(parents=True, exist_ok=True)
-    actions = {"created": [], "edited": [], "deleted": [], "active": []}
-    for rule_id, rule in active.items():
-        path = RULE_FILES_DIR / (rule_id + ".json")
-        payload = {
-            "schema_version": 1,
-            "managed_by": "solana-alert-bot-self-improver",
-            "id": rule_id,
-            "enabled": True,
-            "status": rule.get("status", "experience_derived"),
-            "field": rule.get("field"),
-            "operator": rule.get("operator"),
-            "value": rule.get("value"),
-            "reason": rule.get("reason", ""),
-            "evidence": rule.get("evidence", {}),
-            "updated_at": rule.get("updated_at") or now.isoformat()
-        }
-        serialized = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
-        previous = None
         try:
-            previous = path.read_text(encoding="utf-8")
-        except FileNotFoundError:
-            pass
-        unchanged = False
-        if previous is not None:
-            try:
-                old_payload = json.loads(previous)
-                old_compare = dict(old_payload)
-                new_compare = dict(payload)
-                # A timestamp alone is not a rule edit; avoid rewriting files
-                # on every scheduled scan when evidence and rule semantics match.
-                old_compare.pop("updated_at", None)
-                new_compare.pop("updated_at", None)
-                unchanged = old_compare == new_compare
-            except (json.JSONDecodeError, TypeError, ValueError):
-                unchanged = False
-        if previous is None or not unchanged:
-            temp = path.with_suffix(".json.tmp")
-            temp.write_text(serialized, encoding="utf-8")
-            temp.replace(path)
-            actions["created" if previous is None else "edited"].append(path.name)
-        actions["active"].append(path.name)
+            payload = editor.validate(rule)
+        except (ValueError, TypeError, KeyError) as exc:
+            rejected.append({"id": str(rule.get("id", ""))[:80], "reason": str(exc)[:160]})
+            continue
+        active[payload["id"]] = {**rule, **payload}
+        if not active[payload["id"]].get("updated_at"):
+            active[payload["id"]]["updated_at"] = now.isoformat()
 
-    # Delete only JSON files whose stem is in our fixed allowlist. Never sweep
-    # arbitrary files from the directory.
-    for path in RULE_FILES_DIR.glob("*.json"):
-        if path.stem in allowed_ids and path.stem not in active:
-            path.unlink()
-            actions["deleted"].append(path.name)
+    actions = {"created": [], "edited": [], "deleted": [], "active": [], "unchanged": [], "rejected": rejected}
+    for rule_id, rule in active.items():
+        try:
+            result = editor.write(rule)
+        except (OSError, ValueError, TypeError) as exc:
+            actions["rejected"].append({"id": rule_id, "reason": str(exc)[:160]})
+            continue
+        actions[result].append(rule_id + ".json")
+        actions["active"].append(rule_id + ".json")
+
+    # Only the editor's hard-coded allowlist can be deleted. Unrelated files stay untouched.
+    for rule_id in editor_ids():
+        if rule_id not in active and editor.delete(rule_id):
+            actions["deleted"].append(rule_id + ".json")
     return actions
+
+
+def editor_ids():
+    """Return the static IDs the managed editor is allowed to own."""
+    from managed_file_editor import RULE_SCHEMAS
+    return tuple(RULE_SCHEMAS)
 
 
 def evaluate_experience_rules(candidate, rules):
