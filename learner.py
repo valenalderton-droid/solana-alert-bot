@@ -10,7 +10,9 @@ FEATURES = [
     "ret1", "ret3", "ret6", "ret12", "ret24",
     "ema_gap", "ema_gap34", "rsi", "atr_pct",
     "volatility_ratio", "volume_ratio", "volume_trend",
-    "body_pct", "range_pct", "close_location", "breakout_distance"
+    "body_pct", "range_pct", "close_location", "breakout_distance",
+    "price_vs_ema21", "rsi_short", "upper_wick_pct", "lower_wick_pct",
+    "high_distance24", "low_distance24", "trend_persistence"
 ]
 
 
@@ -31,12 +33,18 @@ def add_features(candles):
     ema34 = close.ewm(span=34, adjust=False).mean()
     df["ema_gap"] = (ema9 / ema21) - 1
     df["ema_gap34"] = (ema9 / ema34) - 1
+    df["price_vs_ema21"] = (close / ema21) - 1
+    df["trend_persistence"] = (close > ema21).rolling(12).mean()
 
     delta = close.diff()
     gain = delta.clip(lower=0).rolling(14).mean()
     loss = (-delta.clip(upper=0)).rolling(14).mean()
     rs = gain / loss.replace(0, np.nan)
     df["rsi"] = (100 - 100 / (1 + rs)) / 100
+    short_gain = delta.clip(lower=0).rolling(6).mean()
+    short_loss = (-delta.clip(upper=0)).rolling(6).mean()
+    short_rs = short_gain / short_loss.replace(0, np.nan)
+    df["rsi_short"] = (100 - 100 / (1 + short_rs)) / 100
 
     previous_close = close.shift(1)
     tr = pd.concat([
@@ -58,8 +66,14 @@ def add_features(candles):
     df["range_pct"] = (df["high"] - df["low"]) / close
     candle_range = (df["high"] - df["low"]).replace(0, np.nan)
     df["close_location"] = (df["close"] - df["low"]) / candle_range
+    df["upper_wick_pct"] = (df["high"] - df[["open", "close"]].max(axis=1)) / candle_range
+    df["lower_wick_pct"] = (df[["open", "close"]].min(axis=1) - df["low"]) / candle_range
     prior_high = df["high"].shift(1).rolling(20).max()
+    prior_high24 = df["high"].shift(1).rolling(24).max()
+    prior_low24 = df["low"].shift(1).rolling(24).min()
     df["breakout_distance"] = close / prior_high - 1
+    df["high_distance24"] = close / prior_high24 - 1
+    df["low_distance24"] = close / prior_low24 - 1
 
     return df.replace([np.inf, -np.inf], np.nan)
 
@@ -217,8 +231,9 @@ def train_model(candle_sets):
     final_model = Pipeline([
         ("scale", StandardScaler()),
         ("logistic", LogisticRegression(
-            class_weight="balanced",
-            max_iter=1000,
+            class_weight=None,
+            C=0.5,
+            max_iter=1500,
             random_state=42
         ))
     ])
@@ -252,15 +267,23 @@ def price_action_ok(candles, row):
 
     prior_high = float(df.iloc[-21:-1]["high"].max())
     uptrend = float(row["ema_gap"]) > 0 and float(row["ret6"]) > 0
+    above_trend = float(row.get("price_vs_ema21", -1)) > 0
+    trend_persistence = float(row.get("trend_persistence", 0)) >= 0.55
     breakout = close > prior_high
     rsi = float(row["rsi"])
+    close_location = float(row.get("close_location", 0.5))
+    upper_wick = float(row.get("upper_wick_pct", 1.0))
     volume_ok = float(row["volume_ratio"]) >= 1.5
 
     if not uptrend:
         return False, "Trend is not bullish"
+    if not above_trend or not trend_persistence:
+        return False, "Price is not holding above a persistent EMA21 trend"
     if not (0.35 <= rsi <= 0.78):
         return False, "RSI outside the selected range"
+    if not breakout and (close_location < 0.50 or upper_wick > 0.65):
+        return False, "Weak candle close or excessive upper wick"
     if not (volume_ok or breakout):
         return False, "No volume confirmation or breakout"
 
-    return True, "Uptrend and confirmation present"
+    return True, "Trend, candle quality and volume/breakout confirmation present"
