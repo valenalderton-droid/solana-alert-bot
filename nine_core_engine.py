@@ -43,6 +43,95 @@ CORE_TOOLSETS = {
 STARTING_CASH_PER_CORE = 10_000.0
 MAJORITY_VOTES = 5
 
+MIN_SUCCESS_TRADES = 8
+MIN_ELIMINATION_TRADES = 12
+MIN_WIN_RATE_FOR_SUCCESS = 0.55
+MAX_WIN_RATE_FOR_ELIMINATION = 0.45
+
+
+def _closed_trade_metrics(core, genome):
+    trades = (core.get("portfolio") or {}).get("closed_trades") or []
+    start = int(genome.get("generation_start_closed_count", 0) or 0)
+    rows = [t for t in trades[start:] if isinstance(t, dict) and isinstance(t.get("pnl_usd"), (int, float))]
+    pnl = sum(float(t["pnl_usd"]) for t in rows)
+    wins = sum(float(t["pnl_usd"]) > 0 for t in rows)
+    count = len(rows)
+    return {"trades": count, "pnl_usd": round(pnl, 4), "win_rate": round(wins / count, 4) if count else 0.0,
+            "return_pct": round(pnl / STARTING_CASH_PER_CORE * 100, 4)}
+
+
+def _initial_genome(spec):
+    return {"profile_id": spec["id"], "threshold": spec["threshold"], "risk_multiplier": 1.0,
+            "generation": 0, "parent_id": None, "generation_start_closed_count": 0,
+            "last_evaluated_closed_count": 0, "bad_streak": 0, "status": "founder"}
+
+
+def evolve_core_population(system):
+    """Replace persistently weak strategy genomes with mutated offspring of paper winners."""
+    cores = system.get("cores", {})
+    for spec in CORE_SPECS:
+        core = cores.get(spec["id"])
+        if isinstance(core, dict) and not isinstance(core.get("genome"), dict):
+            core["genome"] = _initial_genome(spec)
+    successful, weak, metrics_by_id = [], [], {}
+    for spec in CORE_SPECS:
+        cid = spec["id"]
+        core = cores.get(cid) or {}
+        genome = core.get("genome") or _initial_genome(spec)
+        metrics = _closed_trade_metrics(core, genome)
+        metrics_by_id[cid] = metrics
+        total_closed = len((core.get("portfolio") or {}).get("closed_trades") or [])
+        has_new_close = total_closed > int(genome.get("last_evaluated_closed_count", 0) or 0)
+        if metrics["trades"] >= MIN_SUCCESS_TRADES and metrics["pnl_usd"] > 0 and metrics["win_rate"] >= MIN_WIN_RATE_FOR_SUCCESS:
+            successful.append((metrics["return_pct"], cid))
+        if not has_new_close:
+            continue
+        genome["last_evaluated_closed_count"] = total_closed
+        if metrics["trades"] >= MIN_ELIMINATION_TRADES:
+            if metrics["pnl_usd"] <= 0 and metrics["win_rate"] < MAX_WIN_RATE_FOR_ELIMINATION:
+                genome["bad_streak"] = int(genome.get("bad_streak", 0)) + 1
+            else:
+                genome["bad_streak"] = 0
+            if genome["bad_streak"] >= 2:
+                weak.append((metrics["return_pct"], cid))
+    events = system.setdefault("evolution_events", [])
+    successful.sort(reverse=True)
+    weak.sort()
+    replacements, used_parents = [], set()
+    for _, weak_id in weak:
+        parents = [item for item in successful if item[1] != weak_id and item[1] not in used_parents]
+        if not parents:
+            break
+        _, parent_id = parents[0]
+        target = cores[weak_id]
+        old_genome = dict(target["genome"])
+        parent_genome = cores[parent_id]["genome"]
+        generation = int(old_genome.get("generation", 0)) + 1
+        role_ids = [item["id"] for item in CORE_SPECS]
+        parent_profile = parent_genome.get("profile_id", parent_id)
+        parent_index = role_ids.index(parent_profile) if parent_profile in role_ids else role_ids.index(parent_id)
+        child_profile = role_ids[(parent_index + generation + 1) % len(role_ids)]
+        child_threshold = max(52, min(72, _num(parent_genome.get("threshold"), 60) + (-2 if generation % 2 else 2)))
+        child_risk = max(0.8, min(1.25, _num(parent_genome.get("risk_multiplier"), 1.0) + (-0.05 if generation % 2 else 0.05)))
+        closed_count = len((target.get("portfolio") or {}).get("closed_trades") or [])
+        target["genome"] = {"profile_id": child_profile, "threshold": child_threshold,
+            "risk_multiplier": round(child_risk, 3), "generation": generation, "parent_id": parent_id,
+            "generation_start_closed_count": closed_count, "last_evaluated_closed_count": closed_count,
+            "bad_streak": 0, "status": "offspring"}
+        event = {"type": "offspring_replaced_weak_genome", "slot": weak_id, "parent_id": parent_id,
+            "generation": generation, "old_profile": old_genome.get("profile_id", weak_id),
+            "new_profile": child_profile, "threshold": child_threshold, "risk_multiplier": round(child_risk, 3),
+            "parent_metrics": metrics_by_id.get(parent_id, {})}
+        events.append(event)
+        replacements.append(event)
+        used_parents.add(parent_id)
+        successful = [item for item in successful if item[1] != parent_id]
+    system["evolution_events"] = events[-100:]
+    system["last_evolution"] = {"checked_at": datetime.now(timezone.utc).isoformat(),
+        "replacements": replacements, "active_offspring": sum(1 for c in cores.values()
+        if isinstance(c, dict) and (c.get("genome") or {}).get("status") == "offspring")}
+    return system["last_evolution"]
+
 
 def _num(value, default=0.0):
     try:
@@ -67,8 +156,10 @@ def _risk_penalty(candidate):
     return min(35.0, len(flags) * 7.0)
 
 
-def score_for_core(core_id, candidate):
-    """Score one qualified candidate using the core's distinct weighting."""
+def score_for_core(core_id, candidate, genome=None):
+    """Score a candidate using the active genome's inherited analytical profile."""
+    genome = genome or {}
+    profile_id = genome.get("profile_id", core_id)
     pred = candidate.get("prediction") or {}
     ensemble = pred.get("strategy_ensemble") or candidate.get("ensemble") or {}
     quality = pred.get("signal_quality") or candidate.get("quality") or {}
@@ -90,30 +181,30 @@ def score_for_core(core_id, candidate):
     stop_pct = max(0.0, _num(pred.get("stop_pct"), _num(candidate.get("stop_pct")) * 100))
     target_pct = max(0.0, _num(pred.get("target_pct"), _num(candidate.get("target_pct")) * 100))
     reward_risk = target_pct / stop_pct if stop_pct > 0 else 0.0
-    flags_penalty = _risk_penalty(candidate)
+    flags_penalty = _risk_penalty(candidate) * max(0.5, min(1.5, _num(genome.get("risk_multiplier"), 1.0)))
 
-    if core_id == "trend":
+    if profile_id == "trend":
         score = .42*strategies["trend"] + .20*strategies["structure"] + .18*strategies["momentum"] + .20*probability
-    elif core_id == "breakout":
+    elif profile_id == "breakout":
         score = .42*strategies["breakout"] + .23*strategies["volume"] + .20*strategies["structure"] + .15*probability
-    elif core_id == "momentum":
+    elif profile_id == "momentum":
         score = .42*strategies["momentum"] + .25*strategies["trend"] + .18*strategies["volume"] + .15*probability
-    elif core_id == "volume":
+    elif profile_id == "volume":
         score = .48*strategies["volume"] + .22*strategies["breakout"] + .15*strategies["momentum"] + .15*probability
-    elif core_id == "structure":
+    elif profile_id == "structure":
         score = .42*strategies["structure"] + .23*strategies["trend"] + .20*strategies["rejection"] + .15*probability
-    elif core_id == "risk":
+    elif profile_id == "risk":
         score = .45*strategies["risk"] + .25*quality_score + .15*min(100, reward_risk*35) + .15*probability - flags_penalty
         if stop_pct > 5 or entry_deviation > 2.5:
             score -= 15
-    elif core_id == "model":
+    elif profile_id == "model":
         score = .58*probability + .22*quality_score + .20*_num(pred.get("rank_score"))
         metrics = pred.get("model_metrics") or {}
         horizons = metrics.get("horizons") or {}
         ready = [v for v in horizons.values() if isinstance(v, dict) and v.get("ready")]
         if ready and all(_num(v.get("balanced_accuracy"), 0.5) < 0.52 for v in ready):
             score -= 12
-    elif core_id == "quality":
+    elif profile_id == "quality":
         score = .58*quality_score + .22*strategies["risk"] + .20*probability
         if reward_risk < 1.5:
             score -= 12
@@ -222,7 +313,11 @@ def _core_state(system, core_id):
         core = {"id": core_id, "name": spec["name"], "cash_start_usd": STARTING_CASH_PER_CORE,
                 "portfolio": None, "last_score": None, "last_vote": "HOLD",
                 "last_candidate": None, "votes": 0, "decisions": [], "updated_at": None}
+        core["genome"] = _initial_genome(spec)
         system["cores"][core_id] = core
+    if not isinstance(core.get("genome"), dict):
+        spec = next(x for x in CORE_SPECS if x["id"] == core_id)
+        core["genome"] = _initial_genome(spec)
     if not isinstance(core.get("portfolio"), dict):
         substate = {}
         get_portfolio(substate, STARTING_CASH_PER_CORE)
@@ -249,6 +344,8 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
         update_paper_portfolio(substate, market_info or {}, now=now)
         core["portfolio"] = substate["paper_portfolio"]
 
+    evolution = evolve_core_population(system)
+
     candidate_scores = []
     for candidate in candidates or []:
         pred = candidate.get("prediction") or {}
@@ -257,9 +354,10 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
         votes = []
         scores = {}
         for spec in CORE_SPECS:
-            score = score_for_core(spec["id"], candidate)
+            genome = _core_state(system, spec["id"]).get("genome") or {}
+            score = score_for_core(spec["id"], candidate, genome)
             scores[spec["id"]] = score
-            if score >= spec["threshold"]:
+            if score >= _num(genome.get("threshold"), spec["threshold"]):
                 votes.append(spec["id"])
         discussion = deliberate_between_cores(candidate, scores)
         adjusted_scores = {cid: memo["revised_score"] for cid, memo in discussion["memos"].items()}
@@ -272,7 +370,8 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
     for spec in CORE_SPECS:
         eligible = [row for row in candidate_scores
                     if not row["discussion"]["risk_veto"]
-                    and row["adjusted_scores"].get(spec["id"], 0) >= spec["threshold"]]
+                    and row["adjusted_scores"].get(spec["id"], 0) >= _num(
+                        (_core_state(system, spec["id"]).get("genome") or {}).get("threshold"), spec["threshold"])]
         eligible.sort(key=lambda row: row["adjusted_scores"][spec["id"]], reverse=True)
         chosen = eligible[0] if eligible else None
         core = _core_state(system, spec["id"])
@@ -328,6 +427,16 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
                         "adjusted_scores": row["adjusted_scores"],
                         "discussion": row["discussion"]} for row in ranked[:10]],
         "core_choices": core_choices,
+        "evolution": evolution,
+        "core_lineage": {spec["id"]: {
+            "profile_id": (system["cores"][spec["id"]].get("genome") or {}).get("profile_id", spec["id"]),
+            "generation": (system["cores"][spec["id"]].get("genome") or {}).get("generation", 0),
+            "parent_id": (system["cores"][spec["id"]].get("genome") or {}).get("parent_id"),
+            "status": (system["cores"][spec["id"]].get("genome") or {}).get("status", "founder"),
+            "threshold": (system["cores"][spec["id"]].get("genome") or {}).get("threshold", spec["threshold"]),
+            "generation_metrics": _closed_trade_metrics(system["cores"][spec["id"]],
+                system["cores"][spec["id"]].get("genome") or {}),
+        } for spec in CORE_SPECS},
         "shared_data_sources": SHARED_DATA_SOURCES,
         "core_access": {spec["id"]: {"name": spec["name"], "tools": CORE_TOOLSETS[spec["id"]], "uses_shared_scan_data": True, "independent_external_fetch": False} for spec in CORE_SPECS},
         "core_accounts": {spec["id"]: {
@@ -359,6 +468,10 @@ def format_core_result(result):
         lines.append("هیچ توکنی اکثریت ۵ از ۹ را نگرفت؛ هشدار خرید صادر نشود.")
     lines.append(f"ابزارهای اختصاصی تعریف‌شده: {len(result.get('core_access', {}))}/9 هسته؛ منابع مشترک: {len(result.get('shared_data_sources', []))}")
     lines.append("تعامل: هر هسته به ۸ هستهٔ دیگر بازخورد می‌دهد؛ امتیازها پس از گفت‌وگو بازبینی می‌شوند.")
+    evolution = result.get("evolution") or {}
+    lines.append(f"تکامل ژنتیکی: فرزند جدید {len(evolution.get('replacements', []))}؛ فرزندان فعال {evolution.get('active_offspring', 0)}")
+    for event in evolution.get("replacements", []):
+        lines.append(f"  {event.get('parent_id')} → فرزند جایگزین {event.get('slot')}؛ نسل {event.get('generation')}؛ پروفایل {event.get('new_profile')}")
     winner_row = next((item for item in result.get("candidates", [])
                        if item.get("token_address") == result.get("winner")), None)
     if winner_row:
