@@ -629,14 +629,18 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
             stop = min(recent_lows) if recent_lows else 0.0
             if price > 0 and 0 < stop < price:
                 risk_pct = (price - stop) / price * 100
-                target = find_resistance_target(candles, price, 2.0 * risk_pct / 100)
+                # Always report the nearest plausible resistance as a chart
+                # reference. Separately state whether it meets the 2:1 setup rule.
+                target = find_resistance_target(candles, price, 0.0)
+                target_reward_pct = ((target / price) - 1.0) * 100 if target else 0.0
+                reward_risk = target_reward_pct / risk_pct if target and risk_pct > 0 else 0.0
                 exit_lines = (
                     f"قیمت مرجع فعلی: ${price:.8g}\n"
                     f"حد خروج/ابطال زیر کف ۲۰ کندل اخیر: ${stop:.8g} ({risk_pct:.2f}% پایین‌تر)\n"
                     + (
-                        f"هدف مرجع: ${target:.8g} (زیر مقاومت تکنیکال؛ نسبت سود به ریسک حداقل ۲:۱)\n"
+                        f"هدف مرجع تکنیکال: ${target:.8g} ({target_reward_pct:.2f}% بالاتر؛ نسبت سود به ریسک تقریبی {reward_risk:.2f}:1)\n"
                         if target is not None else
-                        "هدف مرجع: تعیین نشد؛ مقاومت معتبر در فاصله مناسب برای نسبت سود به ریسک ۲:۱ پیدا نشد.\n"
+                        "هدف مرجع: مقاومت قابل‌تشخیص در داده‌های فعلی پیدا نشد؛ قیمت مرجع همچنان معتبر است.\n"
                     )
                 )
                 exit_warning = (
@@ -1062,13 +1066,16 @@ def main():
             )
             # A current quote that disagrees materially with the latest closed
             # hourly candle is not safe to print as a verified reference price.
-            price_reference_valid = (
-                math.isfinite(price_deviation_pct) and price_deviation_pct <= 3.0
-            )
-            if not price_reference_valid:
+            # DexScreener's priceUsd is the current pool quote. A gap from the
+            # last completed hourly close is market movement, not proof the quote
+            # is stale. Keep the valid positive quote as the reference and use
+            # the gap only to block a late BUY entry below.
+            price_reference_valid = math.isfinite(spot_price) and spot_price > 0
+            if math.isfinite(price_deviation_pct) and price_deviation_pct > 3.0:
                 print(
-                    f"Price reference rejected for {project.get('name')}: "
-                    f"spot/hourly-close deviation={price_deviation_pct:.2f}%"
+                    f"Large spot/hourly-close move for {project.get('name')}: "
+                    f"{price_deviation_pct:.2f}%; quote remains displayable, "
+                    "but entry confirmation may reject it."
                 )
             market_info[address] = {
                 "pair": pair,
@@ -1116,9 +1123,7 @@ def main():
                     abs(spot_price / cached_close - 1.0) * 100
                     if spot_price > 0 and cached_close > 0 else float("inf")
                 )
-                price_reference_valid = (
-                    math.isfinite(price_deviation_pct) and price_deviation_pct <= 3.0
-                )
+                price_reference_valid = math.isfinite(spot_price) and spot_price > 0
                 market_info[address] = {
                     "pair": pair,
                     "candles": cached,
