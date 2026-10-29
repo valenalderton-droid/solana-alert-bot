@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from learner import FEATURES, add_features, build_training_rows, price_action_ok, recency_sample_weights
+from learner import FEATURES, add_features, build_training_rows, price_action_ok, recency_sample_weights, walk_forward_validation
 
 
 def make_flat_candles(count=80):
@@ -81,6 +81,25 @@ class LearnerTests(unittest.TestCase):
         self.assertGreater(weights[1], weights[0])
         self.assertGreaterEqual(float(weights[0]), 0.20 * float(weights[2]))
         self.assertAlmostEqual(float(np.mean(weights)), 1.0, places=6)
+
+    def test_walk_forward_validation_uses_multiple_future_folds(self):
+        rows = []
+        base_ts = 1_700_000_000
+        for i in range(100):
+            label = i % 2
+            for repeat in range(4):
+                row = {name: float(label) + (i % 5) * 0.01 for name in FEATURES}
+                row.update({
+                    "timestamp": base_ts + i * 3600,
+                    "label_end": base_ts + i * 3600 + 60,
+                    "y": label
+                })
+                rows.append(row)
+        report = walk_forward_validation(__import__("pandas").DataFrame(rows), folds=3)
+        self.assertGreaterEqual(report["folds"], 1)
+        self.assertIn("mean_balanced_accuracy", report)
+        self.assertIn("mean_brier_score", report)
+        self.assertIn("method", report)
 
     def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
         rows = build_training_rows([make_flat_candles()])
