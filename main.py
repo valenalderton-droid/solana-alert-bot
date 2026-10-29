@@ -16,7 +16,7 @@ from self_improver import update_self_improvement, evaluate_experience_rules
 from signal_quality import score_signal
 from strategy_ensemble import evaluate_strategies, rank_candidate
 from learner import train_model, latest_features, price_action_ok
-from paper_portfolio import open_paper_trade, update_paper_portfolio, portfolio_snapshot
+from nine_core_engine import evaluate_nine_cores, format_core_result
 from news_analyzer import fetch_recent_news, analyze_news, format_news_alert
 
 ROOT = Path(__file__).resolve().parent
@@ -1337,8 +1337,6 @@ def main():
         outcomes_path=PAPER_OUTCOMES_FILE, count_live_stats=False
     )
     monitor_open_positions(state, market_info)
-    paper_status = update_paper_portfolio(state, market_info)
-    print("Virtual portfolio:", json.dumps(paper_status, ensure_ascii=False))
 
     # Send a compact performance digest at most once every 24 hours.
     now = datetime.now(timezone.utc)
@@ -1648,13 +1646,17 @@ def main():
           })
 
 
-      # Alert only the highest-ranked qualified candidate; never force a trade.
-      if candidate_alerts:
-          candidate_alerts.sort(key=lambda item: item["prediction"].get("rank_score", 0), reverse=True)
-          chosen = candidate_alerts[0]
+      # All nine independent rule-based cores update their own $10k virtual
+      # portfolios and vote. A BUY-WATCH alert requires a strict majority (5/9).
+      core_result = evaluate_nine_cores(candidate_alerts, state, market_info)
+      print("Nine-core vote:", json.dumps(core_result, ensure_ascii=False))
+      print(format_core_result(core_result))
+      if candidate_alerts and core_result.get("winner"):
+          chosen = next((item for item in candidate_alerts
+                         if item["prediction"].get("token_address") == core_result["winner"]), None)
+          if chosen is None:
+              raise RuntimeError("Nine-core winner was not present in candidate list")
           prediction = chosen["prediction"]
-          paper_open_result = open_paper_trade(state, prediction)
-          print("Virtual trade decision:", json.dumps(paper_open_result, ensure_ascii=False))
           info = chosen["info"]
           ensemble = chosen["ensemble"]
           quality = chosen["quality"]
@@ -1670,7 +1672,9 @@ def main():
           compact_metrics = chosen["compact_metrics"]
           message = (
               "SOLANA TOP-RANKED BUY WATCH — NOT AN AUTOMATIC TRADE\n\n"
-              f"Ranked #1 of {len(candidate_alerts)} qualified candidates\n"
+              f"Nine-core majority vote: {core_result.get('winner_votes', 0)}/9\n"
+              f"Candidate rank: {candidate_alerts.index(chosen) + 1} of {len(candidate_alerts)} qualified candidates\n"
+              + format_core_result(core_result) + "\n"
               f"Project: {prediction['name']} ({prediction['symbol']})\n"
               f"Entry reference: ${entry:.8g}\n"
               f"Stop reference: ${stop:.8g} ({stop_pct * 100:.2f}%)\n"
