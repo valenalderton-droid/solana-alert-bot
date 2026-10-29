@@ -545,21 +545,8 @@ def resolve_old_signals(state, store):
 
 
 def send_watchlist_fallback(active_projects, market_info, state, reason, configured_projects=None):
-    """Send a clearly non-buy top-watchlist ping when no valid BUY setup exists."""
+    """Send one top-ranked watchlist report per scan, even when no BUY setup qualifies."""
     now = datetime.now(timezone.utc)
-    cooldown_minutes = max(5, int(os.getenv("NO_SETUP_PING_COOLDOWN_MINUTES", "60")))
-    last_ping = state.get("last_watchlist_ping_utc")
-    if last_ping:
-        try:
-            parsed = datetime.fromisoformat(str(last_ping).replace("Z", "+00:00"))
-            if parsed.tzinfo is None:
-                parsed = parsed.replace(tzinfo=timezone.utc)
-            if (now - parsed.astimezone(timezone.utc)).total_seconds() < cooldown_minutes * 60:
-                print("No-setup watchlist ping skipped: cooldown active.")
-                return False
-        except (ValueError, TypeError):
-            pass
-
     projects = list(active_projects or [])
     if not projects:
         projects = list(configured_projects or [])
@@ -569,60 +556,82 @@ def send_watchlist_fallback(active_projects, market_info, state, reason, configu
         address = str(project.get("token_address", "")).strip()
         info = market_info.get(address) if address else None
         if info and info.get("candles"):
-            ensemble = evaluate_strategies(info["candles"])
+            candles = sorted(info["candles"], key=lambda c: int(c.get("timestamp", 0)))
+            ensemble = evaluate_strategies(candles)
             liquidity = float(info.get("liquidity") or 0)
             volume = float(info.get("volume24h") or 0)
-            # Ranking only selects a watchlist candidate; it never converts it into a buy signal.
             score = float(ensemble.get("score") or 0)
             score += min(8, math.log10(1 + liquidity / 10000) * 2)
             score += min(5, math.log10(1 + volume / 10000))
             score -= min(15, len(ensemble.get("risk_flags", [])) * 2)
-            ranked.append((score, project, info, ensemble))
+            ranked.append((score, project, info, ensemble, candles))
         else:
-            ranked.append((0.0, project, None, None))
+            ranked.append((0.0, project, info, None, []))
 
     if ranked:
         ranked.sort(key=lambda item: item[0], reverse=True)
-        _, project, info, ensemble = ranked[0]
+        score, project, info, ensemble, candles = ranked[0]
         address = str(project.get("token_address", "")).strip()
-        if info:
+        if info and candles:
+            price = float(info.get("price") or candles[-1].get("close") or 0)
+            recent_lows = [
+                float(c.get("low") or 0) for c in candles[-20:]
+                if float(c.get("low") or 0) > 0
+            ]
+            stop = min(recent_lows) if recent_lows else 0.0
+            if price > 0 and 0 < stop < price:
+                risk_pct = (price - stop) / price * 100
+                target = price + 2 * (price - stop)
+                exit_lines = (
+                    f"قیمت مرجع فعلی: ${price:.8g}\n"
+                    f"حد خروج/ابطال زیر کف اخیر: ${stop:.8g} ({risk_pct:.2f}% پایین‌تر)\n"
+                    f"هدف مرجع با نسبت سود به ریسک ۲:۱: ${target:.8g}\n"
+                )
+                exit_warning = (
+                    "این سطوح از کف ۲۰ کندل اخیر محاسبه شده‌اند؛ اگر فاصله حد خروج بیش از حد بزرگ است، "
+                    "ورود نکن. این سطح تضمین نمی‌کند خروج دقیقاً در همان قیمت انجام شود.\n"
+                )
+            else:
+                exit_lines = "حد خروج/هدف: به‌دلیل نامعتبر بودن قیمت یا نبود کف معتبر، محاسبه نشد.\n"
+                exit_warning = "تا دریافت داده معتبر، ورود نکن.\n"
             message = (
-                "SOLANA TOP WATCHLIST — NO VALID BUY SETUP\n\n"
-                "This is NOT a buy signal. The bot found no candidate that passed all entry rules.\n"
-                f"Top watchlist project: {project.get('name', 'Unknown')} ({project.get('symbol', '')})\n"
-                f"Current reference price: ${float(info.get('price') or 0):.8g}\n"
-                f"Liquidity: ${float(info.get('liquidity') or 0):,.0f}\n"
-                f"24h volume: ${float(info.get('volume24h') or 0):,.0f}\n"
-                f"Ensemble score: {ensemble.get('score', 0)}/100 (not win probability)\n"
-                f"Strategy scores: {json.dumps(ensemble.get('strategies', {}), ensure_ascii=False)}\n"
-                f"Risk flags: {', '.join(ensemble.get('risk_flags', [])) or 'none detected'}\n"
-                f"Why no valid BUY: {reason}\n"
-                f"Mint: {address}\nTime (UTC): {utc_now()}\n\n"
-                "Watchlist ranking is not a recommendation to buy. Wait for a confirmed setup."
+                "SOLANA TOP-RANKED PROJECT — NOT A BUY SIGNAL\n\n"
+                "بهترین پروژه قابل رتبه‌بندی این نوبت (نه الزاماً برنده آینده): "
+                f"{project.get('name', 'Unknown')} ({project.get('symbol', '')})\n"
+                f"رتبه امتیازی: {score:.1f}؛ امتیاز استراتژی: {ensemble.get('score', 0)}/100 (احتمال برد نیست)\n"
+                f"قیمت مرجع فعلی: ${price:.8g}\n"
+                f"نقدینگی: ${float(info.get('liquidity') or 0):,.0f}\n"
+                f"حجم ۲۴ ساعته: ${float(info.get('volume24h') or 0):,.0f}\n"
+                + exit_lines
+                + f"وضعیت ورود: ستاپ خرید از تمام فیلترها عبور نکرد؛ علت: {reason}\n"
+                + f"ریسک‌ها: {', '.join(ensemble.get('risk_flags', [])) or 'ریسک مشخصی در این بررسی شناسایی نشد'}\n"
+                + f"آدرس توکن: {address}\nزمان (UTC): {utc_now()}\n\n"
+                + exit_warning
+                + "رتبه‌بندی اجباری به معنی توصیه خرید نیست؛ در نبود ستاپ معتبر، اقدام نکردن هم نتیجه درست تحلیل است."
             )
         else:
             message = (
-                "SOLANA WATCHLIST STATUS — MARKET DATA UNAVAILABLE\n\n"
-                "This is NOT a buy signal; no reliable live quote/candles were available.\n"
-                f"Project to monitor: {project.get('name', 'Unknown')} ({project.get('symbol', '')})\n"
-                f"Mint: {address or 'unavailable'}\n"
-                f"Reason: {reason}\nTime (UTC): {utc_now()}\n\n"
-                "Do not enter without current price, liquidity and a verified setup."
+                "SOLANA TOP-RANKED PROJECT — DATA UNAVAILABLE\n\n"
+                "یک پروژه از فهرست فعلی انتخاب شد، اما داده معتبر بازار برای تعیین قیمت/حد خروج در دسترس نیست.\n"
+                f"پروژه: {project.get('name', 'Unknown')} ({project.get('symbol', '')})\n"
+                f"آدرس توکن: {address or 'در دسترس نیست'}\n"
+                f"علت: {reason}\nزمان (UTC): {utc_now()}\n\n"
+                "قیمت و حد خروج ساخته نمی‌شوند؛ تا برگشت داده معتبر، معامله نکن."
             )
     else:
         message = (
-            "SOLANA BOT STATUS — NO TOKEN CAN BE RANKED\n\n"
-            "No approved non-meme projects with usable data/configuration were found. "
-            "The bot will not invent a token or fabricate a price.\n"
-            f"Reason: {reason}\nTime (UTC): {utc_now()}"
+            "SOLANA SCAN STATUS — NO PROJECT CAN BE RANKED\n\n"
+            "در این اجرا پروژه تأییدشده‌ای برای رتبه‌بندی پیدا نشد؛ برای جلوگیری از ساختن نام یا قیمت جعلی، "
+            "برنده‌ای اعلام نمی‌شود.\n"
+            f"علت: {reason}\nزمان (UTC): {utc_now()}\n"
+            "پس از برگشت داده/فهرست معتبر، اسکن بعدی دوباره تلاش می‌کند."
         )
 
     sent = send_telegram(message)
-    print(f"Fallback watchlist ping sent={sent}; cooldown={cooldown_minutes}m")
+    print(f"Per-scan top-ranked project report sent={sent}; no cooldown applied.")
     if sent:
         state["last_watchlist_ping_utc"] = now.isoformat()
     return sent
-
 
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
