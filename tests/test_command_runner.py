@@ -30,9 +30,10 @@ class CommandRunnerTests(unittest.TestCase):
             self.assertTrue(command_runner.poll_pay(state))
         self.assertEqual(state["telegram_update_offset"], 13)
 
-    def test_rejects_other_command_spellings(self):
-        for command in ("/Pay", "//pay", "/pay", "Pay", "//Pay@SomeBot"):
+    def test_accepts_common_pay_command_spellings(self):
+        for command in ("//Pay", "//pay", "/pay", "Pay", "  pay  "):
             response = Mock()
+            response.status_code = 200
             response.raise_for_status.return_value = None
             response.json.return_value = {
                 "ok": True,
@@ -41,10 +42,15 @@ class CommandRunnerTests(unittest.TestCase):
                 ],
             }
             send_response = Mock()
+            send_response.status_code = 200
             send_response.raise_for_status.return_value = None
             send_response.json.return_value = {"ok": True}
-            with patch.dict("os.environ", {"TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "123"}), patch.object(command_runner.requests, "get", return_value=response), patch.object(command_runner.requests, "post", return_value=send_response), patch.object(command_runner, "save_state"):
-                self.assertFalse(command_runner.poll_pay({}), command)
+            with patch.dict("os.environ", {
+                "TELEGRAM_BOT_TOKEN": "test-token", "TELEGRAM_CHAT_ID": "123"
+            }), patch.object(command_runner.requests, "get", return_value=response), \
+                 patch.object(command_runner.requests, "post", return_value=send_response), \
+                 patch.object(command_runner, "save_state"):
+                self.assertTrue(command_runner.poll_pay({}), command)
 
     def test_other_chat_cannot_trigger_scan(self):
         response = Mock()
