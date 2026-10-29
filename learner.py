@@ -361,7 +361,7 @@ class MultiHorizonModel:
     """Weighted probability ensemble across available, independently validated horizons."""
     def __init__(self, models):
         self.models = models
-        self.base_weights = {4: 0.35, 12: 0.25, 24: 0.20, 72: 0.15, 168: 0.05}
+        self.base_weights = {4: 0.30, 12: 0.22, 24: 0.18, 72: 0.15, 168: 0.10, 336: 0.05}
         total = sum(self.base_weights.get(h, 0.05) for h, _ in models)
         self.weights = {
             h: self.base_weights.get(h, 0.05) / total
@@ -384,8 +384,8 @@ class MultiHorizonModel:
 
 
 def train_model(candle_sets):
-    """Train separate 4h, 12h, 24h, 72h and 168h outcome models."""
-    horizons = (4, 12, 24, 72, 168)
+    """Train separate 4h, 12h, 24h, 72h, 168h and 336h outcome models."""
+    horizons = (4, 12, 24, 72, 168, 336)
     trained = []
     horizon_metrics = {}
     for horizon in horizons:
