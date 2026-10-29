@@ -238,6 +238,19 @@ def main():
         "signals": 0, "resolved": 0, "wins": 0, "losses": 0
     })
 
+    # Keep tracking every open alert even if it disappears from discovery feeds.
+    for signal in state.get("open_signals", []):
+        address = str(signal.get("token_address", "")).strip()
+        if address and address not in seen_addresses:
+            candidates.append({
+                "token_address": address,
+                "name": signal.get("name", "Open signal"),
+                "symbol": "",
+                "approved_non_meme": True,
+                "discovered_from": "open_signal_tracking"
+            })
+            seen_addresses.add(address)
+
     store = load_candle_store()
     active_projects = []
     market_info = {}
