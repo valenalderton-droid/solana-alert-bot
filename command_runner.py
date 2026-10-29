@@ -403,19 +403,16 @@ def is_trade_alert(message):
 
 def main():
     state = read_state()
-    requested = poll_pay(state)
-    # Research and evidence-gated learning run on every scheduled cycle,
-    # including when positions are open or the user requests a scan. Each has
+    # Fully automatic mode: no Telegram command is required. Every scheduled
+    # workflow run performs a fresh market scan and reports its result to Telegram.
+    requested = True
+    # Research and evidence-gated learning run on every scheduled cycle. Each has
     # its own cooldown; neither is allowed to bypass trading safety filters.
     refresh_news_if_due(state)
     run_self_improvement_if_due(state)
 
-    # Keep checking exit conditions on scheduled runs while a paper position is
-    # open. BUY messages are still suppressed unless the user explicitly sends //Pay.
-    open_positions = state.get("open_positions", [])
-    if not requested and not open_positions:
-        print("No //Pay request and no open positions; market scan skipped.")
-        return
+    # Scan automatically every scheduled run; GitHub Actions currently supplies
+    # the shortest supported cron interval (5 minutes).
 
     import main as scanner
 
@@ -426,10 +423,7 @@ def main():
 
     def capture_buy(message):
         if is_buy_alert(message):
-            if not requested:
-                # Scheduled runs only monitor exits; never open new paper positions
-                # without an explicit //Pay request.
-                return False
+            # Automatically deliver valid BUY alerts on scheduled scans.
             # Never send a placeholder as if it were a valid trade alert.
             compact = concise_reply([message])
             if compact == "NO_SETUP":
@@ -450,7 +444,7 @@ def main():
                 delivered_messages.append(message)
             return sent
 
-        if requested and "SOLANA TOP WATCHLIST — NO VALID BUY SETUP" in str(message):
+        if "SOLANA TOP WATCHLIST — NO VALID BUY SETUP" in str(message):
             # If no entry qualifies, return exactly one live-data-backed top candidate,
             # explicitly labelled WATCHLIST (not a buy signal). Never force an entry.
             sent = original_send_telegram(message)
@@ -475,22 +469,18 @@ def main():
         # invocation in the same process can recursively wrap the Telegram sender.
         scanner.send_telegram = original_send_telegram
 
-    if not requested:
-        print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
-        return
-
-    # Always provide a final response to an explicit trigger, including when
-    # the scanner crashes. Do not report a normal no-setup result after an error.
+    # Always send a final report when the scan produced no trade/watchlist message,
+    # including when the scanner crashes. Do not report a normal no-setup result after an error.
     if not delivered_messages:
         if scan_error is not None:
             final_reply = (
                 "در اجرای اسکن بازار خطا رخ داد و نتیجه قابل اتکا نیست. "
-                "گزارش خطا ثبت شد؛ لطفاً چند دقیقه دیگر دوباره //Pay را بفرست."
+                "گزارش خطا ثبت شد؛ ربات در نوبت خودکار بعدی دوباره تلاش می‌کند."
             )
         else:
             final_reply = (
-                "اسکن بازار سولانا تمام شد، اما هیچ ستاپ خرید معتبری از فیلترهای فعلی عبور نکرد. "
-                "فعلاً خریدی پیشنهاد نمی‌شود. برای بررسی دوباره، //Pay را بفرست."
+                "گزارش خودکار بازار سولانا: این دور هیچ ستاپ خرید معتبری از فیلترهای فعلی عبور نکرد. "
+                "فعلاً خریدی پیشنهاد نمی‌شود؛ در نوبت بعدی دوباره بررسی می‌کنم."
             )
         try:
             telegram_send(
