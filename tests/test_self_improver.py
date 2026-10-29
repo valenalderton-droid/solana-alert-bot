@@ -53,5 +53,41 @@ class SelfImproverTests(unittest.TestCase):
                 self.assertIn("hard liquidity", saved)
 
 
+    def test_failure_diagnostics_create_research_focus_from_repeated_losses(self):
+        predictions, outcomes = [], []
+        for i in range(4):
+            signal_id = f"bad-signal-{i}"
+            predictions.append({
+                "signal_id": signal_id, "probability": 0.62,
+                "liquidity_usd": 50000, "volume_24h_usd": 20000,
+                "entry_deviation_pct": 2.5,
+                "strategy_ensemble": {"score": 52, "risk_flags": ["high_volatility"]},
+                "signal_quality": {"score": 60}
+            })
+            outcomes.append({"signal_id": signal_id, "result": "loss", "return_pct": -1.0})
+
+        result = self_improver.diagnose_failure_modes(predictions, outcomes)
+        self.assertEqual(result["sample_size"], 4)
+        self.assertIn("liquidity", result["research_focus"])
+        self.assertIn("strategy", result["research_focus"])
+        self.assertGreaterEqual(result["groups"]["thin_liquidity"]["n"], 3)
+        self.assertEqual(result["groups"]["thin_liquidity"]["warning"],
+                         "association only; not a causal finding")
+
+    def test_diagnostics_ignore_data_gaps_and_duplicate_outcomes(self):
+        prediction = [{
+            "signal_id": "same", "probability": 0.9,
+            "liquidity_usd": 1, "volume_24h_usd": 1, "entry_deviation_pct": 3
+        }]
+        outcomes = [
+            {"signal_id": "same", "result": "loss", "return_pct": -2},
+            {"signal_id": "same", "result": "win", "return_pct": 3},
+            {"signal_id": "gap", "result": "data_gap", "return_pct": None}
+        ]
+        result = self_improver.diagnose_failure_modes(prediction, outcomes)
+        self.assertEqual(result["sample_size"], 1)
+        self.assertEqual(result["groups"], {})
+
+
 if __name__ == "__main__":
     unittest.main()
