@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T10:57:33.554474+00:00",
+  "last_run_utc": "2026-10-29T11:11:39.408142+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -39,7 +39,8 @@
     "e73a638e0b5dc2275a0f373f",
     "d2e67b2d7ad8c6a701f85b56",
     "ef6966d6f4eec3a520903730",
-    "4083e47ec658f0dff5cf98dd"
+    "4083e47ec658f0dff5cf98dd",
+    "f7daef4a47fc04daed0da83a"
   ],
   "news_observations": [
     {
@@ -302,9 +303,21 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Potentially relevant to SOL itself; verify official status and actual network impact.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — Solana network / protocol\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Solana wallet Solflare pledges to pay missed rewards on staked $160 million after validator goes offline - CoinDesk",
       "url": "https://news.google.com/rss/articles/CBMi5AFBVV95cUxQRGNQZXJtS1JLZGRwLUFlYVVyNFpScjFkRzN0X25Bc210SFZnMFRRSDNBdk03ajF3TWc1dVNPeXFNSlhqU0tLYUZoWXRMYnZ3bWpMclpMMFZpd1lhdW9XZUhYbmdkOGhLTF9tUDNOQ1NzaDNOU214cEp4MmYxZk1sdkE2VGlrN0RKNmJJblpHNk5HWGhJWlNUblJEc0hUc0NjT0xaaWlQeXBOOVJmNEozSkU3WnZWc1lFX054eG4tWlJUOUduZGVXYlhxTmY0cXpZa1dTSmR0X0YwbEFHY3RvSDVrRnY?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T11:10:51.304832+00:00",
+      "published_at": "2026-10-29T11:05:03+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Solana Price News Today: SOL Holds $100 After a Speed Upgrade as Pepeto's Bridge Draws 100x Calls - TechBullion",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQNklDTTZGQ1ZNOWtwTkZabmlhSWRYWk9rT2lFZXpyWEhXbk9DYm93Y0ZWZ2tiSXhhVm9sbmdPdkZKRGhwbWE4ZVdtWmJ6azFXQjRGX0N0aXFaeG9oaEFHSl9kekdCZzhhQms5NFBaeEVDb2ZhdmswQmZLVEpfN20zalNsRmxoemZsVjJ5dW1OYjR2Ui1NQTVaYzNobVNndTNVdWk1QU1NbTEzdWdtLVBjUGw4WlBsTUZDOHJN?oc=5"
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952308,
-  "last_news_refresh_utc": "2026-10-29T10:56:59.293183+00:00"
+  "telegram_update_offset": 806952310,
+  "last_news_refresh_utc": "2026-10-29T11:10:51.304879+00:00"
 }

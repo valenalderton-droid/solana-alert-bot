@@ -1,10 +1,10 @@
 {
-  "saved_at": "2026-10-29T10:12:12.199085+00:00",
+  "saved_at": "2026-10-29T11:10:49.245836+00:00",
   "filters": {
     "min_liquidity": 100000.0,
     "min_volume_24h": 50000.0,
     "min_age_days": 30,
-    "max_projects": 20
+    "max_projects": 100
   },
   "projects": [
     {
@@ -38,15 +38,15 @@
       "approved_non_meme": true
     },
     {
-      "name": "Metaplex Token",
-      "symbol": "MPLX",
-      "token_address": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
-      "approved_non_meme": true
-    },
-    {
       "name": "Parcl",
       "symbol": "PRCL",
       "token_address": "DogpWmFd1BUULq1UML1CZvV4xWgPmKFCfiE22R6j8qxL",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Metaplex Token",
+      "symbol": "MPLX",
+      "token_address": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
       "approved_non_meme": true
     },
     {
@@ -125,6 +125,18 @@
       "name": "Render Token",
       "symbol": "RENDER",
       "token_address": "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Helium Network Token",
+      "symbol": "HNT",
+      "token_address": "hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux",
+      "approved_non_meme": true
+    },
+    {
+      "name": "Infinity",
+      "symbol": "INF",
+      "token_address": "5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm",
       "approved_non_meme": true
     }
   ]
