@@ -1,0 +1,254 @@
+"""Nine diverse, independently scored paper-trading cores.
+
+These are deterministic rule-based voters, not nine independent AI models.
+Each core has its own $10,000 virtual ledger and can choose a different
+qualified candidate. A Telegram BUY-WATCH candidate requires at least 5/9 votes.
+"""
+from datetime import datetime, timezone
+import math
+
+from paper_portfolio import get_portfolio, open_paper_trade, update_paper_portfolio
+
+CORE_SPECS = [
+    {"id": "trend", "name": "Trend follower", "threshold": 58},
+    {"id": "breakout", "name": "Breakout hunter", "threshold": 58},
+    {"id": "momentum", "name": "Momentum analyst", "threshold": 60},
+    {"id": "volume", "name": "Volume/flow analyst", "threshold": 58},
+    {"id": "structure", "name": "Market-structure analyst", "threshold": 58},
+    {"id": "risk", "name": "Capital-preservation analyst", "threshold": 65},
+    {"id": "model", "name": "Model-confidence analyst", "threshold": 60},
+    {"id": "quality", "name": "Signal-quality analyst", "threshold": 60},
+    {"id": "context", "name": "News/regime analyst", "threshold": 60},
+]
+STARTING_CASH_PER_CORE = 10_000.0
+MAJORITY_VOTES = 5
+
+
+def _num(value, default=0.0):
+    try:
+        x = float(value)
+        return x if math.isfinite(x) else default
+    except (TypeError, ValueError, OverflowError):
+        return default
+
+
+def _clamp(x):
+    return max(0.0, min(100.0, x))
+
+
+def _strategy(ensemble, key):
+    return _num((ensemble.get("strategies") or {}).get(key), 50.0)
+
+
+def _risk_penalty(candidate):
+    pred = candidate.get("prediction") or {}
+    ensemble = pred.get("strategy_ensemble") or candidate.get("ensemble") or {}
+    flags = ensemble.get("risk_flags") or []
+    return min(35.0, len(flags) * 7.0)
+
+
+def score_for_core(core_id, candidate):
+    """Score one qualified candidate using the core's distinct weighting."""
+    pred = candidate.get("prediction") or {}
+    ensemble = pred.get("strategy_ensemble") or candidate.get("ensemble") or {}
+    quality = pred.get("signal_quality") or candidate.get("quality") or {}
+    strategies = {
+        "trend": _strategy(ensemble, "trend_following"),
+        "breakout": _strategy(ensemble, "breakout"),
+        "momentum": _strategy(ensemble, "momentum"),
+        "volume": _strategy(ensemble, "volume_flow"),
+        "structure": _strategy(ensemble, "market_structure"),
+        "risk": _strategy(ensemble, "risk_control"),
+        "reversion": _strategy(ensemble, "mean_reversion"),
+        "rejection": _strategy(ensemble, "candle_rejection"),
+    }
+    probability = _clamp(_num(pred.get("probability"), 0.0) * 100)
+    quality_score = _clamp(_num(quality.get("score"), 0.0))
+    liquidity = max(0.0, _num(pred.get("liquidity_usd"), _num(candidate.get("info", {}).get("liquidity"))))
+    volume = max(0.0, _num(pred.get("volume_24h_usd"), _num(candidate.get("info", {}).get("volume24h"))))
+    entry_deviation = max(0.0, _num(pred.get("entry_deviation_pct"), _num(candidate.get("entry_deviation_pct"))))
+    stop_pct = max(0.0, _num(pred.get("stop_pct"), _num(candidate.get("stop_pct")) * 100))
+    target_pct = max(0.0, _num(pred.get("target_pct"), _num(candidate.get("target_pct")) * 100))
+    reward_risk = target_pct / stop_pct if stop_pct > 0 else 0.0
+    flags_penalty = _risk_penalty(candidate)
+
+    if core_id == "trend":
+        score = .42*strategies["trend"] + .20*strategies["structure"] + .18*strategies["momentum"] + .20*probability
+    elif core_id == "breakout":
+        score = .42*strategies["breakout"] + .23*strategies["volume"] + .20*strategies["structure"] + .15*probability
+    elif core_id == "momentum":
+        score = .42*strategies["momentum"] + .25*strategies["trend"] + .18*strategies["volume"] + .15*probability
+    elif core_id == "volume":
+        score = .48*strategies["volume"] + .22*strategies["breakout"] + .15*strategies["momentum"] + .15*probability
+    elif core_id == "structure":
+        score = .42*strategies["structure"] + .23*strategies["trend"] + .20*strategies["rejection"] + .15*probability
+    elif core_id == "risk":
+        score = .45*strategies["risk"] + .25*quality_score + .15*min(100, reward_risk*35) + .15*probability - flags_penalty
+        if stop_pct > 5 or entry_deviation > 2.5:
+            score -= 15
+    elif core_id == "model":
+        score = .58*probability + .22*quality_score + .20*_num(pred.get("rank_score"))
+        metrics = pred.get("model_metrics") or {}
+        horizons = metrics.get("horizons") or {}
+        ready = [v for v in horizons.values() if isinstance(v, dict) and v.get("ready")]
+        if ready and all(_num(v.get("balanced_accuracy"), 0.5) < 0.52 for v in ready):
+            score -= 12
+    elif core_id == "quality":
+        score = .58*quality_score + .22*strategies["risk"] + .20*probability
+        if reward_risk < 1.5:
+            score -= 12
+    else:  # news/regime
+        score = .30*probability + .25*strategies["trend"] + .20*strategies["risk"] + .25*quality_score
+        news = pred.get("recent_news_context") or []
+        negative = sum(1 for n in news if isinstance(n, dict) and
+                       str(n.get("sentiment", "")).lower() in {"negative", "risk", "bearish"})
+        positive = sum(1 for n in news if isinstance(n, dict) and
+                       str(n.get("sentiment", "")).lower() in {"positive", "bullish"})
+        score += min(8, positive*2) - min(18, negative*6)
+        if ensemble.get("market_regime") in {"high_volatility", "downtrend"}:
+            score -= 8
+
+    if liquidity < 100_000:
+        score -= 25
+    if volume < 100_000:
+        score -= 12
+    if entry_deviation > 3:
+        score -= 15
+    return round(_clamp(score), 2)
+
+
+def _core_state(system, core_id):
+    core = system["cores"].get(core_id)
+    if not isinstance(core, dict):
+        spec = next(x for x in CORE_SPECS if x["id"] == core_id)
+        core = {"id": core_id, "name": spec["name"], "cash_start_usd": STARTING_CASH_PER_CORE,
+                "portfolio": None, "last_score": None, "last_vote": "HOLD",
+                "last_candidate": None, "votes": 0, "decisions": [], "updated_at": None}
+        system["cores"][core_id] = core
+    if not isinstance(core.get("portfolio"), dict):
+        substate = {}
+        get_portfolio(substate, STARTING_CASH_PER_CORE)
+        core["portfolio"] = substate["paper_portfolio"]
+    core.setdefault("decisions", [])
+    return core
+
+
+def evaluate_nine_cores(candidates, state, market_info=None, now=None):
+    """Maintain nine $10k ledgers, let each core choose one candidate, then vote."""
+    system = state.get("nine_core_system")
+    if not isinstance(system, dict):
+        system = {"version": 1, "starting_cash_per_core_usd": STARTING_CASH_PER_CORE,
+                  "majority_required": MAJORITY_VOTES, "cores": {}, "last_result": {},
+                  "updated_at": None}
+        state["nine_core_system"] = system
+    system.setdefault("cores", {})
+    timestamp = now or datetime.now(timezone.utc).isoformat()
+
+    # Update every virtual account every scan, including when there are no candidates.
+    for spec in CORE_SPECS:
+        core = _core_state(system, spec["id"])
+        substate = {"paper_portfolio": core["portfolio"]}
+        update_paper_portfolio(substate, market_info or {}, now=now)
+        core["portfolio"] = substate["paper_portfolio"]
+
+    candidate_scores = []
+    for candidate in candidates or []:
+        pred = candidate.get("prediction") or {}
+        if not pred.get("token_address") or not pred.get("signal_id"):
+            continue
+        votes = []
+        scores = {}
+        for spec in CORE_SPECS:
+            score = score_for_core(spec["id"], candidate)
+            scores[spec["id"]] = score
+            if score >= spec["threshold"]:
+                votes.append(spec["id"])
+        candidate_scores.append({"candidate": candidate, "scores": scores, "votes": votes,
+                                 "vote_count": len(votes)})
+
+    # Each core independently picks only its highest-scoring qualified candidate.
+    core_choices = {}
+    for spec in CORE_SPECS:
+        eligible = [row for row in candidate_scores if row["scores"].get(spec["id"], 0) >= spec["threshold"]]
+        eligible.sort(key=lambda row: row["scores"][spec["id"]], reverse=True)
+        chosen = eligible[0] if eligible else None
+        core = _core_state(system, spec["id"])
+        if chosen:
+            pred = chosen["candidate"]["prediction"]
+            core["last_score"] = chosen["scores"][spec["id"]]
+            core["last_vote"] = "BUY" 
+            core["last_candidate"] = pred.get("token_address")
+            core["votes"] = 1
+            substate = {"paper_portfolio": core["portfolio"]}
+            trade = open_paper_trade(substate, pred, now=now)
+            core["portfolio"] = substate["paper_portfolio"]
+            core_choices[spec["id"]] = {"token_address": pred["token_address"],
+                                        "signal_id": pred["signal_id"],
+                                        "score": core["last_score"], "trade": trade}
+            decision = {"at": timestamp, "vote": "BUY", "token_address": pred["token_address"],
+                        "signal_id": pred["signal_id"], "score": core["last_score"],
+                        "paper_trade_opened": bool(trade.get("opened"))}
+        else:
+            core["last_score"] = None
+            core["last_vote"] = "PASS"
+            core["last_candidate"] = None
+            core["votes"] = 0
+            decision = {"at": timestamp, "vote": "PASS", "reason": "no candidate passed this core's threshold"}
+            core_choices[spec["id"]] = {"token_address": None, "score": None, "trade": {"opened": False, "reason": "no_candidate"}}
+        core["decisions"].append(decision)
+        core["decisions"] = core["decisions"][-200:]
+        core["updated_at"] = timestamp
+
+    # Count one vote per core per candidate. Majority means at least 5 of 9.
+    by_address = {}
+    for row in candidate_scores:
+        address = row["candidate"]["prediction"]["token_address"]
+        row["votes"] = [core_id for core_id, choice in core_choices.items()
+                        if choice.get("token_address") == address]
+        row["vote_count"] = len(row["votes"])
+        by_address[address] = row
+    ranked = sorted(candidate_scores, key=lambda row: (row["vote_count"],
+                      sum(row["scores"].values()) / max(1, len(row["scores"]))), reverse=True)
+    winner = ranked[0] if ranked and ranked[0]["vote_count"] >= MAJORITY_VOTES else None
+    result = {
+        "timestamp": timestamp,
+        "majority_required": MAJORITY_VOTES,
+        "winner": (winner["candidate"]["prediction"]["token_address"] if winner else None),
+        "winner_name": (winner["candidate"]["prediction"].get("name") if winner else None),
+        "winner_votes": (winner["vote_count"] if winner else 0),
+        "candidates": [{"token_address": row["candidate"]["prediction"]["token_address"],
+                        "name": row["candidate"]["prediction"].get("name"),
+                        "symbol": row["candidate"]["prediction"].get("symbol"),
+                        "votes": row["vote_count"], "voting_cores": row["votes"],
+                        "core_scores": row["scores"]} for row in ranked[:10]],
+        "core_choices": core_choices,
+        "core_accounts": {spec["id"]: {
+            "name": system["cores"][spec["id"]]["name"],
+            "initial_cash_usd": system["cores"][spec["id"]]["portfolio"]["initial_cash_usd"],
+            "cash_usd": system["cores"][spec["id"]]["portfolio"]["cash_usd"],
+            "open_positions": len(system["cores"][spec["id"]]["portfolio"]["open_positions"]),
+            "closed_trades": len(system["cores"][spec["id"]]["portfolio"]["closed_trades"]),
+            "return_pct": round((sum(float(t.get("pnl_usd", 0)) for t in system["cores"][spec["id"]]["portfolio"]["closed_trades"]) /
+                                STARTING_CASH_PER_CORE) * 100, 3),
+            "last_vote": system["cores"][spec["id"]]["last_vote"],
+            "last_score": system["cores"][spec["id"]]["last_score"],
+        } for spec in CORE_SPECS},
+        "virtual_capital_total_usd": STARTING_CASH_PER_CORE * len(CORE_SPECS),
+        "updated_at": timestamp,
+    }
+    system["last_result"] = result
+    system["updated_at"] = timestamp
+    return result
+
+
+def format_core_result(result):
+    lines = ["\n━━ رأی ۹ هستهٔ آزمایشی ━━",
+             f"اکثریت لازم: {result.get('majority_required', MAJORITY_VOTES)}/9",
+             f"سرمایهٔ مجازی کل: ${result.get('virtual_capital_total_usd', 90000):,.0f}"]
+    if result.get("winner"):
+        lines.append(f"برندهٔ رأی‌گیری: {result.get('winner_name')} — {result.get('winner_votes')}/9 رأی")
+    else:
+        lines.append("هیچ توکنی اکثریت ۵ از ۹ را نگرفت؛ هشدار خرید صادر نشود.")
+    for candidate in result.get("candidates", [])[:5]:
+        lines.append(f"{candidate.get('name')} ({candidate.get('symbol')}): {candidate.get('votes')}/9")
+    return "\n".join(lines)
