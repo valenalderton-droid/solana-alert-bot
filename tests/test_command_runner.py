@@ -236,5 +236,26 @@ class CommandRunnerTests(unittest.TestCase):
         self.assertIn("خطا", send.call_args.args[2])
 
 
+    def test_telegram_send_retries_transient_server_error(self):
+        temporary = Mock()
+        temporary.status_code = 500
+        temporary.text = "temporary server error"
+        temporary.json.return_value = {}
+        success = Mock()
+        success.status_code = 200
+        success.raise_for_status.return_value = None
+        success.json.return_value = {"ok": True}
+        with patch.object(command_runner.requests, "post", side_effect=[temporary, success]) as post, \
+             patch.object(command_runner.time, "sleep"):
+            self.assertTrue(command_runner.telegram_send("token", "123", "hello"))
+        self.assertEqual(post.call_count, 2)
+
+    def test_telegram_send_reports_missing_credentials_without_network_call(self):
+        with patch.object(command_runner.requests, "post") as post:
+            with self.assertRaisesRegex(RuntimeError, "TELEGRAM_BOT_TOKEN"):
+                command_runner.telegram_send("", "123", "hello")
+        post.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
