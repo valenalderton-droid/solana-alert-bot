@@ -18,6 +18,8 @@ FEEDS = [
     ("SOL market", "https://news.google.com/rss/search?q=Solana+SOL+crypto+market&hl=en-US&gl=US&ceid=US:en"),
     ("Solana security", "https://news.google.com/rss/search?q=Solana+hack+exploit+outage+security&hl=en-US&gl=US&ceid=US:en"),
     ("Solana regulation", "https://news.google.com/rss/search?q=Solana+ETF+SEC+regulation+institutional&hl=en-US&gl=US&ceid=US:en"),
+    ("Macro / global markets", "https://news.google.com/rss/search?q=Bitcoin+crypto+Federal+Reserve+inflation+interest+rates+liquidity+ETF+markets&hl=en-US&gl=US&ceid=US:en"),
+    ("Geopolitics / global risk", "https://news.google.com/rss/search?q=geopolitical+risk+war+sanctions+oil+markets+Bitcoin+crypto&hl=en-US&gl=US&ceid=US:en"),
 ]
 MAX_AGE_HOURS = 36
 MAX_ITEMS_PER_RUN = 3
@@ -31,7 +33,7 @@ KEYWORDS = {
         "breach", "attack", "vulnerability", "downtime", "congestion",
         "failed launch", "delay", "lawsuit", "ban", "investigation",
         "liquidation", "outflows", "token unlock", "sell-off", "selling pressure",
-        "inflation", "downgrade"
+        "inflation", "downgrade", "rate hike", "hawkish", "hotter inflation", "recession", "risk-off", "yields spike", "dollar strength", "tariffs", "war escalation", "sanctions", "geopolitical risk", "oil spike", "market crash"
     ],
     "strong_positive": [
         "etf approved", "etf approval", "approved solana etf", "mainnet upgrade live",
@@ -41,7 +43,7 @@ KEYWORDS = {
         "etf filing", "etf application", "partnership", "integrates solana",
         "integration", "integrates", "mainnet upgrade", "upgrade goes live", "adoption",
         "institutional", "payments launch", "launches on solana", "record activity",
-        "record volume", "fund inflows", "funding round"
+        "record volume", "fund inflows", "funding round", "rate cut", "dovish", "cooling inflation", "ceasefire", "de-escalation", "liquidity injection", "risk-on"
     ],
 }
 SOL_RELEVANCE = {
