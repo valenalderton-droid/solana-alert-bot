@@ -110,11 +110,33 @@ def fetch_recent_news(now=None):
     return sorted(found.values(), key=lambda x: x["published_at"], reverse=True)
 
 
+def _active_keyword_hits(text, terms):
+    """Ignore a keyword when nearby wording clearly negates or debunks it."""
+    negation = re.compile(
+        r"\\b(?:no|not|never|without|denies|denied|rejects|rejected|debunked|false|untrue)\\b"
+        r"[^.!?]{0,28}$",
+        re.IGNORECASE,
+    )
+    found = []
+    for term in terms:
+        start = 0
+        while True:
+            index = text.find(term, start)
+            if index < 0:
+                break
+            prefix = text[max(0, index - 45):index]
+            if not negation.search(prefix):
+                found.append(term)
+                break
+            start = index + len(term)
+    return found
+
+
 def analyze_news(item):
     text = (item.get("title", "") + " " + item.get("description", "")).lower()
     hits = {}
     for level, terms in KEYWORDS.items():
-        hits[level] = [term for term in terms if term in text]
+        hits[level] = _active_keyword_hits(text, terms)
 
     if hits["strong_negative"]:
         sentiment, score = "BEARISH", -3
