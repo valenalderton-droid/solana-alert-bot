@@ -72,13 +72,10 @@ def poll_pay(state):
             command = str(message.get("text", "")).strip()
             if not command:
                 continue
-            # Match the configured trigger robustly, regardless of capitalization
-            # or an accidental leading/trailing space. Other ordinary text is ignored.
-            normalized_command = command.strip().casefold()
-            if normalized_command not in {"//pay", "/pay", "pay"} and not command.startswith("/"):
-                continue
-            matched_chat_message = True
-            if normalized_command in {"//pay", "/pay", "pay"}:
+            # The documented trigger is case-sensitive and must be exactly //Pay.
+            # Ignore ordinary text; explain other slash commands without scanning.
+            if command == "//Pay":
+                matched_chat_message = True
                 requested = True
                 try:
                     telegram_send(
@@ -88,7 +85,8 @@ def poll_pay(state):
                 except Exception as send_exc:
                     # A failed acknowledgement must not discard a valid command.
                     print(f"Telegram acknowledgement failed; continuing scan: {send_exc}")
-            else:
+            elif command.startswith("/"):
+                matched_chat_message = True
                 try:
                     telegram_send(
                         token, chat_id,
@@ -96,6 +94,8 @@ def poll_pay(state):
                     )
                 except Exception as send_exc:
                     print(f"Telegram help reply failed: {send_exc}")
+            else:
+                continue
 
         save_state(state)
         if not matched_chat_message:
