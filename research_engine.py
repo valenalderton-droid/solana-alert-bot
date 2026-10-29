@@ -37,6 +37,17 @@ QUERY_PLAN = [
     ("Solana ecosystem", "Solana crypto trading strategy backtest out-of-sample walk-forward validation", "strategy"),
     ("Solana ecosystem", "Solana protocol governance proposal treasury token utility", "governance"),
     ("Solana ecosystem", "Solana developer activity GitHub releases protocol ecosystem", "developers"),
+    ("Solana ecosystem", "Solana lending borrowing liquid staking restaking protocol launch integration", "defi_lending"),
+    ("Solana ecosystem", "Solana oracle bridge interoperability cross-chain protocol upgrade", "infrastructure"),
+    ("Solana ecosystem", "Solana stablecoin payments settlement supply adoption issuer", "stablecoins"),
+    ("Solana ecosystem", "Solana real world assets RWA tokenization institutional protocol", "rwa"),
+    ("Solana ecosystem", "Solana DePIN decentralized physical infrastructure network projects", "depin"),
+    ("Solana ecosystem", "Solana AI agents decentralized compute infrastructure projects", "ai_infrastructure"),
+    ("Solana ecosystem", "Solana protocol team founders funding investors venture round official announcement", "team_funding"),
+    ("Solana security", "Solana token mint authority freeze authority holder concentration exploit rug pull", "token_safety"),
+    ("Solana ecosystem", "Solana protocol fees revenue users retention growth dashboard", "revenue"),
+    ("Solana ecosystem", "Solana governance votes proposals treasury protocol changes", "governance"),
+    ("Solana ecosystem", "Solana ecosystem project GitHub release changelog docs official", "developers"),
 ]
 
 SESSION = requests.Session()
@@ -145,7 +156,7 @@ def build_research_plan(state, outcomes=None, configured_projects=None):
         state["project_research_cursor"] = (cursor + 1) % len(projects)
 
     cursor = int(state.get("research_query_cursor", 0) or 0) % len(plan)
-    general = [plan[(cursor + i) % len(plan)] for i in range(min(2 if project_query is None else 1, len(plan)))]
+    general = [plan[(cursor + i) % len(plan)] for i in range(min(3 if project_query is None else 2, len(plan)))]
     state["research_query_cursor"] = (cursor + len(general)) % len(plan)
     return ([project_query] if project_query else []) + general
 
