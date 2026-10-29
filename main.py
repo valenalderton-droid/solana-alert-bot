@@ -863,6 +863,17 @@ def main():
           stop = entry * (1 - stop_pct)
           target = entry * (1 + target_pct)
 
+          compact_metrics = {
+              "active_horizons": metrics.get("active_horizons", []),
+              "horizons": {
+                  horizon_name: {
+                      key: horizon_data.get(key)
+                      for key in ("ready", "labelled_examples", "balanced_accuracy", "brier_score")
+                  }
+                  for horizon_name, horizon_data in metrics.get("horizons", {}).items()
+              }
+          }
+
           prediction = {
               "signal_id": signal_id,
               "timestamp": candle_ts,
@@ -898,7 +909,7 @@ def main():
               f"Liquidity: ${info['liquidity']:,.0f}\n"
               f"24h volume: ${info['volume24h']:,.0f}\n"
               f"BTC 24h change: {global_context['btc_24h_pct']}%; SOL 24h change: {global_context['sol_24h_pct']}%\n"
-              f"Evaluation: {json.dumps(metrics)}\n"
+              f"Evaluation: {json.dumps(compact_metrics)}\n"
               f"Mint: {address}\n"
               f"Time (UTC): {utc_now()}\n\n"
               "This is a research alert, not financial advice. "
