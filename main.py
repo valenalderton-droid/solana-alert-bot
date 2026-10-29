@@ -589,6 +589,7 @@ def main():
             }, ensure_ascii=False)
         )
     state["seen_news_ids"] = seen_news[-500:]
+    state["last_news_refresh_utc"] = utc_now()
 
     # Adaptive policy learns cautiously from resolved paper outcomes and recent news.
     policy = derive_policy(
