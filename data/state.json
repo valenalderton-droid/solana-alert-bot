@@ -46,7 +46,10 @@
     "eb51a5c985fe9d27b13809a8",
     "f760cd9aac98f5f511794a2a",
     "9caf6de89e84c9685a3476bb",
-    "f8eac83543fe939d91d05d5f"
+    "f8eac83543fe939d91d05d5f",
+    "4e3500f937ca847efa3b4032",
+    "5d3a48e1dd64273a795ddbb2",
+    "bde8d79a7a48a9d1160c0f5d"
   ],
   "news_observations": [
     {
@@ -445,40 +448,89 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Solana price falls below $100 as ETFs lose $24.8M in two days - Crypto News",
       "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE1sR1V3Sm5ucVVxRDBYeG9DV2RCVkJiNWcwVnItMU1XZ24zYzVXUDFOTjg0YXpQM1hucXBJR0hkcENHTWNrZHRoOW1aTzZ4Z0d3STczZTlNYWVBcDl4RGNBSFFhd19OOWhMVzVYalVRY1ZvTUJJLXJCNQ?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T14:06:21.296863+00:00",
+      "published_at": "2026-10-29T13:08:23+00:00",
+      "sentiment": "BEARISH",
+      "impact_score": -2,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline suggests a risk, delay, selling pressure or a negative catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: BEARISH (rule score -2/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: immediate to days; risk can persist if confirmed\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: hawkish. This is a headline-based heuristic, not full-article verification.",
+      "title": "Below $80,000: Bitcoin Price Forecast as BTC retreats after Fed keeps rates unchanged with a hawkish tone - www.tmgm.com",
+      "url": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxOZEl6eTRyVGNRdHBFT3B0VUJPZnliVExkMWpBeTlJNWgxakNqVWc0UWNMTmhlRHByUTJieHF1T0o4VnNXcld1RWZobkZnTWJFeEVsUXZrZ3ROdEk4anMwbDY1N1FRYnVRM3oyWWhyQ25oTzdOSlpKSVllNWdPVDdqTXVYM0FHbWlwZjRvaUxIOUppTm05NXFRek1SZjBpMlBXQzV3X3l0c3dibTNUODltQmEyXzRJcnl6eDBqU1plTDd6MmJxZFprWk9xa09qZjB5UGVVTDEycXNNRjE0SUZ0em0tZDloc1NFMTBvSHpROFA?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T14:06:21.296925+00:00",
+      "published_at": "2026-10-29T10:39:21+00:00",
+      "sentiment": "BEARISH",
+      "impact_score": -2,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline suggests a risk, delay, selling pressure or a negative catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: BEARISH (rule score -2/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: immediate to days; risk can persist if confirmed\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: inflation. This is a headline-based heuristic, not full-article verification.",
+      "title": "Fed Holds Interest Rates Steady Amid Rising Inflation and Midterm Elections - KuCoin",
+      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPMGR6U3NzbmIzSXludEhwbDU1MkpwNEM0QWY4djZTZ1U5WHptSmdlNEZleTR2T0lLS2gtcXJoQ3dFUmZQN3BxWG5vRXk4WG1MQ1QzODZHZ0pPZzlyV0hTeXJtVFpxWG1zRnZUemtacXR5U2FOV3IyZm9zeFFjcGV2NkhmQ2JzRUljTDhLWVFDUDZRRXNpdlE4YWFZNWxjVzcycDU4M2xSLUlJWGVvV0E?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T14:06:21.296969+00:00",
+      "published_at": "2026-10-29T09:00:27+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Bitcoin Etfs See $137M Inflows, Returning October To Positive Net Flows - Menafn",
+      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNQVowUlhDWFRZRU9La29qYXVrWk9oNGg0V2RiSG0tT1pQRFhNUDRqcDFhY1psdVpDcVp5alFBc1dBR3VoWnFBYjZ4a2hDREFkbFFuZTNvUVFWcGpuSmQtQ09rUFJzWDMxUV9XOGFhdWlmLTFmTURNNDlWRnNkSFJxUVU3VWY3OFlEd211UUN0OFNKbmdDRUVKQ01FdW42VzFt?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T14:06:21.297493+00:00",
+      "published_at": "2026-10-27T06:09:31+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "UNCERTAIN — broader crypto or weak Solana link",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "How to Buy PayPal USD (PYUSD): A Step-by-Step Guide - OneBullEx",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOVUprc0I1ZDlVVmp1ZzhRbnpYQ01sWkQ3dW9Ra1JQem96VGwySzIyQ0R0SVRyc0VSeFp4WGNmdHlWV1E2ZjBkc3o3ZE54eklia3l3NjNmX1ZldkY3Ql9QQkN3ZkhRd0NMNFB5YmgwY2VMLVJXT1kwcWk5OXhNbl9USkx6eEFjWGs?oc=5",
+      "research_topic": "adoption"
     }
   ],
   "open_positions": [],
   "telegram_update_offset": 806952332,
-  "last_news_refresh_utc": "2026-10-29T13:23:50.010932+00:00",
+  "last_news_refresh_utc": "2026-10-29T14:06:23.758796+00:00",
   "last_watchlist_ping_utc": "2026-10-29T11:19:40.239690+00:00",
   "project_scan_cursor": 13,
   "research_status": {
-    "last_tvl_refresh_utc": "2026-10-29T12:12:34.745901+00:00",
-    "last_activity_metrics_refresh_utc": "2026-10-29T12:12:34.745901+00:00",
-    "last_run_utc": "2026-10-29T13:09:17.572785+00:00",
+    "last_tvl_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
+    "last_activity_metrics_refresh_utc": "2026-10-29T14:06:21.297493+00:00",
+    "last_run_utc": "2026-10-29T14:06:21.297493+00:00",
     "queries_attempted": 2,
-    "new_articles": 0,
-    "failures": 0,
+    "new_articles": 1,
+    "failures": 1,
     "last_topics": [
-      "security",
-      "protocol"
+      "adoption",
+      "adoption"
     ],
     "query_results": [
       {
-        "topic": "security",
+        "topic": "adoption",
         "results": 0,
         "ok": true
       },
       {
-        "topic": "protocol",
-        "results": 2,
+        "topic": "adoption",
+        "results": 1,
         "ok": true
       }
     ],
-    "total_evidence": 7,
-    "latest_tvl_change_24h_pct": -1.296,
-    "activity_metrics_refreshed": false,
-    "activity_metrics_count": 0
+    "total_evidence": 10,
+    "latest_tvl_change_24h_pct": -1.174,
+    "activity_metrics_refreshed": true,
+    "activity_metrics_count": 2
   },
   "research_observations": [
     {
@@ -563,23 +615,63 @@
       "url": "https://api.llama.fi/overview/fees/Solana",
       "data_quality": "valid",
       "note": "Ecosystem activity context; not a standalone price prediction."
+    },
+    {
+      "id": "72a212867d341f762a9caebd",
+      "title": "How to Buy PayPal USD (PYUSD): A Step-by-Step Guide - OneBullEx",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOVUprc0I1ZDlVVmp1ZzhRbnpYQ01sWkQ3dW9Ra1JQem96VGwySzIyQ0R0SVRyc0VSeFp4WGNmdHlWV1E2ZjBkc3o3ZE54eklia3l3NjNmX1ZldkY3Ql9QQkN3ZkhRd0NMNFB5YmgwY2VMLVJXT1kwcWk5OXhNbl9USkx6eEFjWGs?oc=5",
+      "published_at": "2026-10-27T06:09:31+00:00",
+      "source": "OneBullEx",
+      "description": "How to Buy PayPal USD (PYUSD): A Step-by-Step Guide &nbsp;&nbsp; OneBullEx",
+      "feed_category": "Solana ecosystem",
+      "research_topic": "adoption",
+      "research_query": "Solana DeFi protocol integration partnership launch adoption",
+      "observed_at": "2026-10-29T14:06:21.297493+00:00"
+    },
+    {
+      "id": "defillama-solana-dex-volume-498134",
+      "kind": "metric",
+      "metric": "Solana DEX volume",
+      "value_usd": 1733397982.06,
+      "change_24h_pct": 9.5,
+      "observed_at": "2026-10-29T14:06:21.297493+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/dexs/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
+    },
+    {
+      "id": "defillama-solana-fees-498134",
+      "kind": "metric",
+      "metric": "Solana fees",
+      "value_usd": 10347405.24,
+      "change_24h_pct": -7.89,
+      "observed_at": "2026-10-29T14:06:21.297493+00:00",
+      "source": "DeFiLlama",
+      "url": "https://api.llama.fi/overview/fees/Solana",
+      "data_quality": "valid",
+      "note": "Ecosystem activity context; not a standalone price prediction."
     }
   ],
   "seen_research_ids": [
     "defillama-solana-dex-volume-498132",
-    "f86123a7a1f53fc2863ccef2",
     "6da0f87d5326c4ed4ab9ff0f",
     "defillama-solana-fees-498132",
-    "77fac538df29ffa61e07e9d1",
-    "27a5c8aa52c8ad8b00475135",
-    "defillama-solana-tvl-1793232000"
-  ],
-  "research_query_cursor": 2,
-  "seen_research_news_ids": [
-    "77fac538df29ffa61e07e9d1",
-    "27a5c8aa52c8ad8b00475135",
+    "72a212867d341f762a9caebd",
+    "defillama-solana-dex-volume-498134",
+    "defillama-solana-tvl-1793232000",
+    "defillama-solana-fees-498134",
     "f86123a7a1f53fc2863ccef2",
-    "6da0f87d5326c4ed4ab9ff0f"
+    "27a5c8aa52c8ad8b00475135",
+    "77fac538df29ffa61e07e9d1"
+  ],
+  "research_query_cursor": 4,
+  "seen_research_news_ids": [
+    "6da0f87d5326c4ed4ab9ff0f",
+    "72a212867d341f762a9caebd",
+    "f86123a7a1f53fc2863ccef2",
+    "27a5c8aa52c8ad8b00475135",
+    "77fac538df29ffa61e07e9d1"
   ],
   "research_priority_signature": ""
 }
