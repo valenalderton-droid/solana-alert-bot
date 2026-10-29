@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-29T10:42:07.678801+00:00",
+  "updated_at": "2026-10-29T17:10:15.273405+00:00",
   "rules": [
     {
       "id": "validated_probability_floor",
@@ -14,6 +14,19 @@
   "history": [
     {
       "at": "2026-10-29T10:42:07.678731+00:00",
+      "action": "kept",
+      "rule_id": "validated_probability_floor",
+      "old_value": 0.6,
+      "new_value": 0.6,
+      "decision": {
+        "threshold": 0.6,
+        "changed": false,
+        "reason": "Need at least 20 joined resolved alerts; have 0",
+        "sample_size": 0
+      }
+    },
+    {
+      "at": "2026-10-29T17:10:15.273212+00:00",
       "action": "kept",
       "rule_id": "validated_probability_floor",
       "old_value": 0.6,
@@ -122,6 +135,102 @@
       "sentiment": "NEUTRAL / UNCLEAR",
       "confidence": "MEDIUM — aggregator headline; open original source",
       "feed_category": "SOL market"
+    },
+    {
+      "title": "Solana Price Prediction: SOL Eyes $111 as Its Network Stays Busy, Analysts Tip Pepeto for 100x - openPR.com",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNUUt1MlFMSm9reGp3dWw0azlKa29RWnltd0d2ZlFDSjd4eG1fWUNUVDZ0N2trTXlWOXdjVGtmVDhzNU9zUFJwaFYyQnA2TDZITW9uVk00SFFDVzBJYXZmUndyaVdkQ2Nlbms2bXpSNDVYeV9Oay1lZVBkVnZiSnZPeFJQSWpCZ2dBRGpYRGdXLVZDT2tIbHdQZmhmUTlDOEk?oc=5",
+      "published_at": "2026-10-29T13:36:06+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market"
+    },
+    {
+      "title": "Why Bitcoin, ETH and XRP are falling despite the Fed rate pause - Altcoin Buzz",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQb0FnbkQwVTh1dU9CN2hwckRZWGJHUVUtYS1QOGZEZ29GVWpjMTgzV2h1elBNZGx6UDBXWTlBYVVubXREaG93d2E0alBIdjI0Ri1lVVBFTDV5X3FfdHNmX2djLWJDdElPZFBCTkJqSFQxdzVsYWVaZnlENHBuTHR0eGJBX0ROU1E?oc=5",
+      "published_at": "2026-10-29T14:01:09+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Next Crypto to Hit $1 in 2026: 7 Realistic Picks + Reclaim Candidates - 99Bitcoins",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1ZQ2c0OHBCVGdVTGdlWlBWWklpc2pNdW4xV1FCSzY0eW1hUktzS0JpWUpNRXQ0VVB1d1kyOEthRmJFNzFXY2NiVTJmcmZSOWloUFJhRFFEZjNmRXZfalNtN1VqRmNtTXVDaE9PZVVFemlZSjQ1?oc=5",
+      "published_at": "2026-10-26T07:00:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana ecosystem"
+    },
+    {
+      "title": "Switzerland breaks from European fund limits with first spot bitcoin ETF on SIX - CoinDesk",
+      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQRE5PODNoLUZCLWpzeFIxN1A1bXdwQkZ6dVhNU2ZzbzFfVEM2NTJSQ3dpajZxZ0JCX1NWYUZJa21hcE1XY2JPSE5qOF9VUEU1c2JuTi1LWDRGYVBNbGJnYWNLTW8xNEtUX3FKNHF6ak9JOEJmak90TzBhZkxvcjhJNTdVVFBFTFExVFhmUEhVUnpjTWNyLXFxcWZ5aEpzZ2NsajdMUlhuNnpTWmc0UjBoSkIwcU9sR1lMMmFNNGt4OV9qYkJw?oc=5",
+      "published_at": "2026-10-29T14:15:46+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Solana regulation"
+    },
+    {
+      "title": "Fed Holds Interest Rates Steady Amid Rising Inflation and Midterm Elections - KuCoin",
+      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPMGR6U3NzbmIzSXludEhwbDU1MkpwNEM0QWY4djZTZ1U5WHptSmdlNEZleTR2T0lLS2gtcXJoQ3dFUmZQN3BxWG5vRXk4WG1MQ1QzODZHZ0pPZzlyV0hTeXJtVFpxWG1zRnZUemtacXR5U2FOV3IyZm9zeFFjcGV2NkhmQ2JzRUljTDhLWVFDUDZRRXNpdlE4YWFZNWxjVzcycDU4M2xSLUlJWGVvV0E?oc=5",
+      "published_at": "2026-10-29T10:39:21+00:00",
+      "sentiment": "BEARISH",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Bitcoin Price Faces $11B Options Expiry After FOMC Uncertainty Clears - TradingView",
+      "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQcWh2cmVjeTZVOERLWmlqbV9PRVhLNlRtRWdiSTd1TEQ3ZmZGNlFWX0ZPNEE0SXRGQ2hCcU1tWlFPU0lwWEVuMnlrTWM2VlNwTXZ2ZWh2Ql8tT0EtMloteHo3T0czMEd0Sk1Pakg1VGtKM2thSkRveWFYRVctUS1tVVVvRFY5cG9QZUlzYjNPT3Rfa29qOVFkM1g3a3ZDTzJOaUNjYjJKdThBUjIwWk5GRjl2YzFoV3Bwa09Ic0FvWENqRHpYc09Wbg?oc=5",
+      "published_at": "2026-10-29T07:00:25+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Crypto News Today: BTC, ETH, XRP Slide After Fed Decision Keeps Rates Unchanged - Brave New Coin",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPb3EwZmIyZkx2czJWNmZIYVJmNjJMNHFQNXZCbmVBTmF2X0lnZGJTbUg2dVFZSDJqYlFtaUtCUkpvVUhGZEstOENRa3BiYVB1TWxPVUQyOVUtNmF4NURPVUZmM0hTRlJQaG15WjE5eHNEa0NoS0FCUE9KMi1sYkh6eEtDa0lyRHpoTHp5Njk3SmF3UkdzVjNaQWJhc1hrOElDR1FqUkJtZ2U3RFQ5d3hV?oc=5",
+      "published_at": "2026-10-29T05:51:04+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Why Is BTC Falling as Crypto Derivatives Face Fresh Pressure? - Kalkine Media",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNMVl0RlRRM0RJSmxvQTZpZ2JHbzVEeWJvSE1kVm5XckNjQk53bzA4VF9YLXJOeVBOMjJJSFVFc2xuM1V1bDRoNWtMOGJfZGJKREtMS1hUVVFyeFZCMUJpS3J5U0hUbDBDRXlKNi1pM1FKM256azB1U0ZldVNBQjZreGxKMEc4bmtWT1laSmMxTVRoWDRfY0xJQTBHYWJxV3ZiWmpaeDR6ZWk?oc=5",
+      "published_at": "2026-10-29T04:40:00+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Fed Holds Rates at 3.75%-4.00% but Leaves Room for Another Hike, Stoking Bitcoin Downside Risks - bloomingbit",
+      "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBCMFR2b3lGYjhIdkFKUWIyUFpuZ1JzVXN3MVJ1M2VaMFUwQXNIRTEtdjctWVZPeW5rSkwySFY5WUJNeXlQb1lqQW9ZYjUzYi1QSUgyRA?oc=5",
+      "published_at": "2026-10-29T02:01:44+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Bitcoin Tops $81,000 as Crypto Market Gains Amid Volatility After Fed Holds Rates Steady - TradingKey",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPamVJT25NQkZpQzdXQUdJcVBBVVNLUzVDbFJ5WnVTRTdNUTdOM09hZlU2OGFrT0hhZ0lydElKLU5hZ3RLck0zMVVPMHJ5SjJtWkNaLXVKb3Z4QVI1U29QX3d5cXpta1hySUpfYmg1X0Q4d3F0TndQMUpGX21pQUxYR1dtU1dfN1IwVWlKVmsxdHNKOHB4Sm0zREQ4QVdWX3pSQlBhT014MFFPc2JHR3haZ1ZmeTFZZw?oc=5",
+      "published_at": "2026-10-29T01:43:05+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Federal Reserve Holds Interest Rates Steady at 3.75%–4% - Coinfomania",
+      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQUjBOWmpjMUxieko4RjctUVAydzhndHNjWFpTc3pEOTNNSURoZ2FSdGNDZkswaGdLdWx6UUpRV2VRdVRhbVVrNTBrVFNPbHdxQmNvbmNiRHREVmhZaS1pZzNDYTdaajhhaE9OVGxGOWs4LWFpVmNSeWV6elJzQ0x3Rk13YWk?oc=5",
+      "published_at": "2026-10-28T19:53:11+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
+    },
+    {
+      "title": "Fed Holds Interest Rates at 3.75% - 4.00%: What it Means for Bitcoin and Crypto Markets - Altcoin Buzz",
+      "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNR29xMUxnMUtQSnZVNk5LVjYzYlBWamdidWhFRndqbkhIRjNDLTZfT1l0QVJScUljMW9hREVBMFgtbTVuYXN0WXlSM1JLQnJKWDhaVTA0R2dET1ZMM05KbzhmS0JNVjBqMmdsdzRhb1RLbGdZZjRfdmpjN1RPU0ZMYXVueUpqUnVjbldndA?oc=5",
+      "published_at": "2026-10-28T18:58:54+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "Macro / global markets"
     }
   ],
   "guardrails": [
@@ -131,6 +240,14 @@
     "hard liquidity, stale-data, stop and risk-off protections cannot be removed",
     "no rule changes without chronological holdout evidence"
   ],
-  "last_evaluated_at": "2026-10-29T10:42:07.678731+00:00",
-  "last_outcome_signature": "0:"
+  "last_evaluated_at": "2026-10-29T17:10:15.273212+00:00",
+  "last_outcome_signature": "0:",
+  "learning_diagnostics": {
+    "sample_size": 0,
+    "minimum_group_size": 3,
+    "groups": {},
+    "research_focus": [],
+    "updated_at": "2026-10-29T17:10:15.273323+00:00"
+  },
+  "experience_rules": []
 }
