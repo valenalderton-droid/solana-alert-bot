@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import math
 
 from paper_portfolio import get_portfolio, open_paper_trade, update_paper_portfolio
+from market_university import education_score_bonus
 from core_civilization import (
     run_civilization_cycle, is_core_eligible,
     record_civilization_outcome, format_civilization_report,
@@ -364,6 +365,7 @@ def evaluate_nine_cores(candidates, state, market_info=None, now=None):
                 continue
             genome = _core_state(system, spec["id"]).get("genome") or {}
             score = score_for_core(spec["id"], candidate, genome)
+            score = max(0.0, min(100.0, score + education_score_bonus(system, spec["id"], candidate)))
             scores[spec["id"]] = score
             if score >= _num(genome.get("threshold"), spec["threshold"]):
                 votes.append(spec["id"])
