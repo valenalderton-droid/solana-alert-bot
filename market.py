@@ -91,11 +91,11 @@ def utc_now():
 ECOSYSTEM_SYMBOLS = {
     "JUP", "RAY", "ORCA", "KMNO", "JTO", "PYTH", "DRIFT", "MNDE",
     "HNT", "MOBILE", "RENDER", "SHDW", "NOS", "TNSR", "PRCL", "ZEX",
-    "CLOUD", "INF", "JLP", "MPLX", "W", "WEN", "STEP", "SLND",
-    "PORT", "UXD", "C98", "DUST", "MNGO", "SRM", "FIDA", "SAMO",
+    "CLOUD", "INF", "JLP", "MPLX", "W", "STEP", "SLND",
+    "PORT", "UXD", "C98", "MNGO", "SRM", "FIDA",
     "HONEY", "IO", "ZEUS", "MET", "CROWN", "BLZE", "LST", "STARS",
-    "CASH", "EURO", "USDY", "USDC", "USDT", "MSOL", "BSOL", "JITOSOL",
-    "BNSOL", "INF", "SOL"
+    "MSOL", "BSOL", "JITOSOL",
+    "BNSOL"
 }
 
 MEME_TERMS = {
