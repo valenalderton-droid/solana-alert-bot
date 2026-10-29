@@ -131,8 +131,27 @@ ECOSYSTEM_SYMBOLS = {
 
 MEME_TERMS = {
     "meme", "memecoin", "inu", "doge", "pepe", "bonk", "wif", "shib",
-    "floki", "wojak", "frog", "elon", "trump", "moon", "rocket", "kitty"
+    "floki", "wojak", "frog", "elon", "trump", "moon", "rocket", "kitty",
+    "dogwif", "baby dog", "babyshib", "pumpfun", "pump.fun"
 }
+
+
+def is_allowed_non_meme_project(project):
+    """Fail closed: only known Solana ecosystem utility/protocol tokens pass."""
+    if not isinstance(project, dict) or not project.get("approved_non_meme", False):
+        return False
+    symbol = str(project.get("symbol") or "").strip().upper()
+    name = str(project.get("name") or "").strip().lower()
+    address = str(project.get("token_address") or "").strip()
+    if not symbol or symbol not in ECOSYSTEM_SYMBOLS or not address:
+        return False
+    text = f"{name} {symbol.lower()}"
+    words = set(text.replace("-", " ").replace("_", " ").split())
+    if words & MEME_TERMS:
+        return False
+    if any(term in text for term in ("memecoin", "meme coin", "dogwif", "baby dog", "babyshib", "pump.fun", "pumpfun")):
+        return False
+    return True
 
 
 def discover_solana_projects(min_liquidity=100000, min_volume_24h=50000,
