@@ -27,12 +27,31 @@ FEATURES = [
 
 
 def add_features(candles):
+    """Build causal features only from validated, chronologically ordered candles.
+
+    Bad OHLCV rows and duplicate timestamps are removed before indicators are
+    calculated. Gaps remain visible to build_training_rows, which rejects
+    incomplete future horizons rather than inventing labels.
+    """
     df = pd.DataFrame(candles).copy()
+    required = {"timestamp", "open", "high", "low", "close", "volume"}
+    if not required.issubset(df.columns):
+        return pd.DataFrame()
+    for col in ["timestamp", "open", "high", "low", "close", "volume"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(
+        subset=["timestamp", "open", "high", "low", "close", "volume"]
+    )
+    df = df[
+        (df["timestamp"] > 0) & (df["close"] > 0) &
+        (df["open"] > 0) & (df["low"] > 0) & (df["high"] > 0) &
+        (df["volume"] >= 0) &
+        (df["high"] >= df[["open", "close", "low"]].max(axis=1)) &
+        (df["low"] <= df[["open", "close", "high"]].min(axis=1))
+    ]
+    df = df.sort_values("timestamp").drop_duplicates("timestamp", keep="last").reset_index(drop=True)
     if len(df) < 35:
         return pd.DataFrame()
-
-    for col in ["open", "high", "low", "close", "volume"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
 
     close = df["close"]
     for n in [1, 3, 6, 12, 24, 48]:
