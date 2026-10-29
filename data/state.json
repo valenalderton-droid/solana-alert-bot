@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T18:29:02.190389+00:00",
+  "last_run_utc": "2026-10-29T18:32:24.957449+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -683,9 +683,9 @@
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T18:26:11.836326+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T18:29:01.722814+00:00",
-  "project_scan_cursor": 91,
+  "last_news_refresh_utc": "2026-10-29T18:29:41.252606+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T18:32:24.308936+00:00",
+  "project_scan_cursor": 121,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T18:16:08.925514+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T18:16:08.925514+00:00",
@@ -1208,6 +1208,16 @@
       "entry": 2.071968130140871,
       "stop": 2.0602753257021553,
       "target": 2.0953537390183024
+    },
+    {
+      "signal_id": "soCLGVqNFx63FcSwc89eTLABLXAg2tAoHJhDthz8ExZ:1793293200:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "soCLGVqNFx63FcSwc89eTLABLXAg2tAoHJhDthz8ExZ",
+      "name": "Solana",
+      "timestamp": 1793293200,
+      "entry": 125.30817631560373,
+      "stop": 124.45413813917234,
+      "target": 127.0162526684665
     }
   ],
   "paper_portfolio": {
