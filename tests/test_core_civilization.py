@@ -54,6 +54,8 @@ class CoreCivilizationTests(unittest.TestCase):
         self.assertTrue(is_core_eligible(system, "trend"))
         self.assertTrue(any(d["core_id"] == "trend" and d["decision"] == "reinstated_after_review"
                             for d in system["civilization"]["court"]["decisions"]))
+        self.assertTrue(any(a["core_id"] == "trend" and a["status"] == "accepted"
+                            for a in system["civilization"]["court"]["appeals"]))
 
     def test_governance_is_integrated_into_nine_core_scan(self):
         state = {}
@@ -63,6 +65,20 @@ class CoreCivilizationTests(unittest.TestCase):
         self.assertIsNotNone(result["winner"])
         self.assertIn("academy", state["nine_core_system"]["civilization"])
         self.assertIn("ecology", state["nine_core_system"]["civilization"])
+
+    def test_virtual_treasury_and_academy_process_closed_trades_once(self):
+        system = {"cores": {spec["id"]: {"portfolio": {"initial_cash_usd": 10000,
+                  "cash_usd": 10000, "closed_trades": []}, "decisions": [],
+                  "genome": {"threshold": 60}} for spec in CORE_SPECS}}
+        system["cores"]["trend"]["portfolio"]["closed_trades"] = [
+            {"pnl_usd": 100.0, "token_address": "mintA", "exit_reason": "target"},
+            {"pnl_usd": -20.0, "token_address": "mintB", "exit_reason": "stop"},
+        ]
+        first = run_civilization_cycle(system, CORE_SPECS, "t1")
+        second = run_civilization_cycle(system, CORE_SPECS, "t2")
+        self.assertEqual(first["virtual_treasury_usd"], 1.0)
+        self.assertEqual(second["virtual_treasury_usd"], 1.0)
+        self.assertEqual(second["research_lessons"], 2)
 
 
 if __name__ == "__main__":
