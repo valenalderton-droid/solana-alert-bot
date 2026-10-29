@@ -7,7 +7,7 @@
     "wins": 0,
     "losses": 0
   },
-  "last_run_utc": "2026-10-29T17:18:59.606518+00:00",
+  "last_run_utc": "2026-10-29T17:21:37.407315+00:00",
   "last_status_message_utc": "2026-10-29T09:54:50.482503+00:00",
   "last_stats_report_utc": "2026-10-29T03:54:03.929341+00:00",
   "seen_news_ids": [
@@ -670,9 +670,9 @@
   ],
   "open_positions": [],
   "telegram_update_offset": 806952335,
-  "last_news_refresh_utc": "2026-10-29T17:16:56.313559+00:00",
-  "last_watchlist_ping_utc": "2026-10-29T17:18:59.065084+00:00",
-  "project_scan_cursor": 43,
+  "last_news_refresh_utc": "2026-10-29T17:19:39.314368+00:00",
+  "last_watchlist_ping_utc": "2026-10-29T17:21:36.947819+00:00",
+  "project_scan_cursor": 73,
   "research_status": {
     "last_tvl_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
     "last_activity_metrics_refresh_utc": "2026-10-29T17:10:12.941838+00:00",
@@ -1091,6 +1091,16 @@
       "entry": 0.0024802287278724816,
       "stop": 0.0023979866848202096,
       "target": 0.0026447128139770256
+    },
+    {
+      "signal_id": "7rTNgVdQ1Sa28usQ6CZdbWaYqaQpRNDnwcnEbpmpump:1793289600:PAPER_TOP",
+      "source": "paper_watchlist",
+      "token_address": "7rTNgVdQ1Sa28usQ6CZdbWaYqaQpRNDnwcnEbpmpump",
+      "name": "SOLANA ACCELERATE",
+      "timestamp": 1793289600,
+      "entry": 0.002241988991538861,
+      "stop": 0.0015028757180803806,
+      "target": 0.0037202155384558214
     }
   ]
 }
