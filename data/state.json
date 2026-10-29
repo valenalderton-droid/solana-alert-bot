@@ -37,7 +37,8 @@
     "7cf5cffe6333ef8a77530e3d",
     "0bca9475989b43c0cd73db2f",
     "e73a638e0b5dc2275a0f373f",
-    "d2e67b2d7ad8c6a701f85b56"
+    "d2e67b2d7ad8c6a701f85b56",
+    "ef6966d6f4eec3a520903730"
   ],
   "news_observations": [
     {
@@ -276,8 +277,21 @@
       "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Do not assume this moves SOL; compare BTC, market-wide sentiment and SOL's own price/volume.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: UNCERTAIN — broader crypto or weak Solana link\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
       "title": "Why Positive News for Ripple May Not Lift XRP When Broader Market Conditions are Weak - Analytics Insight",
       "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxNTXNEU3R3X1dwakVneGl4ZWRCaEtraXlCalhNUElUc2Nab25CWFlHYlZMQmtfN25MSnpreWhYcTFJQlpBa0tlLXZ2NEF4VHg0NmtoY3dkdnpQUUFEYzJ4WkJtclFOYXdSblFQdTdlYWdaQ0pHY0kxaGloUDBBcjU1d19SWlR2RE9hQnN0bmR3b3dhN0xYbDNIbno3ZGFBUUcweDBZaGlUcVJqUDhlSUhmRTFVZklyazdjZDNzSlFHRUVwNjJaUUR4Njdwc0x4QnJ2Y29FRnBocHMzUjBiX0RmQ2s5N1dUUdIB8wFBVV95cUxObXRmOEtYVEV1eTh2dlVTWFdEem5VM0VSQTFjbDlPZTc0ZERSUThnMnZvV09aVGItVUU2UjdZQ2NhME0tRUFMRGVUNURzalg3dUpIV0lIS0FOZ2p6ckFKNm15eW9qbFpLVTVQZUJhN3RTU3FPZVluaEFjTXJ1aTBBTEVCc1p5ekF0OTI5WGd2SVRqOGxNaFNENTd4Q3F1b0JrcDJ1cjA3VHVwc0cwc0NhaUNvS05kWkNoX0VJMDczNlBtWGtyZ0xyU1ZwNWxJeE5qWHE3OXFSTjMzdTBxR2N2a2JDNnFPNVVZVlRCUWhHYjVDY3M?oc=5"
+    },
+    {
+      "observed_at": "2026-10-29T10:35:35.183114+00:00",
+      "published_at": "2026-10-28T13:16:10+00:00",
+      "sentiment": "NEUTRAL / UNCLEAR",
+      "impact_score": 0,
+      "relevance": "DIRECT — SOL market / regulation",
+      "confidence": "MEDIUM — aggregator headline; open original source",
+      "feed_category": "SOL market",
+      "analysis": "Meaning: The headline alone does not provide a clear directional catalyst.\nPossible SOL impact: Could affect SOL demand, access or investor expectations if the report is accurate.\nDirection: NEUTRAL / UNCLEAR (rule score +0/3)\nRelevance: DIRECT — SOL market / regulation\nExpected horizon: no reliable horizon until the facts and price reaction are checked\nConfidence: MEDIUM — aggregator headline; open original source\nWhy classified this way: no decisive keyword. This is a headline-based heuristic, not full-article verification.",
+      "title": "Polymarket Makes a Remarkable Move for Bitcoin (BTC), Ethereum (ETH), Solana (SOL), and XRP! Time Limit Reduced to 5 Minutes! - Bitcoin Sistemi",
+      "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQRXlyZ09WcG5LZTNMbUs0ZTB5eFM1SHEwZVItVHdkd1lFRThNSmtyUXZZSlhEVXdnQkNMcnFxbS1QOUVBb2RTZW52S1hhbVpUai15MnBFM19MWTdyT1hsVFJ6NENjLW00VFZsUkFmVkoxdmwyamdiZXJzR0tTXzdNWjVTNjd4TnRIdndsSERkYlZsTkRNSUpCMllyYi1qS1NqYTlBcFpmZkFSNXpWNkw5bFlWQ2V6RFJZSVQ3Y0xUY1ZYa3VyWlN1RHJNTQ?oc=5"
     }
   ],
   "open_positions": [],
-  "telegram_update_offset": 806952304
+  "telegram_update_offset": 806952304,
+  "last_news_refresh_utc": "2026-10-29T10:35:35.183131+00:00"
 }
