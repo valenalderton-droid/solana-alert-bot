@@ -568,6 +568,7 @@ def main():
             "sentiment": analyzed.get("sentiment", "NEUTRAL / UNCLEAR"),
             "impact_score": int(analyzed.get("impact_score", 0)),
             "relevance": analyzed.get("relevance", "UNCERTAIN"),
+            "confidence": analyzed.get("confidence", "UNKNOWN"),
             "feed_category": analyzed.get("feed_category", "Uncategorized"),
             "analysis": analyzed.get("analysis", "")[:900],
             "title": analyzed.get("title", "")[:250],
