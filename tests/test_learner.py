@@ -132,7 +132,7 @@ class LearnerTests(unittest.TestCase):
         model = MultiHorizonModel([(4, FakeModel(0.8)), (24, FakeModel(0.4))])
         combined = model.predict_proba(np.array([[1.0]]))
         horizon = model.predict_horizon_proba(np.array([[1.0]]))
-        self.assertAlmostEqual(float(combined[0][1]), 0.64)
+        self.assertAlmostEqual(float(combined[0][1]), (0.35 * 0.8 + 0.20 * 0.4) / 0.55)
         self.assertEqual(horizon, {"4h": 0.8, "24h": 0.4})
 
     def test_training_rows_include_binary_labels_only(self):
