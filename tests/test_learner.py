@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from learner import add_features, build_training_rows
+from learner import FEATURES, add_features, build_training_rows
 
 
 def make_flat_candles(count=80):
@@ -25,6 +25,15 @@ class LearnerTests(unittest.TestCase):
         self.assertFalse(features.empty)
         numeric = features.select_dtypes(include=[np.number])
         self.assertTrue(np.isfinite(numeric.to_numpy()[~np.isnan(numeric.to_numpy())]).all())
+
+    def test_new_price_action_features_are_available(self):
+        features = add_features(make_flat_candles(120))
+        for name in ("ret24", "ema_gap34", "volatility_ratio",
+                     "volume_trend", "close_location", "breakout_distance"):
+            self.assertIn(name, features.columns)
+        latest = features.dropna(subset=FEATURES)
+        self.assertFalse(latest.empty)
+        self.assertTrue(np.isfinite(latest[FEATURES].to_numpy()).all())
 
     def test_unresolved_timeout_is_not_labelled_as_a_loss(self):
         rows = build_training_rows([make_flat_candles()])
