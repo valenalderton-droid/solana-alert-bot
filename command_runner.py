@@ -370,7 +370,14 @@ def concise_reply(messages):
     if not candidates:
         return "NO_SETUP"
     _, _, project, entry, target, stop, mint = max(candidates, key=lambda row: row[0])
-    return f"{project} | خرید: ${entry} | فروش: ${target} | حدضرر: ${stop} | {mint}"
+    return (
+        f"🏆 بهترین ستاپ خرید: {project}\n"
+        f"نقطه ورود: ${entry}\n"
+        f"🎯 نقطه فروش هدف (Take Profit): ${target}\n"
+        f"🛑 حد ضرر (Stop Loss): ${stop}\n"
+        f"آدرس توکن: {mint}\n"
+        "این‌ها سطوح مرجع‌اند؛ فروش تضمینی نیست و پیش از معامله قیمت زنده و نقدینگی را بررسی کن."
+    )
 
 
 def is_buy_alert(message):
