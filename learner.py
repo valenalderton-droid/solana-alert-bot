@@ -163,6 +163,76 @@ def recency_sample_weights(timestamps, half_life_days=21):
     weights = np.maximum(weights, 0.20)
     return weights / float(np.mean(weights))
 
+
+def walk_forward_validation(data, folds=3):
+    """Evaluate on later, unseen time blocks; purge labels crossing each boundary."""
+    if data.empty or "timestamp" not in data or "label_end" not in data:
+        return {"folds": 0, "reason": "No timestamped rows for walk-forward validation"}
+
+    unique_times = np.array(sorted(pd.to_numeric(data["timestamp"], errors="coerce").dropna().unique()))
+    if len(unique_times) < 6:
+        return {"folds": 0, "reason": "Too few distinct timestamps for walk-forward validation"}
+
+    # Reserve the earliest 50% for initial training; validate on later time blocks.
+    split_at = max(2, int(len(unique_times) * 0.50))
+    validation_times = unique_times[split_at:]
+    blocks = [block for block in np.array_split(validation_times, min(int(folds), len(validation_times))) if len(block)]
+    results = []
+
+    for block in blocks:
+        start_time = int(block[0])
+        end_time = int(block[-1])
+        train = data[
+            (data["timestamp"] < start_time) &
+            (data["label_end"] < start_time)
+        ]
+        valid = data[
+            (data["timestamp"] >= start_time) &
+            (data["timestamp"] <= end_time)
+        ]
+        if len(train) < 100 or len(valid) < 20 or train["y"].nunique() < 2 or valid["y"].nunique() < 2:
+            continue
+
+        fold_model = Pipeline([
+            ("scale", StandardScaler()),
+            ("logistic", LogisticRegression(
+                class_weight=None, C=0.5, max_iter=1500, random_state=42
+            ))
+        ])
+        weights = recency_sample_weights(train["timestamp"])
+        fold_model.fit(train[FEATURES], train["y"], logistic__sample_weight=weights)
+        probs = fold_model.predict_proba(valid[FEATURES])[:, 1]
+        preds = (probs >= 0.5).astype(int)
+        results.append({
+            "balanced_accuracy": float(balanced_accuracy_score(valid["y"], preds)),
+            "brier_score": float(brier_score_loss(valid["y"], probs)),
+            "precision": float(precision_score(valid["y"], preds, zero_division=0)),
+            "rows": int(len(valid)),
+            "start_timestamp": start_time,
+            "end_timestamp": end_time
+        })
+
+    if not results:
+        return {
+            "folds": 0,
+            "reason": "Not enough class-diverse data for valid chronological folds"
+        }
+
+    return {
+        "folds": len(results),
+        "mean_balanced_accuracy": round(float(np.mean([r["balanced_accuracy"] for r in results])), 4),
+        "mean_brier_score": round(float(np.mean([r["brier_score"] for r in results])), 4),
+        "mean_precision": round(float(np.mean([r["precision"] for r in results])), 4),
+        "fold_details": [
+            {**r,
+             "balanced_accuracy": round(r["balanced_accuracy"], 4),
+             "brier_score": round(r["brier_score"], 4),
+             "precision": round(r["precision"], 4)}
+            for r in results
+        ],
+        "method": "expanding chronological windows; labels crossing validation boundary purged"
+    }
+
 def train_model(candle_sets):
     data = build_training_rows(candle_sets)
     if data.empty:
@@ -246,7 +316,8 @@ def train_model(candle_sets):
         "train_positive_rate": round(float(train["y"].mean()), 4),
         "test_positive_rate": round(float(test["y"].mean()), 4),
         "predicted_positive_rate": round(float(np.mean(predictions)), 4),
-        "recency_weighting": "21-day half-life; minimum relative weight 0.20"
+        "recency_weighting": "21-day half-life; minimum relative weight 0.20",
+        "walk_forward": walk_forward_validation(data)
     }
 
     # Refit on all labelled rows for the current prediction.
