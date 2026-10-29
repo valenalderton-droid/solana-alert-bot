@@ -627,6 +627,9 @@ def main():
         category = str(item.get("feed_category", ""))
         relevance = str(item.get("relevance", ""))
         sentiment = str(item.get("sentiment", ""))
+        confidence = str(item.get("confidence", "")).upper()
+        if confidence.startswith("LOW"):
+            continue
         is_market_news = (
             category in ("Macro / global markets", "Geopolitics / global risk")
             or relevance.startswith("DIRECT")
