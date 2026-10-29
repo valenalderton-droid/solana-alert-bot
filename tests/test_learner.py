@@ -29,7 +29,10 @@ class LearnerTests(unittest.TestCase):
     def test_new_price_action_features_are_available(self):
         features = add_features(make_flat_candles(120))
         for name in ("ret24", "ema_gap34", "volatility_ratio",
-                     "volume_trend", "close_location", "breakout_distance"):
+                     "volume_trend", "close_location", "breakout_distance",
+                     "price_vs_ema21", "rsi_short", "upper_wick_pct",
+                     "lower_wick_pct", "high_distance24", "low_distance24",
+                     "trend_persistence"):
             self.assertIn(name, features.columns)
         latest = features.dropna(subset=FEATURES)
         self.assertFalse(latest.empty)
