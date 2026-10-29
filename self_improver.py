@@ -197,10 +197,36 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
     """Update the parameter rule registry and save a concise audit trail."""
     now = now or datetime.now(timezone.utc)
     registry = _read_registry()
-    decision = choose_probability_threshold(predictions, outcomes, current_threshold)
     rules = registry.setdefault("rules", [])
     active = next((rule for rule in rules
                    if rule.get("id") == "validated_probability_floor"), None)
+
+    latest_outcome = max(
+        (str(row.get("resolved_at", row.get("signal_id", "")))
+         for row in outcomes if isinstance(row, dict)),
+        default=""
+    )
+    signature = f"{len(outcomes)}:{latest_outcome}"
+    last_eval = _parse_time(registry.get("last_evaluated_at"))
+    if (last_eval and registry.get("last_outcome_signature") == signature
+            and (now - last_eval).total_seconds() < 6 * 3600):
+        current_value = float(current_threshold)
+        if active and active.get("enabled", True):
+            current_value = max(current_value, float(active.get("value", current_value)))
+        return {
+            "min_probability": round(current_value, 3),
+            "changed": False,
+            "rule_status": active.get("status", "baseline") if active else "baseline",
+            "decision": {
+                "threshold": round(current_value, 3),
+                "changed": False,
+                "reason": "Self-improvement cooldown: no new resolved outcomes; re-evaluate within six hours",
+                "sample_size": len(_joined_resolved(predictions, outcomes))
+            },
+            "registry_path": str(IMPROVEMENT_FILE.relative_to(ROOT))
+        }
+
+    decision = choose_probability_threshold(predictions, outcomes, current_threshold)
 
     if active is None:
         active = {
@@ -220,6 +246,8 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
     candidate = float(decision["threshold"])
     if decision["changed"] and candidate >= configured_floor:
         active["value"] = round(min(0.70, max(configured_floor, candidate)), 3)
+        active["enabled"] = True
+        active["failed_validations"] = 0
         active["status"] = "validated_candidate"
         active["last_validated_at"] = now.isoformat()
         active["validation"] = {
@@ -229,9 +257,17 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
         }
         if active["value"] != before:
             active["updated_at"] = now.isoformat()
-    elif active.get("status") != "baseline":
-        # Do not delete a proven rule due to missing data. Mark as pending review.
-        active["status"] = "unchanged_insufficient_or_no_edge"
+    elif (decision.get("sample_size", 0) >= MIN_RESOLVED
+          and "validation_baseline" in decision
+          and "No allowlisted threshold beat baseline" in decision.get("reason", "")):
+        # Retire only the learned soft rule after repeated failed holdout checks.
+        # The configured base threshold and hard safety rules remain active.
+        active["failed_validations"] = int(active.get("failed_validations", 0)) + 1
+        if active["failed_validations"] >= 3:
+            active["enabled"] = False
+            active["status"] = "retired_after_failed_validation"
+        else:
+            active["status"] = "pending_revalidation"
 
     # Store internet research only as source-linked evidence. Headlines are not
     # allowed to create or execute rules directly.
@@ -249,9 +285,12 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
         if evidence not in registry.setdefault("research_evidence", []):
             registry["research_evidence"].append(evidence)
     registry["research_evidence"] = registry.get("research_evidence", [])[-100:]
+    registry["last_evaluated_at"] = now.isoformat()
+    registry["last_outcome_signature"] = signature
     registry.setdefault("history", []).append({
         "at": now.isoformat(),
-        "action": "updated" if active.get("value") != before else "kept",
+        "action": ("retired" if not active.get("enabled", True)
+                   else "updated" if active.get("value") != before else "kept"),
         "rule_id": active["id"],
         "old_value": round(before, 3),
         "new_value": round(float(active.get("value", before)), 3),
@@ -261,8 +300,11 @@ def update_self_improvement(predictions, outcomes, news_observations=None,
     _save_registry(registry)
 
     return {
-        "min_probability": round(max(configured_floor, float(active.get("value", configured_floor))), 3),
-        "changed": active.get("value") != before,
+        "min_probability": round(max(
+            configured_floor,
+            float(active.get("value", configured_floor)) if active.get("enabled", True) else configured_floor
+        ), 3),
+        "changed": active.get("value") != before or not active.get("enabled", True),
         "rule_status": active.get("status"),
         "decision": decision,
         "registry_path": str(IMPROVEMENT_FILE.relative_to(ROOT))
