@@ -32,6 +32,19 @@ class AdaptivePolicyTests(unittest.TestCase):
         self.assertEqual(result["min_probability"], 0.63)
         self.assertEqual(result["direct_bearish_news_24h"], 2)
 
+    def test_low_confidence_rumors_do_not_trigger_risk_off(self):
+        now = datetime.now(timezone.utc)
+        news = [{
+            "observed_at": (now - timedelta(hours=1)).isoformat(),
+            "sentiment": "BEARISH",
+            "relevance": "DIRECT — Solana network / protocol",
+            "confidence": "LOW — unconfirmed wording",
+            "feed_category": "Solana security"
+        } for _ in range(3)]
+        result = derive_policy([], news, base_probability=0.60, now=now)
+        self.assertEqual(result["direct_bearish_news_24h"], 0)
+        self.assertEqual(result["min_probability"], 0.60)
+
     def test_global_bearish_news_temporarily_raises_threshold(self):
         now = datetime.now(timezone.utc)
         news = [
