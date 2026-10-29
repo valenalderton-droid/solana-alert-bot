@@ -291,6 +291,21 @@ def is_buy_alert(message):
     return "BUY WATCH" in text and "NOT AN AUTOMATIC TRADE" in text
 
 
+def is_sell_alert(message):
+    """Recognize explicit exit alerts, not watchlist/status messages."""
+    text = str(message or "").upper()
+    return (
+        ("SELL" in text or "EXIT" in text)
+        and ("ALERT" in text or "EXIT REASON" in text)
+        and ("NO AUTOMATIC TRADE" in text or "EXIT ALERT ONLY" in text)
+    )
+
+
+def is_trade_alert(message):
+    """Only explicit BUY and SELL/EXIT alerts may be delivered to Telegram."""
+    return is_buy_alert(message) or is_sell_alert(message)
+
+
 def main():
     state = read_state()
     requested = poll_pay(state)
@@ -320,20 +335,30 @@ def main():
                 # Scheduled runs only monitor exits; never open new paper positions
                 # without an explicit //Pay request.
                 return False
-            # Send the compact alert immediately. Return True only after Telegram
-            # confirms delivery so the scanner records only alerts the user received.
-            sent = original_send_telegram(concise_reply([message]))
+            # Never send a placeholder as if it were a valid trade alert.
+            compact = concise_reply([message])
+            if compact == "NO_SETUP":
+                print("BUY alert rejected: required fields could not be parsed; no Telegram message sent.")
+                return False
+            # Record the signal only after Telegram confirms delivery.
+            sent = original_send_telegram(compact)
             if sent:
                 messages.append(message)
                 delivered_buys.append(message)
                 delivered_messages.append(message)
             return sent
-        # SELL/EXIT and explicit status messages pass through. Track delivery so
-        # the caller does not send a second, contradictory "no setup" message.
-        sent = original_send_telegram(message)
-        if sent:
-            delivered_messages.append(message)
-        return sent
+
+        if is_sell_alert(message):
+            # Exit alerts are allowed on both scheduled and requested scans.
+            sent = original_send_telegram(message)
+            if sent:
+                delivered_messages.append(message)
+            return sent
+
+        # Suppress watchlist, no-setup, news, and routine status messages.
+        # The user requested Telegram alerts only for actionable BUY/SELL events.
+        print("Non-trade Telegram message suppressed.")
+        return False
 
     scanner.send_telegram = capture_buy
     scanner.main()
@@ -342,20 +367,6 @@ def main():
         print("Scheduled position-monitoring scan completed; BUY alerts suppressed.")
         return
 
-    if not messages and not delivered_messages:
-        token = os.getenv("TELEGRAM_BOT_TOKEN")
-        chat_id = os.getenv("TELEGRAM_CHAT_ID")
-        if token and chat_id:
-            response = requests.post(
-                f"https://api.telegram.org/bot{token}/sendMessage",
-                json={
-                    "chat_id": chat_id,
-                    "text": "فعلاً ستاپ خرید معتبر پیدا نشد.",
-                    "disable_web_page_preview": True
-                },
-                timeout=20,
-            )
-            response.raise_for_status()
 
 
 if __name__ == "__main__":
